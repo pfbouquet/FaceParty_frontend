@@ -6,6 +6,7 @@ export default function Home({ navigation }) {
 			<Text style={styles.title}>HOME (créer une partie --ADMIN-- ou rejoindre une partie -- joueur</Text>
 			<Button title="Go to HomeTuto" onPress={() => navigation.navigate("HomeTuto")} />
 			<Button title="Go to TabNavigator" onPress={() => navigation.navigate("TabNavigator")} />
+			<Button title="Go to QUESTION" onPress={() => navigation.navigate("Question")} />
 		</View>
 	);
 }

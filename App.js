@@ -7,6 +7,7 @@ import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
 import HomeAdmin from "./screens/HomeAdmin";
 import HomePlayer from "./screens/HomePlayer";
+import Question from "./screens/Question";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -69,6 +70,7 @@ export default function App() {
 						<Stack.Screen name="Home" component={Home} />
 						<Stack.Screen name="HomeTuto" component={HomeTuto} />
 						<Stack.Screen name="TabNavigator" component={TabNavigator} />
+						<Stack.Screen name="Question" component={Question} />
 					</Stack.Navigator>
 				</NavigationContainer>
 			</PersistGate>

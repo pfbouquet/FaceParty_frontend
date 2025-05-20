@@ -7,6 +7,7 @@ export default function Home({ navigation }) {
 			<Button title="Go to HomeTuto" onPress={() => navigation.navigate("HomeTuto")} />
 			<Button title="Go to PlayerName" onPress={() => navigation.navigate("PlayerName")} />
 			<Button title="Go to TabNavigator" onPress={() => navigation.navigate("TabNavigator")} />
+			<Button title="Go to QUESTION" onPress={() => navigation.navigate("Question")} />
 		</View>
 	);
 }

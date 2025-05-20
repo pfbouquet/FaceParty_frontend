@@ -7,6 +7,7 @@ import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
 import HomeAdmin from "./screens/HomeAdmin";
 import HomePlayer from "./screens/HomePlayer";
+import Question from "./screens/Question";
 import PlayerName from "./screens/PlayerName";
 import PlayerLobby from "./screens/PlayerLobby";
 
@@ -73,6 +74,7 @@ export default function App() {
 						<Stack.Screen name="PlayerName" component={PlayerName} />
 						<Stack.Screen name="PlayerLobby" component={PlayerLobby} />
 						<Stack.Screen name="TabNavigator" component={TabNavigator} />
+						<Stack.Screen name="Question" component={Question} />
 					</Stack.Navigator>
 				</NavigationContainer>
 			</PersistGate>

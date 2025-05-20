@@ -7,6 +7,8 @@ import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
 import HomeAdmin from "./screens/HomeAdmin";
 import HomePlayer from "./screens/HomePlayer";
+import PlayerName from "./screens/PlayerName";
+import PlayerLobby from "./screens/PlayerLobby";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -68,6 +70,8 @@ export default function App() {
 					<Stack.Navigator screenOptions={{ headerShown: false }}>
 						<Stack.Screen name="Home" component={Home} />
 						<Stack.Screen name="HomeTuto" component={HomeTuto} />
+						<Stack.Screen name="PlayerName" component={PlayerName} />
+						<Stack.Screen name="PlayerLobby" component={PlayerLobby} />
 						<Stack.Screen name="TabNavigator" component={TabNavigator} />
 					</Stack.Navigator>
 				</NavigationContainer>

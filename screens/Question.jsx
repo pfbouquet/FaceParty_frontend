@@ -7,22 +7,36 @@ import {
   Image,
   SafeAreaView,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { SocketContext } from "../contexts/SocketContext";
 import Constants from "expo-constants";
 
 const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
 
 export default function Question() {
+
+  const socket = useContext(SocketContext);
+  const [questionData, setQuestionData] = useState(null);
+  console.log('usestate questionData =>', questionData)
+
+
   const [image, setImage] = useState(null);
   const [leftButtons, setLeftButtons] = useState(null);
   const [rightButtons, setRightButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
   const [totalRound, setTotalRound] = useState(0);
-  console.log(roundNumber);
 
   useEffect(() => {
-    giveQuestion();
-  }, []);
+    socket.on("game-cycle", (data) => {
+      console.log('data payload =>', data.payload)
+      setQuestionData(data.payload);
+    })
+
+    return () => {
+      socket.off("game-cycle");
+    }
+    // giveQuestion();
+  }, [socket]);
 
   async function giveQuestion() {
     fetch(`${BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)

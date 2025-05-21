@@ -1,8 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import Constants from "expo-constants";
 
 export const SocketContext = createContext(null);
-const BACKEND_URL = "http://192.168.100.181:3000";
+const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,18 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import { SocketContext } from "../contexts/SocketContext";
 
-export default function PlayerLobby({ route, navigation }) {
-  const gameID = '682c986c3faa881ff6c9abe8' ; // gameID passé depuis la navigation --> route.params
+export default function PlayerLobby({ navigation }) {
+  const [gameID, setGameID] = useState(null);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch(`http://192.168.100.236:3000/players/${gameID}`)
+  const socket = useContext(SocketContext);
+
+  const fetchPlayers = (id) => {
+    setLoading(true);
+    fetch(`http://192.168.100.236:3000/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
@@ -28,9 +32,34 @@ export default function PlayerLobby({ route, navigation }) {
         console.error('Erreur fetch:', error);
         setLoading(false);
       });
-  }, [gameID]);
+  };
 
-  if (loading) {
+  useEffect(() => {
+    // Écoute un événement pour récupérer dynamiquement le gameID
+    socket.on("game-id", (id) => {
+      console.log("Received gameID:", id);
+      setGameID(id);
+      fetchPlayers(id); // Fetch les joueurs une fois le gameID reçu
+      console.log(gameID);
+    });
+
+
+    // Écoute les événements socket pour mettre à jour les joueurs
+    socket.on("room-state", ({ room, currentPlayers }) => {
+      if (room === gameID) {
+        console.log(`Party ${room} now has players:`, currentPlayers);
+        fetchPlayers(room); // Relance le fetch pour mettre à jour les joueurs
+      }
+    });
+
+    // Nettoyage des écouteurs socket
+    return () => {
+      socket.off("game-id");
+      socket.off("room-state");
+    };
+  }, [gameID, socket]);
+
+  if (loading || !gameID) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#3498db" />
@@ -40,7 +69,7 @@ export default function PlayerLobby({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Joueurs dans la Gaîème</Text>
+      <Text style={styles.title}>Joueurs dans la Partie</Text>
       {players.map((player) => (
         <TouchableOpacity
           key={player._id}

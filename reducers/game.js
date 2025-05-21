@@ -1,15 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  value: { gameID: null, roomID: null, nbRound: 10, players: [] }, // Valeur initiale du reducer
+  value: { gameID: null, roomID: null, nbRound: 10, players: [] },
 };
 
 export const gameSlice = createSlice({
-  name: "game", // Nom du reducer à exporter
+  name: "game",
   initialState,
-  // Fonctions à importer dans les composants pour agir sur le reducer
   reducers: {
-    initGame: (state, action) => {
+    newGame: (state, action) => {
       state.value.gameID = action.payload.gameID;
       state.value.roomID = action.payload.roomID;
       state.value.nbRound = action.payload.nbRound;
@@ -26,5 +25,5 @@ export const gameSlice = createSlice({
   },
 });
 
-export const { initGame, updatePlayers, resetGame } = gameSlice.actions;
+export const { newGame, updatePlayers, resetGame } = gameSlice.actions;
 export default gameSlice.reducer;

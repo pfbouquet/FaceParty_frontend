@@ -5,11 +5,14 @@ import FontAwesome from "react-native-vector-icons/FontAwesome"; // https://obla
 
 import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
-import HomeAdmin from "./screens/HomeAdmin";
 import HomePlayer from "./screens/HomePlayer";
 import Question from "./screens/Question";
 import PlayerName from "./screens/PlayerName";
 import PlayerLobby from "./screens/PlayerLobby";
+// Multi game screens
+import HomeMulti from "./screens/HomeMulti";
+import NewMultiGame from "./screens/NewMultiGame";
+import JoinMultiGame from "./screens/JoinMultiGame";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -18,7 +21,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import { SocketProvider } from "./contexts/SocketContext";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage
 
-import user from "./reducers/user";
+import game from "./reducers/game";
+import player from "./reducers/player";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -51,14 +55,15 @@ const persistedReducers = persistReducer(
     key: "expojs-starter",
     storage: AsyncStorage,
     blacklist: [], // Add reducers that you don't want to persist
-    whitelist: ["user"], // Add reducers that you want to persist
+    whitelist: ["player", "game"], // Add reducers that you want to persist
   },
-  combineReducers({ user })
+  combineReducers({ player, game })
 );
 
 const store = configureStore({
   reducer: persistedReducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
 const persistor = persistStore(store);
@@ -71,12 +76,15 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="HomeAdmin" component={HomeAdmin} />
               <Stack.Screen name="HomeTuto" component={HomeTuto} />
               <Stack.Screen name="PlayerName" component={PlayerName} />
               <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Question" component={Question} />
+              {/* Multi game admin and lobby screens */}
+              <Stack.Screen name="HomeMulti" component={HomeMulti} />
+              <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
+              <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

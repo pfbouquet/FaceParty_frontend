@@ -7,15 +7,14 @@ const initialState = {
     playerName: null,
     score: 0,
     scoreHistory: [],
-  }, // Valeur initiale du reducer
+  },
 };
 
 export const playerSlice = createSlice({
-  name: "player", // Nom du reducer à exporter
+  name: "player",
   initialState,
-  // Fonctions à importer dans les composants pour agir sur le reducer
   reducers: {
-    initPlayer: (state, action) => {
+    newPlayer: (state, action) => {
       state.value.playerID = action.payload.playerID;
       state.value.isAdmin = action.payload.isAdmin;
       state.value.playerName = action.payload.playerName;
@@ -30,5 +29,5 @@ export const playerSlice = createSlice({
   },
 });
 
-export const { initPlayer, resetPlayer } = playerSlice.actions;
+export const { newPlayer, resetPlayer } = playerSlice.actions;
 export default playerSlice.reducer;

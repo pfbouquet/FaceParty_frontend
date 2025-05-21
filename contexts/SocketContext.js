@@ -7,8 +7,6 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
-  console.log(EXPO_PUBLIC_BACKEND_URL);
-
   useEffect(() => {
     const newSocket = io(EXPO_PUBLIC_BACKEND_URL, {
       transports: ["websocket"],

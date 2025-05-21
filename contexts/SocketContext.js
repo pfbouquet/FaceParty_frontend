@@ -3,13 +3,15 @@ import { io } from "socket.io-client";
 import Constants from "expo-constants";
 
 export const SocketContext = createContext(null);
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
+  console.log(EXPO_PUBLIC_BACKEND_URL);
+
   useEffect(() => {
-    const newSocket = io(BACKEND_URL, {
+    const newSocket = io(EXPO_PUBLIC_BACKEND_URL, {
       transports: ["websocket"],
     });
 
@@ -24,7 +26,5 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-  return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
-  );
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
 };

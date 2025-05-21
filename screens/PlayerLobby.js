@@ -7,9 +7,9 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import Constants from "expo-constants";
 
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerLobby({ route, navigation }) {
   const gameID = "682c986c3faa881ff6c9abe8"; // gameID passé depuis la navigation --> route.params
@@ -17,7 +17,7 @@ export default function PlayerLobby({ route, navigation }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/players/${gameID}`)
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${gameID}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {

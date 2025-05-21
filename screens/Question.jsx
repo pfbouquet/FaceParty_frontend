@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-import Constants from "expo-constants";
 
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function Question() {
 
@@ -39,7 +38,7 @@ export default function Question() {
   }, [socket]);
 
   async function giveQuestion() {
-    fetch(`${BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
       .then((response) => response.json())
       .then((data) => {
         console.log("giveQuestion => ", data.questions.length);

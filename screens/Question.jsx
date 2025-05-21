@@ -2,73 +2,88 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   TouchableOpacity,
   Image,
   SafeAreaView,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function Question() {
+
+  const socket = useContext(SocketContext);
+  const [questionData, setQuestionData] = useState(null);
+
   const [image, setImage] = useState(null);
   const [leftButtons, setLeftButtons] = useState(null);
   const [rightButtons, setRightButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
   const [totalRound, setTotalRound] = useState(0);
-  console.log(roundNumber);
+
 
   useEffect(() => {
-    giveQuestion();
-  }, []);
+    socket.on("game-cycle", (data) => {
+      setQuestionData(data.payload);
+    })
+
+    return () => {
+      socket.off("game-cycle");
+    }
+  }, [socket]);
+
+  useEffect(() => { //second useEffect permettant d'attendre l'exécution du premier qui ajoute infos dans questionData
+    if (questionData) {
+      giveQuestion(); // Se déclenche SEULEMENT quand questionData est mis à jour
+    }
+  }, [questionData]);
+
 
   async function giveQuestion() {
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("giveQuestion => ", data.questions.length);
-        setImage(
-          <Image style={styles.image} source={data.questions[0].imageURL} />
-        ); // marche pas > laisse espace vide dans l'application
 
-        let leftPossibilities = data.questions[0].possibleAnswers[0].map(
-          (e, i) => {
-            //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
-            return (
-              <TouchableOpacity
-                onPress={() => giveQuestion()}
-                style={styles.btn}
-              >
-                <Text key={i}>{e}</Text>
-              </TouchableOpacity>
-            );
-          }
-        );
-        setLeftButtons(leftPossibilities); //save jsx of left buttons
+    // setTotalRound(data.questions.length); //total number of rounds
+    setRoundNumber(questionData.index); //current round number  
+    setImage(
+      <Image style={styles.image} source={{ uri: questionData.imageURL }} />
+    ); // marche pas > laisse espace vide dans l'application
 
-        let rightPossibilities = data.questions[0].possibleAnswers[1].map(
-          (e, i) => {
-            //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
-            return (
-              <TouchableOpacity
-                onPress={() => giveQuestion()}
-                style={styles.btn}
-              >
-                <Text key={i}>{e}</Text>
-              </TouchableOpacity>
-            );
-          }
+    let leftPossibilities = questionData.possibleAnswers[0].map(
+      (e, i) => {
+        //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
+        return (
+          <TouchableOpacity key={i}
+            onPress={() => giveQuestion()}
+            style={styles.btn}
+          >
+            <Text>{e}</Text>
+          </TouchableOpacity>
         );
-        setRightButtons(rightPossibilities); //save jsx of right buttons
-        setTotalRound(data.questions.length); //total number of rounds
-      });
+      }
+    );
+    setLeftButtons(leftPossibilities); //save jsx of left buttons
+
+    let rightPossibilities = questionData.possibleAnswers[1].map(
+      (e, i) => {
+        //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
+        return (
+          <TouchableOpacity key={i}
+            onPress={() => giveQuestion()}
+            style={styles.btn}
+          >
+            <Text>{e}</Text>
+          </TouchableOpacity>
+        );
+      }
+    );
+    setRightButtons(rightPossibilities); //save jsx of right buttons
+
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.question}>
-        <Text style={styles.title}>Round 1/{totalRound}</Text>
+        <Text style={styles.title}>Round {roundNumber}/{totalRound}</Text>
         {/* <Image style={styles.image} source={require('../assets/picture1.png')} /> */}
         {image}
         <Text>Choisissez un nom dans chaque colonne</Text>
@@ -96,8 +111,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
-    height: "50%",
     width: "50%",
+    height: "50%",
+    borderRadius: 10,
   },
   title: {
     marginTop: 10,
@@ -116,15 +132,12 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     marginTop: 10,
     width: "100%",
-    justifyContent: "center",
     alignItems: "center",
   },
   leftAnswers: {
-    justifyContent: "center",
-    alignItems: "center",
+
   },
   rightAnswers: {
-    justifyContent: "center",
-    alignItems: "center",
+
   },
 });

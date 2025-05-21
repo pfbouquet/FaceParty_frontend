@@ -24,6 +24,8 @@ export default function Question() {
   const [rightButtons, setRightButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
   const [totalRound, setTotalRound] = useState(0);
+  console.log('usestate leftButtons and RIGHT =>', leftButtons, rightButtons)
+
 
   useEffect(() => {
     socket.on("game-cycle", (data) => {
@@ -31,52 +33,50 @@ export default function Question() {
       setQuestionData(data.payload);
     })
 
+    giveQuestion(); //récupère les informations de la question stocké dans le useState questionData
+
     return () => {
       socket.off("game-cycle");
     }
-    // giveQuestion();
   }, [socket]);
 
   async function giveQuestion() {
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("giveQuestion => ", data.questions.length);
-        setImage(
-          <Image style={styles.image} source={data.questions[0].imageURL} />
-        ); // marche pas > laisse espace vide dans l'application
 
-        let leftPossibilities = data.questions[0].possibleAnswers[0].map(
-          (e, i) => {
-            //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
-            return (
-              <TouchableOpacity
-                onPress={() => giveQuestion()}
-                style={styles.btn}
-              >
-                <Text key={i}>{e}</Text>
-              </TouchableOpacity>
-            );
-          }
-        );
-        setLeftButtons(leftPossibilities); //save jsx of left buttons
+    setImage(
+      <Image style={styles.image} source={{ uri: questionData.imageURL }} />
+    ); // marche pas > laisse espace vide dans l'application
 
-        let rightPossibilities = data.questions[0].possibleAnswers[1].map(
-          (e, i) => {
-            //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
-            return (
-              <TouchableOpacity
-                onPress={() => giveQuestion()}
-                style={styles.btn}
-              >
-                <Text key={i}>{e}</Text>
-              </TouchableOpacity>
-            );
-          }
+    let leftPossibilities = questionData.possibleAnswers[0].map(
+      (e, i) => {
+        //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
+        return (
+          <TouchableOpacity
+            onPress={() => giveQuestion()}
+            style={styles.btn}
+          >
+            <Text key={i}>{e}</Text>
+          </TouchableOpacity>
         );
-        setRightButtons(rightPossibilities); //save jsx of right buttons
-        setTotalRound(data.questions.length); //total number of rounds
-      });
+      }
+    );
+    setLeftButtons(leftPossibilities); //save jsx of left buttons
+
+    let rightPossibilities = questionData.possibleAnswers[1].map(
+      (e, i) => {
+        //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
+        return (
+          <TouchableOpacity
+            onPress={() => giveQuestion()}
+            style={styles.btn}
+          >
+            <Text key={i}>{e}</Text>
+          </TouchableOpacity>
+        );
+      }
+    );
+    setRightButtons(rightPossibilities); //save jsx of right buttons
+
+    // setTotalRound(data.questions.length); //total number of rounds
   }
 
   return (
@@ -110,8 +110,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
-    height: "50%",
-    width: "50%",
+    width: 200,
+    height: 500,
+    borderRadius: 10,
+    flex: 1,
   },
   title: {
     marginTop: 10,
@@ -122,6 +124,7 @@ const styles = StyleSheet.create({
   answers: {
     flexDirection: "row",
     justifyContent: "space-around",
+    marginTop: 20,
   },
   btn: {
     padding: 20,
@@ -130,15 +133,12 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     marginTop: 10,
     width: "100%",
-    justifyContent: "center",
     alignItems: "center",
   },
   leftAnswers: {
-    justifyContent: "center",
-    alignItems: "center",
+
   },
   rightAnswers: {
-    justifyContent: "center",
-    alignItems: "center",
+
   },
 });

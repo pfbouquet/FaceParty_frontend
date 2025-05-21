@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import Constants from "expo-constants";
 
 export const SocketContext = createContext(null);
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;

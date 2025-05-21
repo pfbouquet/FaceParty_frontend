@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,29 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-} from 'react-native';
+} from "react-native";
+import Constants from "expo-constants";
+
+const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
 
 export default function PlayerLobby({ route, navigation }) {
-  const gameID = '682c986c3faa881ff6c9abe8' ; // gameID passé depuis la navigation --> route.params
+  const gameID = "682c986c3faa881ff6c9abe8"; // gameID passé depuis la navigation --> route.params
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://192.168.100.236:3000/players/${gameID}`)
+    fetch(`${BACKEND_URL}/players/${gameID}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
           setPlayers(data.players);
         } else {
-          console.error('Erreur:', data.error);
+          console.error("Erreur:", data.error);
         }
         setLoading(false);
       })
       .catch((error) => {
-        console.error('Erreur fetch:', error);
+        console.error("Erreur fetch:", error);
         setLoading(false);
       });
   }, [gameID]);
@@ -57,31 +60,31 @@ export default function PlayerLobby({ route, navigation }) {
 const styles = StyleSheet.create({
   loader: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   container: {
     paddingVertical: 40,
-    alignItems: 'center',
-    backgroundColor: '#f0f8ff',
+    alignItems: "center",
+    backgroundColor: "#f0f8ff",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   playerCard: {
-    backgroundColor: '#3498db',
+    backgroundColor: "#3498db",
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 10,
     marginVertical: 10,
-    width: '80%',
-    alignItems: 'center',
+    width: "80%",
+    alignItems: "center",
   },
   playerName: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

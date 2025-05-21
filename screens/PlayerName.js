@@ -1,5 +1,14 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useState } from "react";
+import Constants from "expo-constants";
+
+const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
 
 export default function PlayerName({ navigation }) {
   const [playerName, setPlayerName] = useState("");
@@ -11,7 +20,7 @@ export default function PlayerName({ navigation }) {
       return;
     }
 
-    fetch("http://192.168.100.236:3000/players/updateName", {
+    fetch(`${BACKEND_URL}/players/updateName`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -40,8 +49,17 @@ export default function PlayerName({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>PlayerNameInput</Text>
-      <TextInput placeholder="Player name" onChangeText={(value) => setPlayerName(value)} value={playerName} style={styles.input} />
-      <TouchableOpacity onPress={handleSubmit} style={styles.button} activeOpacity={0.8}>
+      <TextInput
+        placeholder="Player name"
+        onChangeText={(value) => setPlayerName(value)}
+        value={playerName}
+        style={styles.input}
+      />
+      <TouchableOpacity
+        onPress={handleSubmit}
+        style={styles.button}
+        activeOpacity={0.8}
+      >
         <Text style={styles.textButton}>I'm OK with my name</Text>
       </TouchableOpacity>
     </View>

@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, Button } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
+import Constants from "expo-constants";
 
-const BACKEND_URL = "http://192.168.100.181:3000";
+const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
 
 export default function HomeAdmin({ navigation }) {
   const socket = useContext(SocketContext);

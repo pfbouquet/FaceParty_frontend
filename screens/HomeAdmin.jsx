@@ -92,6 +92,8 @@ export default function HomeAdmin({ navigation }) {
     if (gameJoined) {
       setStatusText(`Game ${roomID} has been joined`);
       console.log(`Game ${roomID} has been joined`);
+      // Navigate to PlayerLobby
+      navigation.navigate("PlayerLobby");
     }
   }
 

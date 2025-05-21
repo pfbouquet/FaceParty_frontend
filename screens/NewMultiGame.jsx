@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-import Constants from "expo-constants";
+
 // import game and player reducers
 import { useDispatch } from "react-redux";
-import { initGame } from "../reducers/game";
-import { initPlayer } from "../reducers/player";
+import { newGame } from "../reducers/game";
+import { newPlayer } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function HomeAdmin({ navigation }) {
+export default function NewMultiGame({ navigation }) {
   const socket = useContext(SocketContext);
   const [statusText, setStatusText] = useState("");
   const dispatch = useDispatch();
@@ -29,10 +29,10 @@ export default function HomeAdmin({ navigation }) {
     if (data.result) {
       setStatusText(`Got a new game code: ${data.game.roomID}`);
       dispatch(
-        initGame({
+        newGame({
           gameID: data.game.gameID,
           roomID: data.game.roomID,
-          nbRound: nbRound,
+          nbRound: data.game.nbRound,
         })
       );
       console.log("Game created:", data.game.roomID);
@@ -63,7 +63,7 @@ export default function HomeAdmin({ navigation }) {
       setStatusText("Joined the game");
       // Set playerID
       dispatch(
-        initPlayer({
+        newPlayer({
           playerID: data.player.playerID,
           isAdmin: data.player.isAdmin,
           playerName: data.player.playerName,
@@ -106,7 +106,8 @@ export default function HomeAdmin({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{statusText}</Text>
+      <Text style={styles.title}>NewMultiGame</Text>
+      <Text>Status: {statusText}</Text>
     </View>
   );
 }

@@ -47,7 +47,7 @@ export default function HomeAdmin({ navigation }) {
   async function joinGame(playerSocketID, isAdmin, roomID) {
     setStatusText("Joining the game ...");
     // Call /games/join
-    let response = await fetch(`${BACKEND_URL}/games/join`, {
+    let response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/join`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

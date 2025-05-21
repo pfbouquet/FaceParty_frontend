@@ -8,9 +8,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useEffect, useState } from "react";
-import Constants from "expo-constants";
 
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function Question() {
   const [image, setImage] = useState(null);
@@ -25,7 +24,7 @@ export default function Question() {
   }, []);
 
   async function giveQuestion() {
-    fetch(`${BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/questions/682c952fc4372e9621a7c7e3`)
       .then((response) => response.json())
       .then((data) => {
         console.log("giveQuestion => ", data.questions.length);

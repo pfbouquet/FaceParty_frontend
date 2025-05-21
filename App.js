@@ -58,30 +58,29 @@ const persistedReducers = persistReducer(
 
 const store = configureStore({
   reducer: persistedReducers,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
 });
 
 const persistor = persistStore(store);
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <SocketProvider>
+    <SocketProvider>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="HomeAdmin" component={HomeAdmin} />
               <Stack.Screen name="HomeTuto" component={HomeTuto} />
-						<Stack.Screen name="PlayerName" component={PlayerName} />
-						<Stack.Screen name="PlayerLobby" component={PlayerLobby} />
+              <Stack.Screen name="PlayerName" component={PlayerName} />
+              <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
-						<Stack.Screen name="Question" component={Question} />
+              <Stack.Screen name="Question" component={Question} />
             </Stack.Navigator>
           </NavigationContainer>
-        </SocketProvider>
-      </PersistGate>
-    </Provider>
+        </PersistGate>
+      </Provider>
+    </SocketProvider>
   );
 }

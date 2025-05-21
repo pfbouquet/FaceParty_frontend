@@ -6,9 +6,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useState } from "react";
-import Constants from "expo-constants";
 
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerName({ navigation }) {
   const [playerName, setPlayerName] = useState("");
@@ -20,7 +19,7 @@ export default function PlayerName({ navigation }) {
       return;
     }
 
-    fetch(`${BACKEND_URL}/players/updateName`, {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/updateName`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

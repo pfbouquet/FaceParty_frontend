@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View, Button } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-import Constants from "expo-constants";
 
-const BACKEND_URL = Constants.expoConfig.extra.BACKEND_URL;
+const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function HomeAdmin({ navigation }) {
   const socket = useContext(SocketContext);
@@ -11,7 +10,7 @@ export default function HomeAdmin({ navigation }) {
 
   async function createGame(nbRound = 10, socketID) {
     // Create a game
-    let response = await fetch(`${BACKEND_URL}/games/create`, {
+    let response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -46,6 +46,10 @@ export default function PlayerLobby({ route, navigation }) {
     );
   }
 
+  function startParty() {
+    navigation.navigate("Start")
+  }
+
   return (
     <SafeAreaView style={styles.lobby}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -57,11 +61,11 @@ export default function PlayerLobby({ route, navigation }) {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <TouchableOpacity style={styles.startButton}>
-            <Text style={styles.playerName}>START</Text>
-          </TouchableOpacity>
+      <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+        <Text style={styles.playerName}>START</Text>
+      </TouchableOpacity>
     </SafeAreaView>
-    
+
   );
 }
 
@@ -71,7 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  lobby:{
+  lobby: {
     flex: 1,
     backgroundColor: "white",
     justifyContent: "center",

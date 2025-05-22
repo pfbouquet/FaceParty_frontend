@@ -22,12 +22,13 @@ export default function Question() {
   const [leftButtons, setLeftButtons] = useState(null);
   const [rightButtons, setRightButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
-  const [totalRound, setTotalRound] = useState(0); //à gérer lorsqu'on enverra plusieurs questions
 
   const [buttonsActive, setButtonsActive] = useState(true)
   const [selectedLeftIndex, setSelectedLeftIndex] = useState(null);
   const [selectedRightIndex, setSelectedRightIndex] = useState(null);
   const [goodAnswers, setGoodAnswers] = useState(null);
+
+  const [nextRound, setNextRound] = useState(null);
 
   useEffect(() => {
     socket.on("game-cycle", (data) => {
@@ -48,7 +49,6 @@ export default function Question() {
 
   async function giveQuestion() {
 
-    // setTotalRound(data.questions.length); //total number of rounds
     setRoundNumber(questionData.index); //current round number  
     setImage(<Image style={styles.image} source={{ uri: questionData.imageURL }} />);
 
@@ -127,13 +127,17 @@ export default function Question() {
   function resultAnswer() {
     setButtonsActive(false); //désactive les boutons une fois le timer terminé
     setGoodAnswers(questionData.goodAnswer);
+    setNextRound(
+      <TouchableOpacity style={styles.btnNext}>
+        <Text>Next round</Text>
+      </TouchableOpacity>)
   }
+
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.question}>
-        <Text style={styles.round}>Round {roundNumber}/{totalRound}</Text>
-        {/* <Image style={styles.image} source={require('../assets/picture1.png')} /> */}
+        <Text style={styles.round}>Round {roundNumber}</Text>
         {image}
         <Text style={styles.rule}>Choisissez un nom dans chaque colonne</Text>
 
@@ -147,15 +151,16 @@ export default function Question() {
           timeLabels={{ s: '' }}
           styles={styles.countdown}
         />
+        {nextRound}
       </View>
 
       <View style={styles.answers}>
-        <View style={styles.leftAnswers}>
+        <View>
           <Text>⬇️ 1ère personne ⬇️</Text>
           {leftButtons}
         </View>
 
-        <View style={styles.rightAnswers}>
+        <View>
           <Text>⬇️ 2ème personne ⬇️</Text>
           {rightButtons}
         </View>
@@ -171,8 +176,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
-    width: "50%",
-    height: "50%",
+    width: 300,
+    height: 300,
     borderRadius: 10,
   },
   round: {
@@ -191,6 +196,7 @@ const styles = StyleSheet.create({
   answers: {
     flexDirection: "row",
     justifyContent: "space-around",
+    marginTop: 20,
   },
   btn: {
     padding: 20,
@@ -245,11 +251,15 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
-  leftAnswers: {
-
-  },
-  rightAnswers: {
-
+  btnNext: {
+    padding: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "gray",
+    marginTop: 10,
+    width: "80%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 })
 

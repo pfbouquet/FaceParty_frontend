@@ -14,6 +14,12 @@ export default function NewMultiGame({ navigation }) {
   const [statusText, setStatusText] = useState("");
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (!socket) return;
+
+    adminCreateGame(10);
+  }, []);
+
   async function createGame(nbRound = 10) {
     setStatusText("Create game in backend ...");
     // Create a game
@@ -35,7 +41,7 @@ export default function NewMultiGame({ navigation }) {
           nbRound: data.game.nbRound,
         })
       );
-      console.log("Game created:", data.game.roomID);
+      // console.log("Game created:", data.game.roomID);
       return data.game.roomID;
     } else {
       console.error("Error creating game:", data);
@@ -81,7 +87,7 @@ export default function NewMultiGame({ navigation }) {
     // Create a game
     setStatusText("Creating game ...");
     let roomID = await createGame(nbRound);
-    console.log("Room ID:", roomID);
+    // console.log("Room ID:", roomID);
     if (!roomID) {
       setStatusText("Error creating game");
       return;
@@ -91,18 +97,13 @@ export default function NewMultiGame({ navigation }) {
     let gameJoined = await joinGame(socket.id, true, roomID);
     if (gameJoined) {
       setStatusText(`Game ${roomID} has been joined`);
-      console.log(`Game ${roomID} has been joined`);
+      // console.log(`Game ${roomID} has been joined`);
       // Navigate to PlayerLobby
       navigation.navigate("PlayerLobby");
     }
+
+    // setStatusText("Initiating game ...");
   }
-
-  useEffect(() => {
-    if (!socket) return;
-
-    setStatusText("Initiating game ...");
-    adminCreateGame(10);
-  }, []);
 
   return (
     <View style={styles.container}>

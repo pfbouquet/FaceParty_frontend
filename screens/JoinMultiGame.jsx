@@ -35,7 +35,6 @@ export default function JoinMultiGame({ navigation }) {
         }),
       });
       let data = await response.json();
-      console.log(data);
 
       if (data.result) {
         // Set player reducer

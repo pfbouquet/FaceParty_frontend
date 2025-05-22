@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
-
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { useSelector } from "react-redux";
+import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerLobby({ route, navigation }) {
-  const gameID = "682c986c3faa881ff6c9abe8"; // gameID passé depuis la navigation --> route.params
+  const socket = useContext(SocketContext);
+
+  // const gameID = "682ef18d3e3785b043e7ef5b"; // gameID passé depuis la navigation --> route.params
+  const gameID = useSelector((state) => state.game.value.gameID);
+  console.log(`gameID :`, gameID);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchGame = () => {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${gameID}`)
       .then((response) => response.json())
       .then((data) => {
@@ -31,6 +29,13 @@ export default function PlayerLobby({ route, navigation }) {
         console.error("Erreur fetch:", error);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    gameID && fetchGame();
+
+    socket.on("playerUpdate", () => fetchGame());
+    return () => socket.off("playerUpdate", () => fetchGame());
   }, [gameID]);
 
   if (loading) {
@@ -45,11 +50,7 @@ export default function PlayerLobby({ route, navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Joueurs dans la Gaîème</Text>
       {players.map((player) => (
-        <TouchableOpacity
-          key={player._id}
-          style={styles.playerCard}
-          onPress={() => console.log(`Clicked on ${player.playerName}`)}
-        >
+        <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
           <Text style={styles.playerName}>{player.playerName}</Text>
         </TouchableOpacity>
       ))}

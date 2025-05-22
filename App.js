@@ -13,6 +13,7 @@ import PlayerLobby from "./screens/PlayerLobby";
 import HomeMulti from "./screens/HomeMulti";
 import NewMultiGame from "./screens/NewMultiGame";
 import JoinMultiGame from "./screens/JoinMultiGame";
+import SnapScreen from "./screens/SnapScreen";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -78,6 +79,7 @@ export default function App() {
               <Stack.Screen name="Home" component={Home} />
               <Stack.Screen name="HomeTuto" component={HomeTuto} />
               <Stack.Screen name="PlayerName" component={PlayerName} />
+              <Stack.Screen name="SnapScreen" component={SnapScreen} />
               <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Question" component={Question} />

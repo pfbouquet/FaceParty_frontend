@@ -7,9 +7,9 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerLobby({ route, navigation }) {
   const socket = useContext(SocketContext);
-
-  // const gameID = "682ef18d3e3785b043e7ef5b"; // gameID passé depuis la navigation --> route.params
   const gameID = useSelector((state) => state.game.value.gameID);
+  const roomID = useSelector((state) => state.game.value.roomID);
+
   console.log(`gameID :`, gameID);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,8 @@ export default function PlayerLobby({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Joueurs dans la Gaîème</Text>
+      <Text style={styles.title}>PlayerLobby</Text>
+      <Text style={styles.title}>Room : {roomID}</Text>
       {players.map((player) => (
         <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
           <Text style={styles.playerName}>{player.playerName}</Text>

@@ -36,7 +36,7 @@ export default function PlayerName({ navigation }) {
         console.log(data.message);
         if (data.result) {
           socket.emit("playerUpdate", roomID);
-          navigation.navigate("PlayerLobby");
+          navigation.navigate("SnapScreen");
         } else {
           alert("Erreur lors de la mise à jour du nom.");
         }

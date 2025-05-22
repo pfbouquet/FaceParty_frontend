@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../contexts/SocketContext";
+import Countdown from 'react-native-countdown-component';
+
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -20,8 +22,28 @@ export default function Question() {
   const [leftButtons, setLeftButtons] = useState(null);
   const [rightButtons, setRightButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
-  const [totalRound, setTotalRound] = useState(0);
+  const [totalRound, setTotalRound] = useState(0); //à gérer lorsqu'on enverra plusieurs questions
 
+  // const [leftBtn1, setLeftBtn1] = useState(false);
+  // const [leftBtn2, setLeftBtn2] = useState(false);
+  // const [letfBtn3, setLeftBtn3] = useState(false);
+  // const [rightBtn1, setRightBtn1] = useState(false);
+  // const [rightBtn2, setRightBtn2] = useState(false);
+  // const [rightBtn3, setRightBtn3] = useState(false);
+  // console.log("leftBtn1", leftBtn1);
+  // console.log("leftBtn2", leftBtn2);
+  // console.log("letfBtn3", letfBtn3);
+  const [selectedLeftIndex, setSelectedLeftIndex] = useState(null);
+  const [selectedRightIndex, setSelectedRightIndex] = useState(null);
+
+
+  //fonction permettant de cliquer sur les boutons de réponse
+  // function leftClick(index) {
+  //   if ((leftBtn1 && leftBtn2 && letfBtn3) === false) {
+  //     const btnClick = "setLeftBtn" + index
+  //     btnClick(true);
+  //   }
+  // }
 
   useEffect(() => {
     socket.on("game-cycle", (data) => {
@@ -37,7 +59,7 @@ export default function Question() {
     if (questionData) {
       giveQuestion(); // Se déclenche SEULEMENT quand questionData est mis à jour
     }
-  }, [questionData]);
+  }, [questionData, selectedLeftIndex, selectedRightIndex]);
 
 
   async function giveQuestion() {
@@ -53,10 +75,10 @@ export default function Question() {
         //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
         return (
           <TouchableOpacity key={i}
-            onPress={() => giveQuestion()}
-            style={styles.btn}
+            onPress={() => setSelectedLeftIndex(i)}
+            style={selectedLeftIndex === i ? styles.btnSelect : styles.btn}
           >
-            <Text>{e}</Text>
+            <Text style={selectedLeftIndex === i ? styles.txtSelect : styles.txt}>{e}</Text>
           </TouchableOpacity>
         );
       }
@@ -68,10 +90,10 @@ export default function Question() {
         //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
         return (
           <TouchableOpacity key={i}
-            onPress={() => giveQuestion()}
-            style={styles.btn}
+            onPress={() => setSelectedRightIndex(i)}
+            style={selectedRightIndex === i ? styles.btnSelect : styles.btn}
           >
-            <Text>{e}</Text>
+            <Text style={selectedRightIndex === i ? styles.txtSelect : styles.txt} >{e}</Text>
           </TouchableOpacity>
         );
       }
@@ -87,6 +109,12 @@ export default function Question() {
         {/* <Image style={styles.image} source={require('../assets/picture1.png')} /> */}
         {image}
         <Text>Choisissez un nom dans chaque colonne</Text>
+
+        <Countdown
+          until={10}
+          onFinish={() => alert('Terminé !')}
+          size={20}
+        />
       </View>
 
       <View style={styles.answers}>
@@ -134,10 +162,25 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
+  btnSelect: {
+    padding: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#0F3D61",
+    backgroundColor: "rgba(27, 77, 115, 0.7)",
+    opacity: 0.8,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  txtSelect: {
+    color: "white",
+  },
   leftAnswers: {
 
   },
   rightAnswers: {
 
   },
-});
+})
+

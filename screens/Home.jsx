@@ -14,11 +14,11 @@ export default function Home({ navigation }) {
       payload: {
         questionID: "123456789",
         imageURL:
-          "https://res.cloudinary.com/dat8yzztd/image/upload/v1747390409/soli7celoyncta2u4c4g.jpg",
-        goodAnswer: ["Toto", "Titi"],
+          "https://res.cloudinary.com/dat8yzztd/image/upload/v1747919107/picture1_ybfkmw.png",
+        goodAnswer: ["Allan", "Pierre-François"],
         possibleAnswers: [
-          ["Toto", "Marc", "José"],
-          ["Titi", "Jean-Claude", "Chuck"],
+          ["Allan", "Marc", "José"],
+          ["Titi", "Jean-Claude", "Pierre-François"],
         ],
         index: 2,
         askedAtTime: Date.now(),

@@ -105,15 +105,20 @@ export default function Question() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.question}>
-        <Text style={styles.title}>Round {roundNumber}/{totalRound}</Text>
+        <Text style={styles.round}>Round {roundNumber}/{totalRound}</Text>
         {/* <Image style={styles.image} source={require('../assets/picture1.png')} /> */}
         {image}
-        <Text>Choisissez un nom dans chaque colonne</Text>
+        <Text style={styles.rule}>Choisissez un nom dans chaque colonne</Text>
 
         <Countdown
-          until={10}
+          until={20}
           onFinish={() => alert('Terminé !')}
           size={20}
+          digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
+          digitTxtStyle={{ color: '#0f3e61' }}
+          timeToShow={['S']}
+          timeLabels={{ s: '' }}
+          styles={styles.countdown}
         />
       </View>
 
@@ -143,11 +148,18 @@ const styles = StyleSheet.create({
     height: "50%",
     borderRadius: 10,
   },
-  title: {
+  round: {
     marginTop: 10,
   },
   question: {
     alignItems: "center",
+  },
+  rule: {
+    marginVertical: 10,
+  },
+  countdown: {
+    marginTop: 10,
+    marginBottom: 10,
   },
   answers: {
     flexDirection: "row",

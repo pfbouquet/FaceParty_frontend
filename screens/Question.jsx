@@ -24,15 +24,7 @@ export default function Question() {
   const [roundNumber, setRoundNumber] = useState(0);
   const [totalRound, setTotalRound] = useState(0); //à gérer lorsqu'on enverra plusieurs questions
 
-  // const [leftBtn1, setLeftBtn1] = useState(false);
-  // const [leftBtn2, setLeftBtn2] = useState(false);
-  // const [letfBtn3, setLeftBtn3] = useState(false);
-  // const [rightBtn1, setRightBtn1] = useState(false);
-  // const [rightBtn2, setRightBtn2] = useState(false);
-  // const [rightBtn3, setRightBtn3] = useState(false);
-  // console.log("leftBtn1", leftBtn1);
-  // console.log("leftBtn2", leftBtn2);
-  // console.log("letfBtn3", letfBtn3);
+  const [buttonsActive, setButtonsActive] = useState(true)
   const [selectedLeftIndex, setSelectedLeftIndex] = useState(null);
   const [selectedRightIndex, setSelectedRightIndex] = useState(null);
   const [goodAnswers, setGoodAnswers] = useState(null);
@@ -51,27 +43,21 @@ export default function Question() {
     if (questionData) {
       giveQuestion(); // Se déclenche SEULEMENT quand questionData est mis à jour
     }
-  }, [questionData, selectedLeftIndex, selectedRightIndex]);
+  }, [questionData, selectedLeftIndex, selectedRightIndex, goodAnswers]);
 
 
   async function giveQuestion() {
 
     // setTotalRound(data.questions.length); //total number of rounds
     setRoundNumber(questionData.index); //current round number  
-    setImage(
-      <Image style={styles.image} source={{ uri: questionData.imageURL }} />
-    ); // marche pas > laisse espace vide dans l'application
-    setGoodAnswers(questionData.goodAnswer); //save good answers
+    setImage(<Image style={styles.image} source={{ uri: questionData.imageURL }} />);
+
+    //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
     let leftPossibilities = questionData.possibleAnswers[0].map(
       (e, i) => {
-
-        if (setSelectedLeftIndex === i) {
-          let btnStyle = styles.btnSelect;
-        }
-        //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
         return (
           <TouchableOpacity key={i}
-            onPress={() => setSelectedLeftIndex(i)}
+            onPress={() => { if (buttonsActive) { setSelectedLeftIndex(i) } }}
             style={getLeftButtonStyle(i)}
           >
             <Text style={selectedLeftIndex === i ? styles.txtSelect : styles.txt}>{e}</Text>
@@ -81,12 +67,12 @@ export default function Question() {
     );
     setLeftButtons(leftPossibilities); //save jsx of left buttons
 
+    //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
     let rightPossibilities = questionData.possibleAnswers[1].map(
       (e, j) => {
-        //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
         return (
           <TouchableOpacity key={j}
-            onPress={() => setSelectedRightIndex(j)}
+            onPress={() => { if (buttonsActive) { setSelectedRightIndex(j) } }}
             style={getRightButtonStyle(j)}
           >
             <Text style={selectedRightIndex === j ? styles.txtSelect : styles.txt} >{e}</Text>
@@ -95,18 +81,53 @@ export default function Question() {
       }
     );
     setRightButtons(rightPossibilities); //save jsx of right buttons
-
-
-
   }
 
+  //fonction permettant de dynamiser la couleur des boutons de gauche
   const getLeftButtonStyle = (index) => {
-    return selectedLeftIndex === index ? styles.btnSelect : styles.btn;
+    if (!goodAnswers) {
+      if (selectedLeftIndex === index) {
+        return styles.btnSelect;
+      } else {
+        return styles.btn;
+      }
+    }
+    if (goodAnswers) {
+      if (questionData.goodAnswer[0] === questionData.possibleAnswers[0][index]) {
+        return styles.btnSelectTrue;
+      } else if (selectedLeftIndex === index) {
+        return styles.btnSelectFalse;
+      } else {
+        return styles.btn;
+      }
+    }
   };
 
-    const getRightButtonStyle = (index2) => {
-    return selectedRightIndex === index2 ? styles.btnSelect : styles.btn;
+  //fonction permettant de dynamiser la couleur des boutons de droite
+  const getRightButtonStyle = (index2) => {
+    if (!goodAnswers) {
+      if (selectedRightIndex === index2) {
+        return styles.btnSelect;
+      } else {
+        return styles.btn;
+      }
+    }
+    if (goodAnswers) {
+      if (questionData.goodAnswer[1] === questionData.possibleAnswers[1][index2]) {
+        return styles.btnSelectTrue;
+      } else if (selectedRightIndex === index2) {
+        return styles.btnSelectFalse;
+      } else {
+        return styles.btn;
+      }
+    }
   };
+
+  //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
+  function resultAnswer() {
+    setButtonsActive(false); //désactive les boutons une fois le timer terminé
+    setGoodAnswers(questionData.goodAnswer);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -118,7 +139,7 @@ export default function Question() {
 
         <Countdown
           until={5}
-          // onFinish={() => resultAnswer()}
+          onFinish={() => resultAnswer()}
           size={20}
           digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
           digitTxtStyle={{ color: '#0f3e61' }}
@@ -181,7 +202,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   txt: {
-
+    fontWeight: "bold",
+    color: "#0f3e61",
   },
   btnSelect: {
     padding: 20,
@@ -196,6 +218,7 @@ const styles = StyleSheet.create({
   },
   txtSelect: {
     color: "white",
+    fontWeight: "bold",
   },
   btnSelectFalse: {
     padding: 20,
@@ -210,6 +233,17 @@ const styles = StyleSheet.create({
   },
   txtSelectFalse: {
     color: "black",
+  },
+  btnSelectTrue: {
+    padding: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgb(2, 91, 20)",
+    backgroundColor: "rgb(6, 174, 39)",
+    opacity: 0.8,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
   },
   leftAnswers: {
 

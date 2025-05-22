@@ -35,15 +35,7 @@ export default function Question() {
   // console.log("letfBtn3", letfBtn3);
   const [selectedLeftIndex, setSelectedLeftIndex] = useState(null);
   const [selectedRightIndex, setSelectedRightIndex] = useState(null);
-
-
-  //fonction permettant de cliquer sur les boutons de réponse
-  // function leftClick(index) {
-  //   if ((leftBtn1 && leftBtn2 && letfBtn3) === false) {
-  //     const btnClick = "setLeftBtn" + index
-  //     btnClick(true);
-  //   }
-  // }
+  const [goodAnswers, setGoodAnswers] = useState(null);
 
   useEffect(() => {
     socket.on("game-cycle", (data) => {
@@ -69,14 +61,18 @@ export default function Question() {
     setImage(
       <Image style={styles.image} source={{ uri: questionData.imageURL }} />
     ); // marche pas > laisse espace vide dans l'application
-
+    setGoodAnswers(questionData.goodAnswer); //save good answers
     let leftPossibilities = questionData.possibleAnswers[0].map(
       (e, i) => {
+
+        if (setSelectedLeftIndex === i) {
+          let btnStyle = styles.btnSelect;
+        }
         //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
         return (
           <TouchableOpacity key={i}
             onPress={() => setSelectedLeftIndex(i)}
-            style={selectedLeftIndex === i ? styles.btnSelect : styles.btn}
+            style={getLeftButtonStyle(i)}
           >
             <Text style={selectedLeftIndex === i ? styles.txtSelect : styles.txt}>{e}</Text>
           </TouchableOpacity>
@@ -86,21 +82,31 @@ export default function Question() {
     setLeftButtons(leftPossibilities); //save jsx of left buttons
 
     let rightPossibilities = questionData.possibleAnswers[1].map(
-      (e, i) => {
+      (e, j) => {
         //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
         return (
-          <TouchableOpacity key={i}
-            onPress={() => setSelectedRightIndex(i)}
-            style={selectedRightIndex === i ? styles.btnSelect : styles.btn}
+          <TouchableOpacity key={j}
+            onPress={() => setSelectedRightIndex(j)}
+            style={getRightButtonStyle(j)}
           >
-            <Text style={selectedRightIndex === i ? styles.txtSelect : styles.txt} >{e}</Text>
+            <Text style={selectedRightIndex === j ? styles.txtSelect : styles.txt} >{e}</Text>
           </TouchableOpacity>
         );
       }
     );
     setRightButtons(rightPossibilities); //save jsx of right buttons
 
+
+
   }
+
+  const getLeftButtonStyle = (index) => {
+    return selectedLeftIndex === index ? styles.btnSelect : styles.btn;
+  };
+
+    const getRightButtonStyle = (index2) => {
+    return selectedRightIndex === index2 ? styles.btnSelect : styles.btn;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -111,8 +117,8 @@ export default function Question() {
         <Text style={styles.rule}>Choisissez un nom dans chaque colonne</Text>
 
         <Countdown
-          until={20}
-          onFinish={() => alert('Terminé !')}
+          until={5}
+          // onFinish={() => resultAnswer()}
           size={20}
           digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
           digitTxtStyle={{ color: '#0f3e61' }}
@@ -174,6 +180,9 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
+  txt: {
+
+  },
   btnSelect: {
     padding: 20,
     borderRadius: 10,
@@ -187,6 +196,20 @@ const styles = StyleSheet.create({
   },
   txtSelect: {
     color: "white",
+  },
+  btnSelectFalse: {
+    padding: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#f43311",
+    backgroundColor: "rgba(250, 114, 90, 1)",
+    opacity: 0.8,
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  txtSelectFalse: {
+    color: "black",
   },
   leftAnswers: {
 

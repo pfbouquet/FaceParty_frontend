@@ -20,6 +20,8 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width } = Dimensions.get("window");
 const FRAME_SIZE = width * 0.65;
 
+// const formData = new FormData();
+
 export default function SnapScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(false);
   const [photoUri, setPhotoUri] = useState(null);
@@ -40,30 +42,40 @@ export default function SnapScreen({ navigation }) {
   };
 
   const handleConfirm = () => {
-    dispatch(addPitcure(photoUri)); // Redux local update
-
-    const formData = new FormData();
+    dispatch(addPitcure(photoUri)); // Redux update
+  
+    const formData = new FormData(); // ✅ instanciation
     formData.append("photoFromFront", {
       uri: photoUri,
       name: "photo.jpg",
       type: "image/jpeg",
     });
-
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/upload`, {
+  
+    console.log("POST vers :", `${EXPO_PUBLIC_BACKEND_URL}/upload`);
+    console.log("photoUri:", photoUri);
+  
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/selfie/upload`, {
       method: "POST",
       body: formData,
+      headers: {
+        Accept: "application/json",
+      },
     })
-      .then((response) => response.json())
+      .then(async (res) => {
+        const txt = await res.text();
+        console.log("Réponse brute:", txt);
+        return JSON.parse(txt);
+      })
       .then((data) => {
+        console.log("Réponse JSON:", data);
         if (data.result) {
-          console.log("Photo enregistrée dans tmp :", data.fileName);
           navigation.navigate("PlayerLobby");
         } else {
           alert("Erreur lors de l'envoi");
         }
       })
       .catch((err) => {
-        console.error("Erreur réseau:", err);
+        console.error("Erreur réseau:", JSON.stringify(err, null, 2));
         alert("Erreur réseau");
       });
   };

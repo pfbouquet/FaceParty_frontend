@@ -12,6 +12,9 @@ export const SocketProvider = ({ children }) => {
       transports: ["websocket"],
     });
 
+    console.log("url =>", EXPO_PUBLIC_BACKEND_URL);
+    console.log("new socket", newSocket);
+
     setSocket(newSocket);
 
     newSocket.on("connect", () => {

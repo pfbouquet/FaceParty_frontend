@@ -38,6 +38,11 @@ export default function PlayerLobby({ route, navigation }) {
     return () => socket.off("playerUpdate", () => fetchGame());
   }, [gameID]);
 
+  useEffect(() => {
+    socket.on("lets-go", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
+    return () => socket.off("lets-go");
+  }, []);
+
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -47,7 +52,7 @@ export default function PlayerLobby({ route, navigation }) {
   }
 
   function startParty() {
-    navigation.navigate("Start")
+    socket.emit("start-game", roomID);
   }
 
   return (

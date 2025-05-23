@@ -38,6 +38,11 @@ export default function PlayerLobby({ route, navigation }) {
     return () => socket.off("playerUpdate", () => fetchGame());
   }, [gameID]);
 
+  useEffect(() => {
+    socket.on("goCountdown", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
+    return () => socket.off("goCountdown");
+  }, []);
+
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -46,8 +51,9 @@ export default function PlayerLobby({ route, navigation }) {
     );
   }
 
-  function startParty() {
-    navigation.navigate("Start")
+  //fonction au clic sur le bouton START
+  function startParty() { 
+    socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
   }
 
   return (

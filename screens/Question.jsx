@@ -7,6 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 import Countdown from 'react-native-countdown-component';
 
@@ -16,7 +17,10 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 export default function Question() {
 
   const socket = useContext(SocketContext);
+  const roomID = useSelector((state) => state.game.value.roomID);
+
   const [questionData, setQuestionData] = useState(null);
+  console.log(questionData)
 
   const [image, setImage] = useState(null);
   const [leftButtons, setLeftButtons] = useState(null);
@@ -31,12 +35,13 @@ export default function Question() {
   const [nextRound, setNextRound] = useState(null);
 
   useEffect(() => {
-    socket.on("game-cycle", (data) => {
+    socket.emit("get-question", (roomID)); //envoi du signal pour récupérer la question stocké sur le serveur
+    socket.on("questionText", (data) => {
       setQuestionData(data.payload);
     })
 
     return () => {
-      socket.off("game-cycle");
+      socket.off("questionText");
     }
   }, [socket]);
 

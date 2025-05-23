@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -14,8 +14,11 @@ export default function PlayerLobby({ route, navigation }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchGame = () => {
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${gameID}`)
+  const socket = useContext(SocketContext);
+
+  const fetchPlayers = (id) => {
+    setLoading(true);
+    fetch(`${BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
@@ -32,13 +35,38 @@ export default function PlayerLobby({ route, navigation }) {
   };
 
   useEffect(() => {
+    // Écoute un événement pour récupérer dynamiquement le gameID
+    socket.on("game-id", (id) => {
+      console.log("Received gameID:", id);
+      setGameID(id);
+      fetchPlayers(id); // Fetch les joueurs une fois le gameID reçu
+      console.log(gameID);
+    });
+
+
+    // Écoute les événements socket pour mettre à jour les joueurs
+    socket.on("room-state", ({ room, currentPlayers }) => {
+      if (room === gameID) {
+        console.log(`Party ${room} now has players:`, currentPlayers);
+        fetchPlayers(room); // Relance le fetch pour mettre à jour les joueurs
+      }
+    });
+
+    // Nettoyage des écouteurs socket
+    return () => {
+      socket.off("game-id");
+      socket.off("room-state");
+    };
+  };
+
+  useEffect(() => {
     gameID && fetchGame();
 
     socket.on("playerUpdate", () => fetchGame());
     return () => socket.off("playerUpdate", () => fetchGame());
-  }, [gameID]);
+  }, [gameID, socket]);
 
-  if (loading) {
+  if (loading || !gameID) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#3498db" />

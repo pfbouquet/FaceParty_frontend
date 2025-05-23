@@ -62,3 +62,5 @@ typings/
 
 # mac
 .DS_Store
+.env.local
+.env*

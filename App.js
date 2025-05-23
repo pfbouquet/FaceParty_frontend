@@ -14,6 +14,7 @@ import HomeMulti from "./screens/HomeMulti";
 import NewMultiGame from "./screens/NewMultiGame";
 import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
+import Start from "./screens/Start";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -87,6 +88,7 @@ export default function App() {
               <Stack.Screen name="HomeMulti" component={HomeMulti} />
               <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
               <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
+              <Stack.Screen name="Start" component={Start} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

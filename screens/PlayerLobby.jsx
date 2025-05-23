@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, SafeAreaView } from "react-native";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
@@ -63,16 +63,26 @@ export default function PlayerLobby({ route, navigation }) {
     );
   }
 
+  function startParty() {
+    navigation.navigate("Start")
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>PlayerLobby</Text>
-      <Text style={styles.title}>Room : {roomID}</Text>
-      {players.map((player) => (
-        <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
-          <Text style={styles.playerName}>{player.playerName}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+    <SafeAreaView style={styles.lobby}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>PlayerLobby</Text>
+        <Text style={styles.title}>Room : {roomID}</Text>
+        {players.map((player) => (
+          <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
+            <Text style={styles.playerName}>{player.playerName}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+        <Text style={styles.playerName}>START</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+
   );
 }
 
@@ -82,10 +92,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  lobby: {
+    flex: 1,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     paddingVertical: 40,
     alignItems: "center",
-    backgroundColor: "#f0f8ff",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 24,
@@ -105,5 +121,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  startButton: {
+    backgroundColor: "#de6b58",
+    paddingVertical: 30,
+    paddingHorizontal: 0,
+    borderRadius: 10,
+    marginVertical: 10,
+    width: "80%",
+    alignItems: "center",
   },
 });

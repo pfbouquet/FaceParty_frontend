@@ -10,12 +10,12 @@ export default function PlayerLobby({ route, navigation }) {
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
 
-  console.log(`gameID :`, gameID);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchGame = () => {
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${gameID}`)
+  const fetchPlayers = (id) => {
+    setLoading(true);
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
@@ -32,18 +32,41 @@ export default function PlayerLobby({ route, navigation }) {
   };
 
   useEffect(() => {
-    gameID && fetchGame();
+    socket.on("game-id", (id) => {
+      fetchPlayers(id);
+    });
 
-    socket.on("playerUpdate", () => fetchGame());
-    return () => socket.off("playerUpdate", () => fetchGame());
+    socket.on("room-state", ({ room, currentPlayers }) => {
+      if (room === gameID) {
+        fetchPlayers(room);
+      }
+    });
+
+    return () => {
+      socket.off("game-id", (id) => {
+        fetchPlayers(id);
+      });
+      socket.off("room-state", ({ room, currentPlayers }) => {
+        if (room === gameID) {
+          fetchPlayers(room);
+        }
+      });
+    };
   }, [gameID]);
 
   useEffect(() => {
     socket.on("goCountdown", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
-    return () => socket.off("goCountdown");
+    return () => socket.off("goCountdown", () => navigation.navigate("Start"));
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    gameID && fetchPlayers(gameID);
+
+    socket.on("playerUpdate", () => fetchPlayers(gameID));
+    return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
+  }, [gameID, socket]);
+
+  if (loading || !gameID) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#3498db" />
@@ -52,7 +75,7 @@ export default function PlayerLobby({ route, navigation }) {
   }
 
   //fonction au clic sur le bouton START
-  function startParty() { 
+  function startParty() {
     socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
   }
 
@@ -71,7 +94,6 @@ export default function PlayerLobby({ route, navigation }) {
         <Text style={styles.playerName}>START</Text>
       </TouchableOpacity>
     </SafeAreaView>
-
   );
 }
 

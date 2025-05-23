@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -10,15 +10,12 @@ export default function PlayerLobby({ route, navigation }) {
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
 
-  console.log(`gameID :`, gameID);
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const socket = useContext(SocketContext);
-
   const fetchPlayers = (id) => {
     setLoading(true);
-    fetch(`${BACKEND_URL}/players/${id}`)
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
@@ -35,35 +32,27 @@ export default function PlayerLobby({ route, navigation }) {
   };
 
   useEffect(() => {
-    // Écoute un événement pour récupérer dynamiquement le gameID
     socket.on("game-id", (id) => {
-      console.log("Received gameID:", id);
-      setGameID(id);
-      fetchPlayers(id); // Fetch les joueurs une fois le gameID reçu
-      console.log(gameID);
+      fetchPlayers(id);
     });
 
-
-    // Écoute les événements socket pour mettre à jour les joueurs
     socket.on("room-state", ({ room, currentPlayers }) => {
       if (room === gameID) {
-        console.log(`Party ${room} now has players:`, currentPlayers);
-        fetchPlayers(room); // Relance le fetch pour mettre à jour les joueurs
+        fetchPlayers(room);
       }
     });
 
-    // Nettoyage des écouteurs socket
     return () => {
       socket.off("game-id");
       socket.off("room-state");
     };
-  };
+  }, [gameID]);
 
   useEffect(() => {
-    gameID && fetchGame();
+    gameID && fetchPlayers(gameID);
 
-    socket.on("playerUpdate", () => fetchGame());
-    return () => socket.off("playerUpdate", () => fetchGame());
+    socket.on("playerUpdate", () => fetchPlayers(gameID));
+    return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
   }, [gameID, socket]);
 
   if (loading || !gameID) {

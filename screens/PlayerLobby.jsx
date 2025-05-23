@@ -39,8 +39,8 @@ export default function PlayerLobby({ route, navigation }) {
   }, [gameID]);
 
   useEffect(() => {
-    socket.on("lets-go", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
-    return () => socket.off("lets-go");
+    socket.on("goCountdown", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
+    return () => socket.off("goCountdown");
   }, []);
 
   if (loading) {
@@ -51,8 +51,9 @@ export default function PlayerLobby({ route, navigation }) {
     );
   }
 
-  function startParty() {
-    socket.emit("start-game", roomID);
+  //fonction au clic sur le bouton START
+  function startParty() { 
+    socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
   }
 
   return (

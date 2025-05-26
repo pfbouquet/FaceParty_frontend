@@ -7,6 +7,7 @@ import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
 import HomePlayer from "./screens/HomePlayer";
 import Question from "./screens/Question";
+import GameLifeScreen from "./screens/GameLifeScreen";
 import PlayerName from "./screens/PlayerName";
 import PlayerLobby from "./screens/PlayerLobby";
 // Multi game screens
@@ -84,6 +85,8 @@ export default function App() {
               <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Question" component={Question} />
+              <Stack.Screen name="GameLifeScreen" component={GameLifeScreen} />
+
               {/* Multi game admin and lobby screens */}
               <Stack.Screen name="HomeMulti" component={HomeMulti} />
               <Stack.Screen name="NewMultiGame" component={NewMultiGame} />

@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  SafeAreaView,
+} from "react-native";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
@@ -55,8 +63,11 @@ export default function PlayerLobby({ route, navigation }) {
   }, [gameID]);
 
   useEffect(() => {
-    socket.on("goCountdown", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
-    return () => socket.off("goCountdown", () => navigation.navigate("Start"));
+    socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
+    return () =>
+      socket.off("game-preparation", () =>
+        navigation.navigate("GamePreparation")
+      );
   }, []);
 
   useEffect(() => {
@@ -85,7 +96,11 @@ export default function PlayerLobby({ route, navigation }) {
         <Text style={styles.title}>PlayerLobby</Text>
         <Text style={styles.title}>Room : {roomID}</Text>
         {players.map((player) => (
-          <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
+          <TouchableOpacity
+            key={player._id}
+            style={styles.playerCard}
+            onPress={() => console.log(`Clicked on ${player.playerName}`)}
+          >
             <Text style={styles.playerName}>{player.playerName}</Text>
           </TouchableOpacity>
         ))}

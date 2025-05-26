@@ -18,6 +18,9 @@ export default function Question() {
 
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
+  const playerID = useSelector((state) => state.player.value.playerID);
+  console.log('playerID :', playerID);
+
 
   const [questionData, setQuestionData] = useState(null);
 
@@ -27,7 +30,10 @@ export default function Question() {
 
   const [buttonsActive, setButtonsActive] = useState(true)
   const [selectedButtonsIndexes, setSelectedButtonsIndexes] = useState([]);
+  console.log('selectedButtonsIndexes :', selectedButtonsIndexes);
   const [goodAnswers, setGoodAnswers] = useState(null);
+  console.log('goodAnswers :', goodAnswers);
+  
 
   const [nextRound, setNextRound] = useState(null);
 
@@ -61,80 +67,116 @@ export default function Question() {
           <TouchableOpacity key={i}
             onPress={() => {
               if (!buttonsActive) return;
-              if (selectedButtonsIndexes.includes(i)) {
-                setSelectedButtonsIndexes(selectedButtonsIndexes.filter(index => index !== i)); //si le bouton est déjà sélectionné, on le désélectionne
-              }else if (selectedButtonsIndexes.length < 2) {
-                setSelectedButtonsIndexes([...selectedButtonsIndexes, i]); //si le bouton n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajoute
+              if (selectedButtonsIndexes.includes(e)) {
+                setSelectedButtonsIndexes(selectedButtonsIndexes.filter(element => element !== e)); //si le bouton est déjà sélectionné, on le désélectionne
+              } else if (selectedButtonsIndexes.length < 2) {
+                setSelectedButtonsIndexes([...selectedButtonsIndexes, e]); //si le bouton n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajoute
               }
             }}
-              style = { getLeftButtonStyle(i) }
-                >
-                <Text style={selectedButtonsIndexes.includes(i) ? styles.txtSelect : styles.txt}>{e}</Text>
+            style={getButtonStyle(e)}
+          >
+            <Text style={selectedButtonsIndexes.includes(e) ? styles.txtSelect : styles.txt}>{e}</Text>
           </TouchableOpacity >
         );
-  }
+      }
     );
-  setButtons(possibleAnswers); //save jsx of left buttons
+    setButtons(possibleAnswers); //save jsx of buttons
 
 
-}
+  }
 
-
-const getLeftButtonStyle = (index) => {
+const getButtonStyle = (name) => {
   if (!goodAnswers) {
     // Sélection en cours
-    return selectedButtonsIndexes.includes(index) ? styles.btnSelect : styles.btn;
+    return selectedButtonsIndexes.includes(name) ? styles.btnSelect : styles.btn;
   }
   // Résultat affiché
-  if (goodAnswers.includes(questionData.possibleAnswers[index])) {
-    // Bonne réponse
+  if (goodAnswers.includes(name) && selectedButtonsIndexes.includes(name)) {
+    // Bonne réponse sélectionnée
     return styles.btnSelectTrue;
-  } else if (selectedButtonsIndexes.includes(index)) {
+  } else if (!goodAnswers.includes(name) && selectedButtonsIndexes.includes(name)) {
     // Mauvaise réponse sélectionnée
     return styles.btnSelectFalse;
+  } else if (goodAnswers.includes(name)) {
+    // Bonne réponse non sélectionnée
+    return styles.btnSelectTrue;
   } else {
-    // Non sélectionné
+    // Non sélectionné et mauvaise réponse
     return styles.btn;
   }
 };
+  
+  //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
+  function resultAnswer() {
+    setButtonsActive(false); //désactive les boutons une fois le timer terminé
+    setGoodAnswers(questionData.goodAnswer);
+    setNextRound(
+      <TouchableOpacity style={styles.btnNext}>
+        <Text>Next round</Text>
+      </TouchableOpacity>)
 
-//fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
-function resultAnswer() {
-  setButtonsActive(false); //désactive les boutons une fois le timer terminé
-  setGoodAnswers(questionData.goodAnswer);
-  setNextRound(
-    <TouchableOpacity style={styles.btnNext}>
-      <Text>Next round</Text>
-    </TouchableOpacity>)
-}
+    if ((selectedButtonsIndexes.length === 0)) { //manque les "ou si 2 réponses sont fausses" et "ou si 1 réponse est sélectionné et fausse"
+      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          playerID: playerID,
+          score: 0, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
+        }),
+      })
+    } else if ((selectedButtonsIndexes.length === 1)) { //si 1 réponses est sélectionné et bonne
+      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          playerID: playerID,
+          score: 10, //score de 10 si les 1 bonne réponse est sélectionnée
+        }),
+      })
+    } else {
+      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          playerID: playerID,
+          score: 20, //score de 20 si les 2 bonnes réponse sont sélectionnées
+        }),
+      })
+    }
+  }
 
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.question}>
+        <Text style={styles.round}>Round {roundNumber}</Text>
+        {image}
+        <Text style={styles.rule}>Sélectionnez les 2 personnes présente dans la photo</Text>
 
-return (
-  <SafeAreaView style={styles.container}>
-    <View style={styles.question}>
-      <Text style={styles.round}>Round {roundNumber}</Text>
-      {image}
-      <Text style={styles.rule}>Sélectionnez les 2 personnes présente dans la photo</Text>
+        <Countdown
+          until={5}
+          onFinish={() => resultAnswer()}
+          size={20}
+          digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
+          digitTxtStyle={{ color: '#0f3e61' }}
+          timeToShow={['S']}
+          timeLabels={{ s: '' }}
+          styles={styles.countdown}
+        />
+        {nextRound}
+      </View>
 
-      <Countdown
-        until={5}
-        onFinish={() => resultAnswer()}
-        size={20}
-        digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
-        digitTxtStyle={{ color: '#0f3e61' }}
-        timeToShow={['S']}
-        timeLabels={{ s: '' }}
-        styles={styles.countdown}
-      />
-      {nextRound}
-    </View>
+      <View style={styles.answers}>
+        {buttons}
+      </View>
 
-    <View style={styles.answers}>
-      {buttons}
-    </View>
-
-  </SafeAreaView>
-);
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -232,5 +274,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-})
-
+});

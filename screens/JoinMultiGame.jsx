@@ -79,7 +79,7 @@ export default function JoinMultiGame({ navigation }) {
       return;
     }
     try {
-      let joined = await joinGame(socket.id, false, roomID.toUpperCase());
+      let joined = await joinGame(socket.id, true, roomID.toUpperCase());
       if (joined) {
         // Navigate to the game screen => PlayerName
         navigation.navigate("PlayerName");

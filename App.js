@@ -28,6 +28,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncSt
 
 import game from "./reducers/game";
 import player from "./reducers/player";
+import question from "./reducers/question";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -60,9 +61,9 @@ const persistedReducers = persistReducer(
     key: "expojs-starter",
     storage: AsyncStorage,
     blacklist: [], // Add reducers that you don't want to persist
-    whitelist: ["player", "game"], // Add reducers that you want to persist
+    whitelist: ["player", "game", "question"], // Add reducers that you want to persist
   },
-  combineReducers({ player, game })
+  combineReducers({ player, game, question })
 );
 
 const store = configureStore({

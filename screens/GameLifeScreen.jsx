@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { newQuestion } from "../reducers/question";
 import { SocketContext } from "../contexts/SocketContext";
 import { GameLifeGetReadyForNextQuestion } from "../components/GameLifeGetReadyForNextQuestion";
+import { Question } from "../components/Question";
 
 export default function GameLifeScreen({ navigation }) {
   const socket = useContext(SocketContext);
@@ -45,7 +46,9 @@ export default function GameLifeScreen({ navigation }) {
   if (phase === "question-get-ready") {
     GameContent = <GameLifeGetReadyForNextQuestion />;
   } else if (phase === "question") {
-    GameContent = <Text>Next question</Text>;
+    GameContent = <Question />;
+  } else if (phase === "scoreboard") {
+    GameContent = <Text>Scoreboard will be displayed here.</Text>;
   }
 
   return <View style={styles.container}>{GameContent}</View>;

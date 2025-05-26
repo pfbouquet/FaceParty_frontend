@@ -20,8 +20,6 @@ export default function Question() {
   const roomID = useSelector((state) => state.game.value.roomID);
   const playerID = useSelector((state) => state.player.value.playerID);
   const [questionData, setQuestionData] = useState(null);
-
-  console.log("questionData :", questionData);
   
   const [image, setImage] = useState(null);
   // const [buttons, setButtons] = useState(null);
@@ -64,7 +62,7 @@ export default function Question() {
       },
       body: JSON.stringify({
         playerID: playerID,
-        score: selectedNames.filter((e) => questionData?.goodAnswer.includes(e)).length * 10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
+        score: selectedNames.filter((e) => questionData?.goodAnswers.includes(e)).length * 10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
       }),
     })
   }
@@ -95,7 +93,7 @@ export default function Question() {
   const buttons = questionData?.possibleAnswers.map((e, i) => {
     const canClick = buttonsActive;
     const isSelected = selectedNames.includes(e);
-    const isValid = questionData?.goodAnswer.includes(e);
+    const isValid = questionData?.goodAnswers.includes(e);
 
     return (
       <TouchableOpacity 

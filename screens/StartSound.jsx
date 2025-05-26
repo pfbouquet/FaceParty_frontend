@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Audio } from 'expo-av';
-import { useSelector } from 'react-redux';
-import { SocketContext } from '../contexts/SocketContext';
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Audio } from "expo-av";
+import { useSelector } from "react-redux";
+import { SocketContext } from "../contexts/SocketContext";
 
-export default function Start({ navigation }) {
+export default function StartSound({ navigation }) {
   const [timeLeft, setTimeLeft] = useState(5); // durée du compte à rebours
   const beepSound = useRef(null);
   const finishSound = useRef(null);
@@ -14,15 +14,12 @@ export default function Start({ navigation }) {
 
   useEffect(() => {
     // Charger les sons
+    console.log("StartSound");
     const loadSounds = async () => {
-      const { sound: beep } = await Audio.Sound.createAsync(
-        require('../assets/sounds/beep.mp3')
-      );
+      const { sound: beep } = await Audio.Sound.createAsync(require("../assets/sounds/beep.mp3"));
       beepSound.current = beep;
 
-      const { sound: finish } = await Audio.Sound.createAsync(
-        require('../assets/sounds/countdown-boom.mp3')
-      );
+      const { sound: finish } = await Audio.Sound.createAsync(require("../assets/sounds/countdown-boom.mp3"));
       finishSound.current = finish;
     };
 
@@ -35,14 +32,15 @@ export default function Start({ navigation }) {
       if (finishSound.current) {
         finishSound.current.unloadAsync();
       }
-      socket.off('nextQuestion');
+      socket.off("nextQuestion");
+      return () => socket.off("nextQuestion", goToStartSound);
       clearInterval(countdownInterval.current);
     };
   }, []);
 
   useEffect(() => {
-    socket.on('nextQuestion', () => navigation.navigate('Question'));
-    return () => socket.off('nextQuestion');
+    socket.on("nextQuestion", () => navigation.navigate("Question"));
+    return () => socket.off("nextQuestion");
   }, []);
 
   useEffect(() => {
@@ -56,7 +54,7 @@ export default function Start({ navigation }) {
           try {
             await beepSound.current.replayAsync();
           } catch (e) {
-            console.warn('Erreur de lecture audio (initial) :', e);
+            console.warn("Erreur de lecture audio (initial) :", e);
           }
         }
       }, 0);
@@ -69,7 +67,7 @@ export default function Start({ navigation }) {
           try {
             await beepSound.current.replayAsync();
           } catch (e) {
-            console.warn('Erreur de lecture audio :', e);
+            console.warn("Erreur de lecture audio :", e);
           }
         }
 
@@ -78,11 +76,11 @@ export default function Start({ navigation }) {
             try {
               await finishSound.current.replayAsync();
             } catch (e) {
-              console.warn('Erreur de lecture audio (fin) :', e);
+              console.warn("Erreur de lecture audio (fin) :", e);
             }
           }
           clearInterval(countdownInterval.current);
-          socket.emit('endCountdown', roomID);
+          socket.emit("endCountdown", roomID);
         }
       }, 1000);
     };
@@ -95,7 +93,7 @@ export default function Start({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>La partie va bientôt commencer !</Text>
-      <Text style={styles.countdown}>{timeLeft > 0 ? timeLeft : 'FaceParty!'}</Text>
+      <Text style={styles.countdown}>{timeLeft > 0 ? timeLeft : "FaceParty!"}</Text>
     </View>
   );
 }
@@ -103,17 +101,17 @@ export default function Start({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   text: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   countdown: {
     fontSize: 50,
-    fontWeight: 'bold',
-    color: '#FA725A',
+    fontWeight: "bold",
+    color: "#FA725A",
   },
 });

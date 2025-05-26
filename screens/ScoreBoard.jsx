@@ -5,7 +5,7 @@ import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function PlayerLobby({ route, navigation }) {
+export default function ScoreBoard({ navigation }) {
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -47,28 +47,37 @@ export default function PlayerLobby({ route, navigation }) {
   }, [gameID]);
 
   useEffect(() => {
-    socket.on("goCountdown", () => navigation.navigate("StartSound"));
-    return () => socket.off("goCountdown", () => navigation.navigate("StartSound"));
-  }, []);
-
-  useEffect(() => {
     gameID && fetchPlayers(gameID);
 
     socket.on("playerUpdate", () => fetchPlayers(gameID));
     return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
   }, [gameID, socket]);
 
-  const startParty = () => {
-    socket.emit("start-game", roomID);
+  const continueParty = () => {
+    // socket.emit("start-game", roomID);
+    console.log("continueParty");
+    socket.emit("game-cycle", { type: "go-startsound", roomID: roomID }); //transmet le signal de l'admin pour revenir sur un compte à rebours
   };
 
-  if (loading || !gameID) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#3498db" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    const goToStartSound = () => navigation.navigate("Start"); //écoute le signal de lancement plus bas dans startParty() et qui correspond au emit de la fonction StartParty juste au dessus
+    socket.on("game-cycle", (data) => {
+      setTimeout(() => {
+        if (data.type == "go-startsound") {
+          goToStartSound();
+        }
+      }, 500);
+    });
+    return () => socket.off("game-cycle", goToStartSound);
+  }, []);
+
+  // if (loading || !gameID) {
+  //   return (
+  //     <View style={styles.loader}>
+  //       <ActivityIndicator size="large" color="#3498db" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <SafeAreaView style={styles.lobby}>
@@ -89,7 +98,7 @@ export default function PlayerLobby({ route, navigation }) {
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={startParty}>
+        <TouchableOpacity style={styles.startButton} onPress={continueParty}>
           <Text style={styles.startButtonText}>Next round</Text>
         </TouchableOpacity>
       )}

@@ -56,8 +56,8 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
   }, [gameID]);
 
   useEffect(() => {
-    socket.on("goCountdown", () => navigation.navigate("StartSound")); //écoute le signal de lancement plus bas dans startParty()
-    return () => socket.off("goCountdown", () => navigation.navigate("StartSound"));
+    socket.on("goCountdown", () => navigation.navigate("Start")); //écoute le signal de lancement plus bas dans startParty()
+    return () => socket.off("goCountdown", () => navigation.navigate("Start"));
   }, []);
 
   useEffect(() => {

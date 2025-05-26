@@ -1,10 +1,10 @@
+
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Countdown from 'react-native-countdown-component';
 import { useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
-
 
 export default function Start({ navigation }) {
   const socket = useContext(SocketContext);

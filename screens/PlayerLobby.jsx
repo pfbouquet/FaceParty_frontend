@@ -13,10 +13,11 @@ import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function PlayerLobby({ route, navigation }) {
+export default function PlayerLobby({ route, navigation }) { /*  supprimer le route dans la fonction ??? */
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
+  const admin = useSelector((state) => state.player.value.isAdmin);
 
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -105,9 +106,12 @@ export default function PlayerLobby({ route, navigation }) {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
-        <Text style={styles.playerName}>START</Text>
-      </TouchableOpacity>
+
+      {admin && (
+        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+          <Text style={styles.playerName}>START</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 }

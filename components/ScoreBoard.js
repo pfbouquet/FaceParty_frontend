@@ -1,21 +1,27 @@
-import React, { useEffect, useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+
+import { useEffect, useState, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function ScoreBoard({ navigation }) {
+export const ScoreBoard = () => {
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
   const admin = useSelector((state) => state.player.value.isAdmin);
-
+  const question = useSelector((state) => state.question.value);
   const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchPlayers = (id) => {
-    setLoading(true);
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -26,58 +32,25 @@ export default function ScoreBoard({ navigation }) {
         } else {
           console.error("Erreur:", data.error);
         }
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Erreur fetch:", error);
-        setLoading(false);
       });
   };
-
-  useEffect(() => {
-    socket.on("game-id", (id) => {
-      fetchPlayers(id);
-    });
-
-    return () => {
-      socket.off("game-id", (id) => {
-        fetchPlayers(id);
-      });
-    };
-  }, [gameID]);
 
   useEffect(() => {
     gameID && fetchPlayers(gameID);
-
-    socket.on("playerUpdate", () => fetchPlayers(gameID));
-    return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
-  }, [gameID, socket]);
-
-  const continueParty = () => {
-    // socket.emit("start-game", roomID);
-    console.log("continueParty");
-    socket.emit("game-cycle", { type: "go-startsound", roomID: roomID }); //transmet le signal de l'admin pour revenir sur un compte à rebours
-  };
-
-  useEffect(() => {
-    const goToStartSound = () => navigation.navigate("Start"); //écoute le signal de lancement plus bas dans startParty() et qui correspond au emit de la fonction StartParty juste au dessus
-    socket.on("game-cycle", (data) => {
-      setTimeout(() => {
-        if (data.type == "go-startsound") {
-          goToStartSound();
-        }
-      }, 500);
-    });
-    return () => socket.off("game-cycle", goToStartSound);
   }, []);
 
-  // if (loading || !gameID) {
-  //   return (
-  //     <View style={styles.loader}>
-  //       <ActivityIndicator size="large" color="#3498db" />
-  //     </View>
-  //   );
-  // }
+  const continueParty = () => {
+    console.log("continue party to next question");
+    socket.emit("game-cycle", {
+      type: "get-next-question",
+      roomID: roomID,
+      gameID: gameID,
+      currentQuestionIndex: question.index,
+    }); //transmet le signal de l'admin pour passer à la prochaine question
+  };
 
   return (
     <SafeAreaView style={styles.lobby}>
@@ -104,7 +77,7 @@ export default function ScoreBoard({ navigation }) {
       )}
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   loader: {

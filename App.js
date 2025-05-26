@@ -6,7 +6,6 @@ import FontAwesome from "react-native-vector-icons/FontAwesome"; // https://obla
 import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";
 import HomePlayer from "./screens/HomePlayer";
-import Question from "./screens/Question";
 import GameLifeScreen from "./screens/GameLifeScreen";
 import PlayerName from "./screens/PlayerName";
 import PlayerLobby from "./screens/PlayerLobby";
@@ -17,7 +16,6 @@ import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 // import StartSound from "./screens/StartSound";
 import Start from "./screens/Start";
-import ScoreBoard from "./screens/ScoreBoard";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -87,7 +85,6 @@ export default function App() {
               <Stack.Screen name="SnapScreen" component={SnapScreen} />
               <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
-              <Stack.Screen name="Question" component={Question} />
               <Stack.Screen name="GameLifeScreen" component={GameLifeScreen} />
 
               {/* Multi game admin and lobby screens */}
@@ -95,7 +92,6 @@ export default function App() {
               <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
               <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
               <Stack.Screen name="Start" component={Start} />
-              <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

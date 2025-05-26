@@ -5,11 +5,10 @@ import { newQuestion } from "../reducers/question";
 import { SocketContext } from "../contexts/SocketContext";
 import { GameLifeGetReadyForNextQuestion } from "../components/GameLifeGetReadyForNextQuestion";
 import { Question } from "../components/Question";
+import { ScoreBoard } from "../components/ScoreBoard";
 
 export default function GameLifeScreen({ navigation }) {
   const socket = useContext(SocketContext);
-  const game = useSelector((state) => state.game.value);
-  const player = useSelector((state) => state.player.value);
   const [phase, setPhase] = useState("game-preparation");
 
   const dispatch = useDispatch();
@@ -44,7 +43,7 @@ export default function GameLifeScreen({ navigation }) {
   } else if (phase === "question") {
     GameContent = <Question />;
   } else if (phase === "scoreboard") {
-    GameContent = <Text>Scoreboard will be displayed here.</Text>;
+    GameContent = <ScoreBoard />;
   }
 
   return <View style={styles.container}>{GameContent}</View>;

@@ -16,24 +16,20 @@ export default function GameLifeScreen({ navigation }) {
 
   useEffect(() => {
     const handler = (data) => {
-      switch (data.type) {
-        case "next-question":
-          dispatch(
-            newQuestion({
-              index: data.payload.index,
-              goodAnswers: data.payload.goodAnswers,
-              possibleAnswers: data.payload.possibleAnswers,
-              imageURL: data.payload.morphURL,
-            })
-          );
-          setPhase("question-get-ready");
-          break;
-        case "go-question":
-          setPhase("question");
-          break;
-        case "go-scoreboard":
-          setPhase("scoreboard");
-          break;
+      if (data.type === "next-question") {
+        dispatch(
+          newQuestion({
+            index: data.payload.index,
+            goodAnswers: data.payload.goodAnswers,
+            possibleAnswers: data.payload.possibleAnswers,
+            imageURL: data.payload.morphURL,
+          })
+        );
+        setPhase("question-get-ready");
+      } else if (data.type === "go-question") {
+        setPhase("question");
+      } else if (data.type === "go-scoreboard") {
+        setPhase("scoreboard");
       }
     };
 

@@ -18,6 +18,7 @@ export default function Question() {
 
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
+  const admin = useSelector((state) => state.player.value.isAdmin);
 
   const [questionData, setQuestionData] = useState(null);
   console.log(questionData)
@@ -129,14 +130,19 @@ export default function Question() {
   };
 
   //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
-  function resultAnswer() {
-    setButtonsActive(false); //désactive les boutons une fois le timer terminé
-    setGoodAnswers(questionData.goodAnswer);
+function resultAnswer() {
+  setButtonsActive(false); // désactive les boutons une fois le timer terminé
+  setGoodAnswers(questionData.goodAnswer);
+
+  // Affiche le bouton uniquement si l'utilisateur est admin
+  if (admin) {
     setNextRound(
       <TouchableOpacity style={styles.btnNext}>
         <Text>Next round</Text>
-      </TouchableOpacity>)
+      </TouchableOpacity>
+    );
   }
+}
 
 
   return (

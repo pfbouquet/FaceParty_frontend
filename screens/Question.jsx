@@ -22,14 +22,11 @@ export default function Question() {
   const [questionData, setQuestionData] = useState(null);
 
   const [image, setImage] = useState(null);
-  const [leftButtons, setLeftButtons] = useState(null);
-  const [rightButtons, setRightButtons] = useState(null);
   const [buttons, setButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
 
   const [buttonsActive, setButtonsActive] = useState(true)
-  const [selectedLeftIndex, setSelectedLeftIndex] = useState(null);
-  const [selectedRightIndex, setSelectedRightIndex] = useState(null);
+  const [selectedButtonsIndexes, setSelectedButtonsIndexes] = useState([]);
   const [goodAnswers, setGoodAnswers] = useState(null);
 
   const [nextRound, setNextRound] = useState(null);
@@ -39,7 +36,6 @@ export default function Question() {
     socket.on("questionText", (data) => {
       setQuestionData(data.payload);
     })
-  console.log("data??",questionData)
 
     return () => {
       socket.off("questionText");
@@ -50,7 +46,7 @@ export default function Question() {
     if (questionData) {
       giveQuestion(); // Se déclenche SEULEMENT quand questionData est mis à jour
     }
-  }, [questionData, selectedLeftIndex, selectedRightIndex, goodAnswers]);
+  }, [questionData, selectedButtonsIndexes, goodAnswers]);
 
 
   async function giveQuestion() {
@@ -59,124 +55,86 @@ export default function Question() {
     setImage(<Image style={styles.image} source={{ uri: questionData.imageURL }} />);
 
     //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
-    let leftPossibilities = questionData.possibleAnswers[0].map(
+    let possibleAnswers = questionData.possibleAnswers.map(
       (e, i) => {
         return (
           <TouchableOpacity key={i}
-            onPress={() => { if (buttonsActive) { setSelectedLeftIndex(i) } }}
-            style={getLeftButtonStyle(i)}
-          >
-            <Text style={selectedLeftIndex === i ? styles.txtSelect : styles.txt}>{e}</Text>
-          </TouchableOpacity>
+            onPress={() => {
+              if (!buttonsActive) return;
+              if (selectedButtonsIndexes.includes(i)) {
+                setSelectedButtonsIndexes(selectedButtonsIndexes.filter(index => index !== i)); //si le bouton est déjà sélectionné, on le désélectionne
+              }else if (selectedButtonsIndexes.length < 2) {
+                setSelectedButtonsIndexes([...selectedButtonsIndexes, i]); //si le bouton n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajoute
+              }
+            }}
+              style = { getLeftButtonStyle(i) }
+                >
+                <Text style={selectedButtonsIndexes.includes(i) ? styles.txtSelect : styles.txt}>{e}</Text>
+          </TouchableOpacity >
         );
-      }
+  }
     );
-    setLeftButtons(leftPossibilities); //save jsx of left buttons
+  setButtons(possibleAnswers); //save jsx of left buttons
 
-    //boucle pour créer dans le 2nd des 2 tableaux de réponses possibles les boutons associés
-    // let rightPossibilities = questionData.possibleAnswers[1].map(
-    //   (e, j) => {
-    //     return (
-    //       <TouchableOpacity key={j}
-    //         onPress={() => { if (buttonsActive) { setSelectedRightIndex(j) } }}
-    //         style={getRightButtonStyle(j)}
-    //       >
-    //         <Text style={selectedRightIndex === j ? styles.txtSelect : styles.txt} >{e}</Text>
-    //       </TouchableOpacity>
-    //     );
-    //   }
-    // );
-    // setRightButtons(rightPossibilities); //save jsx of right buttons
+
+}
+
+
+const getLeftButtonStyle = (index) => {
+  if (!goodAnswers) {
+    // Sélection en cours
+    return selectedButtonsIndexes.includes(index) ? styles.btnSelect : styles.btn;
   }
-
-  //fonction permettant de dynamiser la couleur des boutons de gauche
-  const getLeftButtonStyle = (index) => {
-    if (!goodAnswers) {
-      if (selectedLeftIndex === index) {
-        return styles.btnSelect;
-      } else {
-        return styles.btn;
-      }
-    }
-    if (goodAnswers) {
-      if (questionData.goodAnswer[0] === questionData.possibleAnswers[index]) {
-        return styles.btnSelectTrue;
-      } else if (selectedLeftIndex === index) {
-        return styles.btnSelectFalse;
-      } else {
-        return styles.btn;
-      }
-    }
-  };
-
-  //fonction permettant de dynamiser la couleur des boutons de droite
-  // const getRightButtonStyle = (index2) => {
-  //   if (!goodAnswers) {
-  //     if (selectedRightIndex === index2) {
-  //       return styles.btnSelect;
-  //     } else {
-  //       return styles.btn;
-  //     }
-  //   }
-  //   if (goodAnswers) {
-  //     if (questionData.goodAnswer[1] === questionData.possibleAnswers[1][index2]) {
-  //       return styles.btnSelectTrue;
-  //     } else if (selectedRightIndex === index2) {
-  //       return styles.btnSelectFalse;
-  //     } else {
-  //       return styles.btn;
-  //     }
-  //   }
-  // };
-
-  //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
-  function resultAnswer() {
-    setButtonsActive(false); //désactive les boutons une fois le timer terminé
-    setGoodAnswers(questionData.goodAnswer);
-    setNextRound(
-      <TouchableOpacity style={styles.btnNext}>
-        <Text>Next round</Text>
-      </TouchableOpacity>)
+  // Résultat affiché
+  if (goodAnswers.includes(questionData.possibleAnswers[index])) {
+    // Bonne réponse
+    return styles.btnSelectTrue;
+  } else if (selectedButtonsIndexes.includes(index)) {
+    // Mauvaise réponse sélectionnée
+    return styles.btnSelectFalse;
+  } else {
+    // Non sélectionné
+    return styles.btn;
   }
+};
+
+//fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
+function resultAnswer() {
+  setButtonsActive(false); //désactive les boutons une fois le timer terminé
+  setGoodAnswers(questionData.goodAnswer);
+  setNextRound(
+    <TouchableOpacity style={styles.btnNext}>
+      <Text>Next round</Text>
+    </TouchableOpacity>)
+}
 
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.question}>
-        <Text style={styles.round}>Round {roundNumber}</Text>
-        {image}
-        <Text style={styles.rule}>Sélectionnez les 2 personnes présente dans la photo</Text>
+return (
+  <SafeAreaView style={styles.container}>
+    <View style={styles.question}>
+      <Text style={styles.round}>Round {roundNumber}</Text>
+      {image}
+      <Text style={styles.rule}>Sélectionnez les 2 personnes présente dans la photo</Text>
 
-        <Countdown
-          until={5}
-          onFinish={() => resultAnswer()}
-          size={20}
-          digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
-          digitTxtStyle={{ color: '#0f3e61' }}
-          timeToShow={['S']}
-          timeLabels={{ s: '' }}
-          styles={styles.countdown}
-        />
-        {nextRound}
-      </View>
+      <Countdown
+        until={5}
+        onFinish={() => resultAnswer()}
+        size={20}
+        digitStyle={{ backgroundColor: '#FA725A', color: '#0F3E61' }}
+        digitTxtStyle={{ color: '#0f3e61' }}
+        timeToShow={['S']}
+        timeLabels={{ s: '' }}
+        styles={styles.countdown}
+      />
+      {nextRound}
+    </View>
 
-      <View style={styles.answers}>
-          {leftButtons}
-      </View>
+    <View style={styles.answers}>
+      {buttons}
+    </View>
 
-      {/* <View style={styles.answers}>
-        <View>
-          <Text>⬇️ 1ère personne ⬇️</Text>
-          {leftButtons}
-        </View>
-
-        <View>
-          <Text>⬇️ 2ème personne ⬇️</Text>
-          {rightButtons}
-        </View>
-      </View> */}
-    </SafeAreaView>
-  );
+  </SafeAreaView>
+);
 }
 
 const styles = StyleSheet.create({
@@ -218,7 +176,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: "40%",
     alignItems: "center",
-    marginRight:5,
+    marginRight: 5,
   },
   txt: {
     fontWeight: "bold",

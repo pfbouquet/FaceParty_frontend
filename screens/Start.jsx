@@ -6,7 +6,6 @@ import { useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
-
 export default function Start({ navigation }) {
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);

@@ -15,6 +15,7 @@ import NewMultiGame from "./screens/NewMultiGame";
 import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 import StartSound from "./screens/StartSound";
+import ScoreBoard from "./screens/ScoreBoard";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -89,6 +90,7 @@ export default function App() {
               <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
               <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
               <Stack.Screen name="StartSound" component={StartSound} />
+              <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
             </Stack.Navigator>
           </NavigationContainer>
         </PersistGate>

@@ -5,7 +5,7 @@ import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function PlayerLobby({ route, navigation }) { /*  supprimer le route dans la fonction ??? */
+export default function PlayerLobby({ route, navigation }) {
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -20,7 +20,9 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          setPlayers(data.players);
+          // Trie par score décroissant
+          const sorted = [...data.players].sort((a, b) => b.score - a.score);
+          setPlayers(sorted);
         } else {
           console.error("Erreur:", data.error);
         }
@@ -37,26 +39,15 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
       fetchPlayers(id);
     });
 
-    socket.on("room-state", ({ room, currentPlayers }) => {
-      if (room === gameID) {
-        fetchPlayers(room);
-      }
-    });
-
     return () => {
       socket.off("game-id", (id) => {
         fetchPlayers(id);
-      });
-      socket.off("room-state", ({ room, currentPlayers }) => {
-        if (room === gameID) {
-          fetchPlayers(room);
-        }
       });
     };
   }, [gameID]);
 
   useEffect(() => {
-    socket.on("goCountdown", () => navigation.navigate("StartSound")); //écoute le signal de lancement plus bas dans startParty()
+    socket.on("goCountdown", () => navigation.navigate("StartSound"));
     return () => socket.off("goCountdown", () => navigation.navigate("StartSound"));
   }, []);
 
@@ -67,6 +58,10 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
     return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
   }, [gameID, socket]);
 
+  const startParty = () => {
+    socket.emit("start-game", roomID);
+  };
+
   if (loading || !gameID) {
     return (
       <View style={styles.loader}>
@@ -75,26 +70,27 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
     );
   }
 
-  //fonction au clic sur le bouton START
-  function startParty() {
-    socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
-  }
-
   return (
     <SafeAreaView style={styles.lobby}>
+      <Text style={styles.title}>🏆 Classement des joueurs</Text>
+      <View style={styles.tableHeader}>
+        <Text style={[styles.cell, styles.header]}>Rang</Text>
+        <Text style={[styles.cell, styles.header]}>Nom</Text>
+        <Text style={[styles.cell, styles.header]}>Score</Text>
+      </View>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>PlayerLobby</Text>
-        <Text style={styles.title}>Room : {roomID}</Text>
-        {players.map((player) => (
-          <TouchableOpacity key={player._id} style={styles.playerCard} onPress={() => console.log(`Clicked on ${player.playerName}`)}>
-            <Text style={styles.playerName}>{player.playerName}</Text>
-          </TouchableOpacity>
+        {players.map((player, index) => (
+          <View key={player._id} style={styles.row}>
+            <Text style={styles.cell}>{index + 1}</Text>
+            <Text style={styles.cell}>{player.playerName}</Text>
+            <Text style={styles.cell}>{player.score}</Text>
+          </View>
         ))}
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
-          <Text style={styles.playerName}>START</Text>
+        <TouchableOpacity style={styles.startButton} onPress={startParty}>
+          <Text style={styles.startButtonText}>Next round</Text>
         </TouchableOpacity>
       )}
     </SafeAreaView>
@@ -110,40 +106,53 @@ const styles = StyleSheet.create({
   lobby: {
     flex: 1,
     backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  container: {
-    paddingVertical: 40,
-    alignItems: "center",
-    backgroundColor: "white",
+    paddingTop: 40,
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    textAlign: "center",
+    marginBottom: 30,
+    color: "#2c3e50",
   },
-  playerCard: {
+  container: {
+    paddingBottom: 40,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#ecf0f1",
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  row: {
+    flexDirection: "row",
     backgroundColor: "#3498db",
+    marginBottom: 10,
     paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: "80%",
-    alignItems: "center",
+    borderRadius: 8,
   },
-  playerName: {
-    color: "#fff",
+  cell: {
+    flex: 1,
+    textAlign: "center",
+    color: "white",
     fontSize: 18,
+  },
+  header: {
     fontWeight: "bold",
+    color: "#2c3e50",
   },
   startButton: {
     backgroundColor: "#de6b58",
-    paddingVertical: 30,
-    paddingHorizontal: 0,
+    paddingVertical: 15,
     borderRadius: 10,
-    marginVertical: 10,
-    width: "80%",
     alignItems: "center",
+    marginTop: 20,
+  },
+  startButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

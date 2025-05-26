@@ -14,7 +14,7 @@ import Countdown from 'react-native-countdown-component';
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function Question() {
+export default function Question({navigation}) {
 
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -129,6 +129,22 @@ export default function Question() {
     }
   };
 
+  //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
+  function continueParty() {
+    socket.emit("game-cycle", {type : 'go-scoreboard', roomID: roomID}); //transmet le signal de l'admin pour lancer la partie
+  }
+
+useEffect(() => {
+  const goToScoreBoard = () => navigation.navigate("ScoreBoard"); //écoute le signal de lancement plus bas dans startParty() et qui correspond au emit de la fonction StartParty juste au dessus
+      socket.on("game-cycle", (data) => {
+        setTimeout(() => {
+            if (data.type == 'go-scoreboard') {
+              goToScoreBoard()}
+        }, 500);
+    });
+  return () => socket.off("game-cycle", goToScoreBoard);
+}, []);
+
   //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
 function resultAnswer() {
   setButtonsActive(false); // désactive les boutons une fois le timer terminé
@@ -137,7 +153,7 @@ function resultAnswer() {
   // Affiche le bouton uniquement si l'utilisateur est admin
   if (admin) {
     setNextRound(
-      <TouchableOpacity style={styles.btnNext}>
+      <TouchableOpacity style={styles.btnNext} onPress={() => continueParty()}>
         <Text>Next round</Text>
       </TouchableOpacity>
     );

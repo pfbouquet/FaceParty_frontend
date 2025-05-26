@@ -19,21 +19,16 @@ export default function Question() {
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
   const playerID = useSelector((state) => state.player.value.playerID);
-  console.log('playerID :', playerID);
-
-
   const [questionData, setQuestionData] = useState(null);
 
+  console.log("questionData :", questionData);
+  
   const [image, setImage] = useState(null);
-  const [buttons, setButtons] = useState(null);
+  // const [buttons, setButtons] = useState(null);
   const [roundNumber, setRoundNumber] = useState(0);
 
   const [buttonsActive, setButtonsActive] = useState(true)
-  const [selectedButtonsIndexes, setSelectedButtonsIndexes] = useState([]);
-  console.log('selectedButtonsIndexes :', selectedButtonsIndexes);
-  const [goodAnswers, setGoodAnswers] = useState(null);
-  console.log('goodAnswers :', goodAnswers);
-  
+  const [selectedNames, setSelectedNames] = useState([]);
 
   const [nextRound, setNextRound] = useState(null);
 
@@ -52,104 +47,68 @@ export default function Question() {
     if (questionData) {
       giveQuestion(); // Se déclenche SEULEMENT quand questionData est mis à jour
     }
-  }, [questionData, selectedButtonsIndexes, goodAnswers]);
+  }, [questionData]);
+
 
 
   async function giveQuestion() {
-
     setRoundNumber(questionData.index); //current round number  
     setImage(<Image style={styles.image} source={{ uri: questionData.imageURL }} />);
-
-    //boucle pour créer dans le 1er des 2 tableaux de réponses possibles les boutons associés
-    let possibleAnswers = questionData.possibleAnswers.map(
-      (e, i) => {
-        return (
-          <TouchableOpacity key={i}
-            onPress={() => {
-              if (!buttonsActive) return;
-              if (selectedButtonsIndexes.includes(e)) {
-                setSelectedButtonsIndexes(selectedButtonsIndexes.filter(element => element !== e)); //si le bouton est déjà sélectionné, on le désélectionne
-              } else if (selectedButtonsIndexes.length < 2) {
-                setSelectedButtonsIndexes([...selectedButtonsIndexes, e]); //si le bouton n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajoute
-              }
-            }}
-            style={getButtonStyle(e)}
-          >
-            <Text style={selectedButtonsIndexes.includes(e) ? styles.txtSelect : styles.txt}>{e}</Text>
-          </TouchableOpacity >
-        );
-      }
-    );
-    setButtons(possibleAnswers); //save jsx of buttons
-
-
   }
 
-const getButtonStyle = (name) => {
-  if (!goodAnswers) {
-    // Sélection en cours
-    return selectedButtonsIndexes.includes(name) ? styles.btnSelect : styles.btn;
+  function sendScoreToDB() {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        playerID: playerID,
+        score: selectedNames.filter((e) => questionData?.goodAnswer.includes(e)).length * 10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
+      }),
+    })
   }
-  // Résultat affiché
-  if (goodAnswers.includes(name) && selectedButtonsIndexes.includes(name)) {
-    // Bonne réponse sélectionnée
-    return styles.btnSelectTrue;
-  } else if (!goodAnswers.includes(name) && selectedButtonsIndexes.includes(name)) {
-    // Mauvaise réponse sélectionnée
-    return styles.btnSelectFalse;
-  } else if (goodAnswers.includes(name)) {
-    // Bonne réponse non sélectionnée
-    return styles.btnSelectTrue;
-  } else {
-    // Non sélectionné et mauvaise réponse
-    return styles.btn;
-  }
-};
-  
   //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
   function resultAnswer() {
     setButtonsActive(false); //désactive les boutons une fois le timer terminé
-    setGoodAnswers(questionData.goodAnswer);
     setNextRound(
       <TouchableOpacity style={styles.btnNext}>
         <Text>Next round</Text>
       </TouchableOpacity>)
 
-    if ((selectedButtonsIndexes.length === 0)) { //manque les "ou si 2 réponses sont fausses" et "ou si 1 réponse est sélectionné et fausse"
-      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          playerID: playerID,
-          score: 0, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
-        }),
-      })
-    } else if ((selectedButtonsIndexes.length === 1)) { //si 1 réponses est sélectionné et bonne
-      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          playerID: playerID,
-          score: 10, //score de 10 si les 1 bonne réponse est sélectionnée
-        }),
-      })
-    } else {
-      fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          playerID: playerID,
-          score: 20, //score de 20 si les 2 bonnes réponse sont sélectionnées
-        }),
-      })
+    sendScoreToDB()
+  }
+
+  // FUNCTIONS ------------------------------------------------------------
+
+  // Fonction pour sélectionner les boutons
+  const handleSelect = (name) => {
+    if (selectedNames.includes(name)) {
+      setSelectedNames(selectedNames.filter((n) => n !== name)); // Si le nom est déjà sélectionné, on le désélectionne
+    } else if (selectedNames.length < 2) {
+        setSelectedNames([...selectedNames, name]); // Si le nom n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajout
     }
   }
+
+  // VARIABLES ----------------------------------------------------------------
+
+  const buttons = questionData?.possibleAnswers.map((e, i) => {
+    const canClick = buttonsActive;
+    const isSelected = selectedNames.includes(e);
+    const isValid = questionData?.goodAnswer.includes(e);
+
+    return (
+      <TouchableOpacity 
+        key={i}
+        onPress={() => canClick && handleSelect(e)}
+        style={styles[canClick ? (!isSelected ? "btn" : "btnSelect") : (isValid ? "btnSelectTrue" : (isSelected ? "btnSelectFalse" : "btn"))]}
+      >
+        <Text style={styles[isSelected ? "txtSelect" : "txt"]}>{e}</Text>
+      </TouchableOpacity >
+    );
+  });
+
+  // JSX ----------------------------------------------------------------
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,9 +1,14 @@
 import { StyleSheet, View, Text } from "react-native";
 import Countdown from "react-native-countdown-component";
 import { useSelector } from "react-redux";
+import { useContext } from "react";
+import { SocketContext } from "../contexts/SocketContext";
 
 export const GameLifeGetReadyForNextQuestion = () => {
   const player = useSelector((state) => state.player.value);
+  const socket = useContext(SocketContext);
+  const roomID = useSelector((state) => state.game.value.roomID);
+
 
   function endReadyForQuestionCountdown() {
     if (player.isAdmin) {

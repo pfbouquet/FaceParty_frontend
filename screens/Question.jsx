@@ -127,7 +127,7 @@ function resultAnswer() {
       </TouchableOpacity >
     );
   });
-
+}
   // JSX ----------------------------------------------------------------
 
   return (

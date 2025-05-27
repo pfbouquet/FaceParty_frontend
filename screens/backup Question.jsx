@@ -13,7 +13,7 @@ import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const Question = () => {
+export const Question = ({ navigation }) => {
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
   const question = useSelector((state) => state.question.value);
@@ -60,10 +60,37 @@ export const Question = () => {
     socket.emit("game-cycle", { type: "go-scoreboard", roomID: roomID }); //transmet le signal de l'admin pour lancer la partie
   }
   // fonction pour naviguer vers la page Podium
-  function finishParty() {
-  socket.emit("game-cycle", { type: "to-podium", roomID: roomID }); //transmet le signal de l'admin pour emètre un socket pour aller sur la page Podium
-  }
+  // function finishParty() {navigation.navigate("Podium");}
 
+   // 🧠 Écoute du signal socket pour retour au lobby
+  useEffect(() => {
+    const handler = (data) => {
+      if (data.type === "to-the-podium") {
+        navigation.navigate("Podium");
+      }
+    };
+
+    socket.on("game-cycle", handler);
+    return () => {
+      socket.off("game-cycle", handler);
+    };
+  }, []);
+
+  // 🔁 Émet un signal pour tous retourner au lobby
+  const toScoreBoard = () => {
+    console.log("Bring everyone to the Podium");
+    socket.emit("game-cycle", {
+      type: "to-the-podium",
+      roomID: roomID,
+      gameID: gameID,
+      playerID: playerID,
+    });
+  };
+
+    //fonction au clic sur le bouton Go to Podium pour émètre dans le player socket
+  function finishParty() {
+    socket.emit("game-cycle", roomID); //transmet le signal de l'admin pour lancer la partie
+  }
   
   //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
 function resultAnswer() {
@@ -259,3 +286,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
+
+
+
+
+
+  // {navigation.navigate("Podium");}

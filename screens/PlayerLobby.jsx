@@ -7,9 +7,14 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
+  Modal,
+  TextInput,
+  Image,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -18,10 +23,17 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
   const admin = useSelector((state) => state.player.value.isAdmin);
+  const player = useSelector((state) => state.player.value);
 
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newPlayerName, setNewPlayerName] = useState('');
+  const [selfieURL, setSelfieURL] = useState('');
+  const [playnerNameClick, setPlayerNameClick] = useState('');
+  const [selectedPlayerID, setSelectedPlayerID] = useState('');
 
+  // FONCTIONS --------------------------------------------------------------
   const fetchPlayers = (id) => {
     setLoading(true);
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
@@ -40,6 +52,48 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
       });
   };
 
+  function handleNewName() {
+    if (newPlayerName.length === 0 || newPlayerName === player.playerName) {
+      alert("Player name empty or unchanged.");
+      return;
+    }
+
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/updateName`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerID: player.playerID,
+        playerName: newPlayerName,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.message);
+        if (data.result) {
+          socket.emit("playerUpdate", roomID);
+        } else {
+          alert("Erreur lors de la mise à jour du nom.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erreur réseau.");
+      });
+    setModalVisible(false);
+  };
+
+
+  function handleModal(id, playerName) {
+    setSelfieURL(`${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}`);
+    setNewPlayerName(playerName);
+    setPlayerNameClick(playerName);
+    setSelectedPlayerID(id);
+    setModalVisible(true);
+  }
+
+  // USEEFFECT --------------------------------------------------------------
   useEffect(() => {
     socket.on("game-id", (id) => {
       fetchPlayers(id);
@@ -62,7 +116,6 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
       });
     };
   }, [gameID]);
-
   useEffect(() => {
     socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
     return () =>
@@ -86,6 +139,48 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
     );
   }
 
+  // VARIABLES --------------------------------------------------------------
+  const modal = (
+    <Modal visible={modalVisible} animationType="fade" transparent>
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <View style={styles.modalCross}>
+            <TouchableOpacity
+              onPress={() => { setModalVisible(false) }}
+              style={styles.crossModal}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.textButton}>X</Text>
+            </TouchableOpacity>
+          </View>
+
+          {player.playerID === selectedPlayerID ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
+            <>
+              <TouchableOpacity onPress={() => navigation.navigate("SnapScreen")} activeOpacity={0.8} style={styles.blockChangeImg}>
+                <Image style={styles.image} source={{ uri: selfieURL }} />
+                <FontAwesome name='pencil' size='20' color='#de6b58' style={styles.icon}/>
+              </TouchableOpacity>
+              <TextInput
+                onChangeText={setNewPlayerName}
+                value={newPlayerName}
+                style={styles.input}
+              />
+              <TouchableOpacity onPress={handleNewName} style={styles.button} activeOpacity={0.8}>
+                <Text style={styles.textButton}>Update</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Image style={styles.image} source={{ uri: selfieURL }} />
+              <Text>{playnerNameClick}</Text>
+            </>
+          )}
+
+        </View>
+      </View>
+    </Modal>)
+
+
   //fonction au clic sur le bouton START
   function startParty() {
     socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
@@ -94,13 +189,15 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
   return (
     <SafeAreaView style={styles.lobby}>
       <ScrollView contentContainerStyle={styles.container}>
+        {modal}
         <Text style={styles.title}>PlayerLobby</Text>
         <Text style={styles.title}>Room : {roomID}</Text>
         {players.map((player) => (
           <TouchableOpacity
             key={player._id}
             style={styles.playerCard}
-            onPress={() => console.log(`Clicked on ${player.playerName}`)}
+            // onPress={() => console.log(`Clicked on ${player.playerName}`)}
+            onPress={() => handleModal(player._id, player.playerName)}
           >
             <Text style={styles.playerName}>{player.playerName}</Text>
           </TouchableOpacity>
@@ -160,5 +257,80 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "80%",
     alignItems: "center",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '90%',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 30,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalCross: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: '',
+    width: '100%',
+  },
+  input: {
+    width: 200,
+    borderBottomColor: '#de6b58',
+    borderBottomWidth: 1,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  button: {
+    width: 200,
+    alignItems: 'center',
+    marginTop: 20,
+    paddingTop: 8,
+    backgroundColor: '#de6b58',
+    borderRadius: 10,
+  },
+  textButton: {
+    color: '#ffffff',
+    height: 24,
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  image: {
+    width: 150,
+    height: 200,
+    borderRadius: 20,
+    marginBottom: 20,
+    alignSelf: 'center',
+    marginRight:-20,
+  },
+  crossModal: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    paddingTop: 5,
+    backgroundColor: '#de6b58',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -10,
+    marginBottom: 15,
+  },
+  blockChangeImg:{
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  icon:{
+    marginLeft: -5,
+    marginTop: 10,
   },
 });

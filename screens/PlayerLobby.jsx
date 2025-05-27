@@ -7,7 +7,6 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
-  Modal,
   TextInput,
   Image,
   Modal,

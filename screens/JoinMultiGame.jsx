@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from "react-native";
-import KeyboardAvoidingWrapper from "../components/KeyboardAvoidingWrapper";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
 // import game and player reducers
@@ -93,25 +92,23 @@ export default function JoinMultiGame({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingWrapper>
-      <View style={styles.container}>
-        <Text style={styles.title}>JoinMultiGame</Text>
-        <Text style={styles.errorMessage}>{errorMessage}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="XXXX"
-          value={roomID}
-          onChangeText={(value) => setRoomID(value)}
-        />
+    <View style={styles.container}>
+      <Text style={styles.title}>JoinMultiGame</Text>
+      <Text style={styles.errorMessage}>{errorMessage}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="XXXX"
+        value={roomID}
+        onChangeText={(value) => setRoomID(value)}
+      />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleCodeSubmission()}
-        >
-          <Text style={styles.buttonText}> ^ JOIN ^ </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingWrapper>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handleCodeSubmission()}
+      >
+        <Text style={styles.buttonText}> ^ JOIN ^ </Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 

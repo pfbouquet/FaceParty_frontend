@@ -2,7 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome"; // https://oblador.github.io/react-native-vector-icons/#FontAwesome
-import { KeyboardAvoidingWrapper } from "../components/KeyboardAvoidingWrapper";
+import { KeyboardAvoidingWrapper } from "./components/KeyboardAvoidingWrapper";
 
 import Home from "./screens/Home";
 import HomeTuto from "./screens/HomeTuto";

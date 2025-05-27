@@ -1,6 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
 import { useEffect, useState, useContext } from "react";
-import ConfettiCannon from 'react-native-confetti-cannon';
+import ConfettiCannon from "react-native-confetti-cannon";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
@@ -11,7 +18,7 @@ export default function Podium({ navigation }) {
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
   const admin = useSelector((state) => state.player.value.isAdmin);
-  const question = useSelector((state) => state.question.value);
+  const playerID = useSelector((state) => state.player.value.playerID);
   const [players, setPlayers] = useState([]);
 
   const fetchPlayers = (id) => {
@@ -19,7 +26,6 @@ export default function Podium({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          // Trie par score décroissant
           const sorted = [...data.players].sort((a, b) => b.score - a.score);
           setPlayers(sorted);
         } else {
@@ -32,32 +38,98 @@ export default function Podium({ navigation }) {
   };
 
   useEffect(() => {
-    gameID && fetchPlayers(gameID);
+    if (gameID) fetchPlayers(gameID);
+  }, [gameID]);
+
+  // 🧠 Écoute du signal socket pour retour au lobby
+  useEffect(() => {
+    const handler = (data) => {
+      if (data.type === "to-the-lobby") {
+        navigation.navigate("PlayerLobby");
+      }
+    };
+
+    socket.on("game-cycle", handler);
+    return () => {
+      socket.off("game-cycle", handler);
+    };
   }, []);
 
-  const continueParty = () => {
-    console.log("continue party to next question");
+  // 🔁 Émet un signal pour tous retourner au lobby
+  const toTheLobby = () => {
+    console.log("Bring everyone to the Lobby");
     socket.emit("game-cycle", {
-      type: "get-next-question",
+      type: "to-the-lobby",
       roomID: roomID,
       gameID: gameID,
-      currentQuestionIndex: question.index,
-    }); //transmet le signal de l'admin pour passer à la prochaine question
+      playerID: playerID,
+    });
+  };
+
+  // 🧹 Réinitialise les scores et retourne au lobby
+  const relaunchParty = async () => {
+    try {
+      const response = await fetch(
+        `${EXPO_PUBLIC_BACKEND_URL}/players/clearScores/${gameID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.result) {
+        console.log("Relauch successful. Returning to lobby...");
+        toTheLobby();
+      } else {
+        console.error("Failed to clear scores:", data.message);
+      }
+    } catch (error) {
+      console.error("Error during relaunchParty:", error.message);
+    }
   };
 
   return (
     <SafeAreaView style={styles.lobby}>
-    <ConfettiCannon count={100} origin={{ x: -10, y: 0 }} fadeOut={true} />
+      <ConfettiCannon
+        count={300}
+        origin={{ x: -10, y: 0 }}
+        fadeOut={true}
+        fallSpeed={5000}
+        explosionSpeed={900}
+      />
+
       <Text style={styles.title}>🏆 Podium 🏆</Text>
+
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
         <Text style={[styles.cell, styles.header]}>Nom</Text>
         <Text style={[styles.cell, styles.header]}>Score</Text>
       </View>
+
       <ScrollView contentContainerStyle={styles.container}>
         {players.map((player, index) => (
-          <View key={player._id} style={[styles.row, index === 0 && { backgroundColor: "#f1c40f" }, index === 1 && { backgroundColor: "#bdc3c7" }, index === 2 && { backgroundColor: "#cd7f32" }]}>
-            <Text style={styles.cell}>{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}</Text>
+          <View
+            key={player._id}
+            style={[
+              styles.row,
+              index === 0 && { backgroundColor: "#f1c40f" },
+              index === 1 && { backgroundColor: "#bdc3c7" },
+              index === 2 && { backgroundColor: "#cd7f32" },
+            ]}
+          >
+            <Text style={styles.cell}>
+              {index === 0
+                ? "🥇"
+                : index === 1
+                ? "🥈"
+                : index === 2
+                ? "🥉"
+                : index + 1}
+            </Text>
             <Text style={styles.cell}>{player.playerName}</Text>
             <Text style={styles.cell}>{player.score}</Text>
           </View>
@@ -65,7 +137,7 @@ export default function Podium({ navigation }) {
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={continueParty}>
+        <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
           <Text style={styles.startButtonText}>New Game</Text>
         </TouchableOpacity>
       )}
@@ -74,11 +146,6 @@ export default function Podium({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   lobby: {
     flex: 1,
     backgroundColor: "white",

@@ -32,6 +32,8 @@ export default function GameLifeScreen({ navigation }) {
         setPhase("question");
       } else if (data.type === "go-scoreboard") {
         setPhase("scoreboard");
+      } else if (data.type === "to-podium") {
+        setPhase("podium");
       }
     };
 
@@ -49,7 +51,7 @@ export default function GameLifeScreen({ navigation }) {
     GameContent = <Question navigation={navigation} />;
   } else if (phase === "scoreboard") {
     GameContent = <ScoreBoard />;
-  }
+  } else if (phase === "podium") {navigation.navigate("Podium");}
 
   return <View style={styles.container}>{GameContent}</View>;
 }

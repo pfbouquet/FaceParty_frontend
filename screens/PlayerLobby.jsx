@@ -15,10 +15,12 @@ import * as ClipboardExpo from "expo-clipboard";
 import { Share } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { Ionicons } from "@expo/vector-icons";
+// Load reducers
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+// Load components
+import { LobbyPlayerAdminMenu } from "../components/LobbyPlayerAdminMenu";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -34,10 +36,10 @@ export default function PlayerLobby({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [modalQRVisible, setModalQRVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newPlayerName, setNewPlayerName] = useState('');
-  const [selfieURL, setSelfieURL] = useState('');
-  const [playnerNameClick, setPlayerNameClick] = useState('');
-  const [selectedPlayerID, setSelectedPlayerID] = useState('');
+  const [newPlayerName, setNewPlayerName] = useState("");
+  const [selfieURL, setSelfieURL] = useState("");
+  const [playnerNameClick, setPlayerNameClick] = useState("");
+  const [selectedPlayerID, setSelectedPlayerID] = useState("");
 
   // FONCTIONS --------------------------------------------------------------
   const fetchPlayers = (id) => {
@@ -78,7 +80,7 @@ export default function PlayerLobby({ route, navigation }) {
       .then((data) => {
         console.log(data.message);
         if (data.result) {
-          socket.emit("playerUpdate", roomID);
+          socket.emit("player-update", roomID);
         } else {
           alert("Erreur lors de la mise à jour du nom.");
         }
@@ -88,8 +90,7 @@ export default function PlayerLobby({ route, navigation }) {
         alert("Erreur réseau.");
       });
     setModalVisible(false);
-  };
-
+  }
 
   function handleModal(id, playerName) {
     setSelfieURL(`${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}`);
@@ -122,6 +123,7 @@ export default function PlayerLobby({ route, navigation }) {
       });
     };
   }, [gameID]);
+
   useEffect(() => {
     socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
     return () =>
@@ -133,8 +135,8 @@ export default function PlayerLobby({ route, navigation }) {
   useEffect(() => {
     gameID && fetchPlayers(gameID);
 
-    socket.on("playerUpdate", () => fetchPlayers(gameID));
-    return () => socket.off("playerUpdate", () => fetchPlayers(gameID));
+    socket.on("player-update", () => fetchPlayers(gameID));
+    return () => socket.off("player-update", () => fetchPlayers(gameID));
   }, [gameID, socket]);
 
   if (loading || !gameID) {
@@ -152,7 +154,9 @@ export default function PlayerLobby({ route, navigation }) {
         <View style={styles.modalView}>
           <View style={styles.modalCross}>
             <TouchableOpacity
-              onPress={() => { setModalVisible(false) }}
+              onPress={() => {
+                setModalVisible(false);
+              }}
               style={styles.crossModal}
               activeOpacity={0.8}
             >
@@ -162,16 +166,29 @@ export default function PlayerLobby({ route, navigation }) {
 
           {player.playerID === selectedPlayerID ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
             <>
-              <TouchableOpacity onPress={() => navigation.navigate("SnapScreen")} activeOpacity={0.8} style={styles.blockChangeImg}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("SnapScreen")}
+                activeOpacity={0.8}
+                style={styles.blockChangeImg}
+              >
                 <Image style={styles.image} source={{ uri: selfieURL }} />
-                <FontAwesome name='pencil' size='20' color='#de6b58' style={styles.icon}/>
+                <FontAwesome
+                  name="pencil"
+                  size="20"
+                  color="#de6b58"
+                  style={styles.icon}
+                />
               </TouchableOpacity>
               <TextInput
                 onChangeText={setNewPlayerName}
                 value={newPlayerName}
                 style={styles.input}
               />
-              <TouchableOpacity onPress={handleNewName} style={styles.button} activeOpacity={0.8}>
+              <TouchableOpacity
+                onPress={handleNewName}
+                style={styles.button}
+                activeOpacity={0.8}
+              >
                 <Text style={styles.textButton}>Update</Text>
               </TouchableOpacity>
             </>
@@ -181,11 +198,10 @@ export default function PlayerLobby({ route, navigation }) {
               <Text>{playnerNameClick}</Text>
             </>
           )}
-
         </View>
       </View>
-    </Modal>)
-
+    </Modal>
+  );
 
   //fonction au clic sur le bouton START
   function startParty() {
@@ -219,14 +235,22 @@ export default function PlayerLobby({ route, navigation }) {
           </TouchableOpacity>
         </View>
         {players.map((player) => (
-          <TouchableOpacity
-            key={player._id}
-            style={styles.playerCard}
-            // onPress={() => console.log(`Clicked on ${player.playerName}`)}
-            onPress={() => handleModal(player._id, player.playerName)}
-          >
-            <Text style={styles.playerName}>{player.playerName}</Text>
-          </TouchableOpacity>
+          <View key={player._id} style={styles.playerCard}>
+            <TouchableOpacity
+              style={styles.playerButton}
+              // onPress={() => console.log(`Clicked on ${player.playerName}`)}
+              onPress={() => handleModal(player._id, player.playerName)}
+            >
+              <Text style={styles.playerName}>{player.playerName}</Text>
+            </TouchableOpacity>
+            {admin && (
+              <LobbyPlayerAdminMenu
+                style={styles.playerAdminMenu}
+                playerID={player._id}
+                roomID={roomID}
+              ></LobbyPlayerAdminMenu>
+            )}
+          </View>
         ))}
       </ScrollView>
 
@@ -284,19 +308,33 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   playerCard: {
-    backgroundColor: "#3498db",
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 10,
     marginVertical: 10,
-    width: "80%",
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  playerButton: {
+    backgroundColor: "#3498db",
+    height: "80%",
+    width: "80%",
+    borderRadius: 10,
+    paddingHorizontal: 25,
+    alignItems: "center",
+    justifyContent: "center",
   },
   playerName: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
+  playerAdminMenu: {
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   startButton: {
     backgroundColor: "#de6b58",
     paddingVertical: 30,
@@ -345,16 +383,16 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '90%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "90%",
   },
   modalView: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     padding: 30,
-    justifyContent: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -364,30 +402,30 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modalCross: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: '',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "",
+    width: "100%",
   },
   input: {
     width: 200,
-    borderBottomColor: '#de6b58',
+    borderBottomColor: "#de6b58",
     borderBottomWidth: 1,
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   button: {
     width: 200,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
     paddingTop: 8,
-    backgroundColor: '#de6b58',
+    backgroundColor: "#de6b58",
     borderRadius: 10,
   },
   textButton: {
-    color: '#ffffff',
+    color: "#ffffff",
     height: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 15,
   },
   image: {
@@ -395,26 +433,26 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 20,
     marginBottom: 20,
-    alignSelf: 'center',
-    marginRight:-20,
+    alignSelf: "center",
+    marginRight: -20,
   },
   crossModal: {
     width: 30,
     height: 30,
     borderRadius: 15,
     paddingTop: 5,
-    backgroundColor: '#de6b58',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#de6b58",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: -10,
     marginBottom: 15,
   },
-  blockChangeImg:{
-    flexDirection: 'row',
-    justifyContent: 'center',
+  blockChangeImg: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 20,
   },
-  icon:{
+  icon: {
     marginLeft: -5,
     marginTop: 10,
   },

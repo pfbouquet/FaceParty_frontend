@@ -1,30 +1,81 @@
+import React, { useRef, useEffect } from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    ScrollView,
     SafeAreaView,
+    Animated,
+    Easing,
+    Image,
 } from "react-native";
-import { useEffect, useState, useContext } from "react";
-import { useSelector } from "react-redux";
-import { SocketContext } from "../contexts/SocketContext";
 
-const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+export const WaitingStart = () => {
+    const spinValue = useRef(new Animated.Value(0)).current;
 
-export const ScoreBoard = () => {
-    const socket = useContext(SocketContext);
-    const gameID = useSelector((state) => state.game.value.gameID);
-    const roomID = useSelector((state) => state.game.value.roomID);
-    const admin = useSelector((state) => state.player.value.isAdmin);
-    const question = useSelector((state) => state.question.value);
-    const [players, setPlayers] = useState([]);
+    useEffect(() => {
+        Animated.loop(
+            Animated.timing(spinValue, {
+                toValue: 1,
+                duration: 3000,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            })
+        ).start();
+    }, [spinValue]);
 
+    const spin = spinValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
+    });
+
+    const messages = [
+        "Génération des mix de vos visages...",
+        "Chargement des confettis",
+        "Eradication des inégalités salariales",
+        "Dégustation imminente des saucisses !",
+        "Inversement du réchauffement climatique",
+        "Préparation de la fête...",
+        "Soyez patient, nous y sommes presque !",
+
+    ];
+    const [messageIndex, setMessageIndex] = React.useState(0);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const animateMessage = () => {
+            Animated.sequence([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+                Animated.delay(1500),
+                Animated.timing(fadeAnim, {
+                    toValue: 0,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+            ]).start(() => {
+                setMessageIndex(prev => (prev + 1) % messages.length);
+            });
+        };
+        animateMessage();
+    }, [messageIndex, fadeAnim, messages.length]);
 
     return (
         <SafeAreaView style={styles.container}>
-            <Image source={require('../assets/logo-faceparty.png')} style={styles.logo}/>
-            <Text>Waiting for game to start...</Text>
+            <View>
+                <TouchableOpacity>
+                    <Animated.Image
+                        source={require('../assets/logo-faceparty.png')}
+                        style={[styles.logo, { transform: [{ rotate: spin }] }]}
+                    />
+                </TouchableOpacity>
+            </View>
+            <Animated.Text style={[styles.text, { opacity: fadeAnim }]}>
+                {messages[messageIndex]}
+            </Animated.Text>
         </SafeAreaView>
     );
 };
@@ -32,10 +83,17 @@ export const ScoreBoard = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'space-around',
+        alignItems: 'center',
     },
-    logo:{
+    logo: {
         width: 200,
-        height: 200,    },
+        height: 200,
+    },
+    text: {
+        fontSize: 20,
+        color: '#0f3e61',
+        textAlign: 'center',
+        marginTop: 20,
+    },
 });

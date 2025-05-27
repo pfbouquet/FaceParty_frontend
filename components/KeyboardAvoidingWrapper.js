@@ -5,7 +5,7 @@ import {
   Platform,
 } from "react-native";
 
-export default function KeyboardAvoidingWrapper({ children }) {
+export const KeyboardAvoidingWrapper = ({ children }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -16,4 +16,4 @@ export default function KeyboardAvoidingWrapper({ children }) {
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
-}
+};

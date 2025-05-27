@@ -1,19 +1,12 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
-
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
 import { useEffect, useState, useContext } from "react";
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function Podium ({ navigation }) {
+export default function Podium({ navigation }) {
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -54,6 +47,7 @@ export default function Podium ({ navigation }) {
 
   return (
     <SafeAreaView style={styles.lobby}>
+    <ConfettiCannon count={100} origin={{ x: -10, y: 0 }} fadeOut={true} />
       <Text style={styles.title}>🏆 Podium 🏆</Text>
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
@@ -62,8 +56,8 @@ export default function Podium ({ navigation }) {
       </View>
       <ScrollView contentContainerStyle={styles.container}>
         {players.map((player, index) => (
-          <View key={player._id} style={styles.row}>
-            <Text style={styles.cell}>{index + 1}</Text>
+          <View key={player._id} style={[styles.row, index === 0 && { backgroundColor: "#f1c40f" }, index === 1 && { backgroundColor: "#bdc3c7" }, index === 2 && { backgroundColor: "#cd7f32" }]}>
+            <Text style={styles.cell}>{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}</Text>
             <Text style={styles.cell}>{player.playerName}</Text>
             <Text style={styles.cell}>{player.score}</Text>
           </View>
@@ -77,7 +71,7 @@ export default function Podium ({ navigation }) {
       )}
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   loader: {

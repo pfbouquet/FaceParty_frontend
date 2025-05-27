@@ -8,6 +8,7 @@ import { SocketContext } from "../contexts/SocketContext";
 import { GameLifeGetReadyForNextQuestion } from "../components/GameLifeGetReadyForNextQuestion";
 import { Question } from "../components/Question";
 import { ScoreBoard } from "../components/ScoreBoard";
+import { WaitingStart } from "../components/WaitingStart";
 
 export default function GameLifeScreen({ navigation }) {
   const socket = useContext(SocketContext);
@@ -38,7 +39,9 @@ export default function GameLifeScreen({ navigation }) {
     return () => socket.off("game-cycle", handler);
   }, []);
 
-  let GameContent = <Text>Waiting for game to start...</Text>;
+  let GameContent = <WaitingStart />; // >> à réactiver
+  // let GameContent = <GameLifeGetReadyForNextQuestion />; // >> à supprimer une fois prête
+
 
   if (phase === "question-get-ready") {
     GameContent = <GameLifeGetReadyForNextQuestion />;

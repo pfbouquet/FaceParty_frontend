@@ -1,13 +1,36 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Animated, Easing, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { SocketContext } from "../contexts/SocketContext";
 
 export const GameLifeGetReadyForNextQuestion = () => {
   const player = useSelector((state) => state.player.value);
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
+  const game = useSelector((state) => state.game.value);
+  const question = useSelector((state) => state.question.value); //utile pour récupérer l'index de la question
   const [counter, setCounter] = useState(3);
+  const [nbRound, setNbRound] = useState(0);
+
+
+  const spinValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, [spinValue]);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
 
   useEffect(() => {
     if (counter === 0) {
@@ -23,8 +46,14 @@ export const GameLifeGetReadyForNextQuestion = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Prépare toi à la question i/nbround</Text>
-      <Text styles={styles.countdown}>{counter}</Text>
+      <TouchableOpacity>
+        <Animated.Image
+          source={require('../assets/logo-faceparty.png')}
+          style={[styles.logo, { transform: [{ rotate: spin }] }]}
+        />
+      </TouchableOpacity>
+      <Text style={styles.text}>Prépare toi à la question {question.index + 1}/{game.nbRound}</Text>
+      <Text style={styles.counter}>{counter}</Text>
     </View>
   );
 };
@@ -41,11 +70,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   counter: {
-    fontSize: 40,
+    fontSize: 36,
     fontWeight: "bold",
-    color: "#0F3E61",
     backgroundColor: "#FA725A",
-    padding: 20,
+    color: "#0F3E61",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 10,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   },
 });

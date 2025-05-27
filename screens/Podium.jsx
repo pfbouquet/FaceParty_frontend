@@ -35,19 +35,33 @@ export default function Podium({ navigation }) {
     gameID && fetchPlayers(gameID);
   }, []);
 
-  const continueParty = () => {
-    console.log("continue party to next question");
-    socket.emit("game-cycle", {
-      type: "get-next-question",
-      roomID: roomID,
-      gameID: gameID,
-      currentQuestionIndex: question.index,
-    }); //transmet le signal de l'admin pour passer à la prochaine question
-  };
+
+const relaunchParty = async () => {
+  try {
+    const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/clearScores/${gameID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (data.result) {
+      console.log("Relauch successful. Returning to lobby...");
+      navigation.navigate("PlayerLobby");
+    } else {
+      console.error("Failed to clear scores:", data.message);
+    }
+  } catch (error) {
+    console.error("Error during relaunchParty:", error.message);
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.lobby}>
-    <ConfettiCannon count={100} origin={{ x: -10, y: 0 }} fadeOut={true} />
+    <ConfettiCannon count={300} origin={{ x: -10, y: 0 }} fadeOut={true} fallSpeed={5000} explosionSpeed={900}/>
       <Text style={styles.title}>🏆 Podium 🏆</Text>
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
@@ -65,7 +79,7 @@ export default function Podium({ navigation }) {
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={continueParty}>
+        <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
           <Text style={styles.startButtonText}>New Game</Text>
         </TouchableOpacity>
       )}

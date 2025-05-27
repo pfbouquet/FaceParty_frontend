@@ -21,7 +21,7 @@ export default function GameLifeScreen({ navigation }) {
             index: data.payload.index,
             goodAnswers: data.payload.goodAnswers,
             possibleAnswers: data.payload.possibleAnswers,
-            imageURL: data.payload.morphURL,
+            imageURL: data.payload.imageURL,
           })
         );
         setPhase("question-get-ready");

@@ -1,19 +1,15 @@
-import {
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Platform,
-} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export const KeyboardAvoidingWrapper = ({ children }) => {
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        {children}
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <KeyboardAwareScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ flexGrow: 1 }}
+      enableOnAndroid={true}
+      keyboardShouldPersistTaps="handled"
+      extraScrollHeight={20}
+    >
+      {children}
+    </KeyboardAwareScrollView>
   );
 };

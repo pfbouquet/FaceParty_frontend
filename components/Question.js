@@ -17,6 +17,7 @@ export const Question = ({ navigation }) => {
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
   const question = useSelector((state) => state.question.value);
+  const game = useSelector((state) => state.game.value);
   const playerID = useSelector((state) => state.player.value.playerID);
   const admin = useSelector((state) => state.player.value.isAdmin);
   const currentQuestionIndex = useSelector((state) => state.question.value.index);
@@ -136,7 +137,7 @@ function resultAnswer() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.question}>
-        <Text style={styles.round}>Round {question.index + 1}</Text>
+        <Text style={styles.round}>Round {question.index + 1}/{game.nbRound}</Text>
         <Image style={styles.image} source={{ uri: question.imageURL }} />
         <Text style={styles.rule}>
           Sélectionnez les 2 personnes présentes dans la photo

@@ -4,14 +4,18 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
+  Modal,
 } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-// import game and player reducers
+import { Ionicons } from "@expo/vector-icons";
+
+// Loadreducers
 import { useDispatch } from "react-redux";
 import { newGame } from "../reducers/game";
 import { newPlayer } from "../reducers/player";
+// Load components
+import { JoinQRScanner } from "../components/JoinQRScanner";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -19,6 +23,7 @@ export default function JoinMultiGame({ navigation }) {
   const socket = useContext(SocketContext);
   const [roomID, setRoomID] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [scannerVisible, setScannerVisible] = useState(false);
   const dispatch = useDispatch();
 
   async function joinGame(playerSocketID, isAdmin, roomID) {
@@ -65,11 +70,11 @@ export default function JoinMultiGame({ navigation }) {
     }
   }
 
-  const handleCodeSubmission = async () => {
-    console.log(`testing code ${roomID.toUpperCase()}`);
+  const handleCodeSubmission = async (roomIDvalue) => {
+    console.log(`testing code ${roomIDvalue.toUpperCase()}`);
 
     setErrorMessage("");
-    if (roomID.length !== 4) {
+    if (roomIDvalue.length !== 4) {
       setErrorMessage("Please enter a valid code");
       return;
     }
@@ -78,7 +83,7 @@ export default function JoinMultiGame({ navigation }) {
       return;
     }
     try {
-      let joined = await joinGame(socket.id, true, roomID.toUpperCase());
+      let joined = await joinGame(socket.id, true, roomIDvalue.toUpperCase());
       if (joined) {
         // Navigate to the game screen => PlayerName
         navigation.navigate("PlayerName");
@@ -91,9 +96,27 @@ export default function JoinMultiGame({ navigation }) {
     }
   };
 
+  const handleScanSuccess = (code) => {
+    setRoomID(code);
+    handleCodeSubmission(code);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>JoinMultiGame</Text>
+      {/* Scan to fill the code */}
+      <TouchableOpacity onPress={() => setScannerVisible(true)}>
+        <Ionicons name="qr-code-outline" size={120} color="#333" />
+      </TouchableOpacity>
+
+      <Modal visible={scannerVisible} animationType="slide">
+        <JoinQRScanner
+          onScanned={handleScanSuccess}
+          onCancel={() => setScannerVisible(false)}
+        />
+      </Modal>
+
+      {/* Joining by entering the code */}
+      <Text style={styles.title}>Join a game</Text>
       <Text style={styles.errorMessage}>{errorMessage}</Text>
       <TextInput
         style={styles.input}
@@ -104,7 +127,7 @@ export default function JoinMultiGame({ navigation }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => handleCodeSubmission()}
+        onPress={() => handleCodeSubmission(roomID)}
       >
         <Text style={styles.buttonText}> ^ JOIN ^ </Text>
       </TouchableOpacity>

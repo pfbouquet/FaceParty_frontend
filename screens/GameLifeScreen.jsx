@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useState, useEffect, useContext } from "react";
+// Load reducers
 import { useSelector, useDispatch } from "react-redux";
 import { newQuestion } from "../reducers/question";
 import { SocketContext } from "../contexts/SocketContext";
+// Load components
 import { GameLifeGetReadyForNextQuestion } from "../components/GameLifeGetReadyForNextQuestion";
 import { Question } from "../components/Question";
 import { ScoreBoard } from "../components/ScoreBoard";

@@ -16,6 +16,7 @@ import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 // import StartSound from "./screens/StartSound";
 import Start from "./screens/Start";
+import Podium from "./screens/Podium";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -86,6 +87,7 @@ export default function App() {
               <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="GameLifeScreen" component={GameLifeScreen} />
+              <Stack.Screen name="Podium" component={Podium} />
 
               {/* Multi game admin and lobby screens */}
               <Stack.Screen name="HomeMulti" component={HomeMulti} />

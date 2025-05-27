@@ -41,7 +41,7 @@ export default function GameLifeScreen({ navigation }) {
   if (phase === "question-get-ready") {
     GameContent = <GameLifeGetReadyForNextQuestion />;
   } else if (phase === "question") {
-    GameContent = <Question />;
+    GameContent = <Question navigation={navigation} />;
   } else if (phase === "scoreboard") {
     GameContent = <ScoreBoard />;
   }

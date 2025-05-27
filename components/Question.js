@@ -9,16 +9,21 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
-import Countdown from "react-native-countdown-component";
+// import Countdown from "react-native-countdown-component";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const Question = () => {
+export const Question = ({ navigation }) => {
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
   const question = useSelector((state) => state.question.value);
   const playerID = useSelector((state) => state.player.value.playerID);
   const admin = useSelector((state) => state.player.value.isAdmin);
+  const currentQuestionIndex = useSelector((state) => state.question.value.index);
+  // console.log(`currentQuestionIndex : `,currentQuestionIndex)
+  const nbRound = useSelector((state) => state.game.value.nbRound);
+  // console.log(`nbRound : `, nbRound)
+
   const [counter, setCounter] = useState(5);
   const [buttonsActive, setButtonsActive] = useState(true);
   const [selectedNames, setSelectedNames] = useState([]);
@@ -49,31 +54,41 @@ export const Question = () => {
       }),
     });
   }
-  
+
   //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
   function continueParty() {
     socket.emit("game-cycle", { type: "go-scoreboard", roomID: roomID }); //transmet le signal de l'admin pour lancer la partie
   }
+  // fonction pour naviguer vers la page Podium
+  function finishParty() {navigation.navigate("Podium");}
+  
+  //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
+function resultAnswer() {
+  setButtonsActive(false);
+  sendScoreToDB();
 
-  //fonction lancée une fois countdown terminé et chargeant usestate des bonnes réponses
-  function resultAnswer() {
-    setButtonsActive(false); // désactive les boutons une fois le timer terminé
-    // setGoodAnswers(questionData.goodAnswer);
+  const lastRound = currentQuestionIndex === nbRound - 1;
 
-    // Affiche le bouton uniquement si l'utilisateur est admin
-    if (admin) {
-      setNextRound(
-        <TouchableOpacity
-          style={styles.btnNext}
-          onPress={() => continueParty()}
-        >
-          <Text>Next round</Text>
-        </TouchableOpacity>
-      );
-
-      sendScoreToDB();
-    }
+  if (admin && lastRound) {
+    setNextRound(
+      <TouchableOpacity
+        style={styles.btnNext}
+        onPress={() => finishParty()}
+      >
+        <Text>Go to Podium</Text>
+      </TouchableOpacity>
+    );
+  } else if (admin) {
+    setNextRound(
+      <TouchableOpacity
+        style={styles.btnNext}
+        onPress={() => continueParty()}
+      >
+        <Text>Next round</Text>
+      </TouchableOpacity>
+    );
   }
+}
 
   // FUNCTIONS ------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,16 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from "react-native";
+import * as ClipboardExpo from "expo-clipboard";
+import { Share } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function PlayerLobby({ route, navigation }) { /*  supprimer le route dans la fonction ??? */
+export default function PlayerLobby({ route, navigation }) {
+  /*  supprimer le route dans la fonction ??? */
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -95,7 +99,24 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
     <SafeAreaView style={styles.lobby}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>PlayerLobby</Text>
-        <Text style={styles.title}>Room : {roomID}</Text>
+        <View style={styles.roomCodeContainer}>
+          <Text style={styles.roomCodeInvite}>Room :</Text>
+          <Text style={styles.roomCode}>{roomID}</Text>
+          <TouchableOpacity
+            onPress={() => ClipboardExpo.setStringAsync(roomID)}
+          >
+            <Ionicons name="copy-outline" size={25} color="#333" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={async () => {
+              await Share.share({
+                message: `${roomID}`,
+              });
+            }}
+          >
+            <Ionicons name="share-outline" size={25} color="#333" />
+          </TouchableOpacity>
+        </View>
         {players.map((player) => (
           <TouchableOpacity
             key={player._id}
@@ -108,7 +129,10 @@ export default function PlayerLobby({ route, navigation }) { /*  supprimer le ro
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => startParty()}
+        >
           <Text style={styles.playerName}>START</Text>
         </TouchableOpacity>
       )}
@@ -160,5 +184,21 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "80%",
     alignItems: "center",
+  },
+  // Room code styles
+  roomCodeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    gap: 10,
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+  roomCodeInvite: {
+    fontSize: 25,
+  },
+  roomCode: {
+    fontSize: 30,
+    fontWeight: "bold",
   },
 });

@@ -17,6 +17,7 @@ import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 // import StartSound from "./screens/StartSound";
 import Start from "./screens/Start";
+import Podium from "./screens/Podium";
 
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -78,6 +79,7 @@ export default function App() {
     <SocketProvider>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
+<<<<<<< HEAD
           <KeyboardAvoidingWrapper>
             <NavigationContainer>
               <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -91,6 +93,18 @@ export default function App() {
                   name="GameLifeScreen"
                   component={GameLifeScreen}
                 />
+=======
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="HomeTuto" component={HomeTuto} />
+              <Stack.Screen name="PlayerName" component={PlayerName} />
+              <Stack.Screen name="SnapScreen" component={SnapScreen} />
+              <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen name="GameLifeScreen" component={GameLifeScreen} />
+              <Stack.Screen name="Podium" component={Podium} />
+>>>>>>> chantal
 
                 {/* Multi game admin and lobby screens */}
                 <Stack.Screen name="HomeMulti" component={HomeMulti} />

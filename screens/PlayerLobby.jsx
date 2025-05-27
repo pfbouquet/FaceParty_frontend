@@ -7,9 +7,11 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
+  Modal,
 } from "react-native";
 import * as ClipboardExpo from "expo-clipboard";
 import { Share } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -25,6 +27,7 @@ export default function PlayerLobby({ route, navigation }) {
 
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalQRVisible, setModalQRVisible] = useState(false);
 
   const fetchPlayers = (id) => {
     setLoading(true);
@@ -116,6 +119,9 @@ export default function PlayerLobby({ route, navigation }) {
           >
             <Ionicons name="share-outline" size={25} color="#333" />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => setModalQRVisible(true)}>
+            <Ionicons name="qr-code-outline" size={24} color="#333" />
+          </TouchableOpacity>
         </View>
         {players.map((player) => (
           <TouchableOpacity
@@ -136,6 +142,25 @@ export default function PlayerLobby({ route, navigation }) {
           <Text style={styles.playerName}>START</Text>
         </TouchableOpacity>
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalQRVisible}
+        onRequestClose={() => setModalQRVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.title}>Scan ce QR pour rejoindre</Text>
+            <QRCode value={roomID} size={200} backgroundColor="white" />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalQRVisible(false)}
+            >
+              <Text style={{ color: "white" }}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -200,5 +225,26 @@ const styles = StyleSheet.create({
   roomCode: {
     fontSize: 30,
     fontWeight: "bold",
+  },
+  // QR Code model styles
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    width: 300,
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 20,
+    alignItems: "center",
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#de6b58",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
 });

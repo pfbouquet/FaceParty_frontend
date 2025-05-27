@@ -19,10 +19,6 @@ export default function Home({ navigation }) {
         title="Go to PlayerName"
         onPress={() => navigation.navigate("PlayerName")}
       />
-      <Button
-        title="Go to WaitingStart"
-        onPress={() => navigation.navigate("GameLifeScreen")}
-      />
     </View>
   );
 }

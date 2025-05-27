@@ -37,7 +37,9 @@ export default function GameLifeScreen({ navigation }) {
     return () => socket.off("game-cycle", handler);
   }, []);
 
-  let GameContent = <WaitingStart />;
+  let GameContent = <WaitingStart />; // >> à réactiver
+  // let GameContent = <GameLifeGetReadyForNextQuestion />; // >> à supprimer une fois prête
+
 
   if (phase === "question-get-ready") {
     GameContent = <GameLifeGetReadyForNextQuestion />;

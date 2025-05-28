@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   Button,
   ImageBackground,
+  Animated,
 } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +21,9 @@ const { width } = Dimensions.get("window");
 const FRAME_SIZE = width * 0.65;
 
 export default function SnapScreen({ navigation, route }) {
+  //----------------------------------------------
+  //VARIABLES ------------------------------------
+  //----------------------------------------------
   const [hasPermission, setHasPermission] = useState(false);
   const [photoUri, setPhotoUri] = useState(null);
   const isFocused = useIsFocused();
@@ -27,12 +31,23 @@ export default function SnapScreen({ navigation, route }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.player.value);
 
+  //Animation pour la bordure de l'encart photo
+  const borderAnim = useRef(new Animated.Value(0)).current;
+  const borderColor = borderAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#F86F5D", "#0F3D62"] // orange <-> bleu 
+  });
+
+  //----------------------------------------------
+  //USEEFFECT ------------------------------------
+  //----------------------------------------------
   // ✅ Initialise playerID si présent dans route.params
   useEffect(() => {
     if (route.params?.playerID) {
       dispatch(setPlayerID(route.params.playerID));
     }
   }, [route.params?.playerID]);
+
 
   useEffect(() => {
     (async () => {
@@ -41,6 +56,26 @@ export default function SnapScreen({ navigation, route }) {
     })();
   }, []);
 
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(borderAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [borderAnim]);
+
+  //----------------------------------------------
+  //FONCTIONS ------------------------------------
+  //----------------------------------------------
   const takePicture = async () => {
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.3 });
     if (photo) setPhotoUri(photo.uri);
@@ -100,20 +135,23 @@ export default function SnapScreen({ navigation, route }) {
     );
   }
 
+  //----------------------------------------------
+  //JSX ------------------------------------------
+  //----------------------------------------------
   return (
     <ImageBackground style={styles.overlay}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Prends-toi en photo !</Text>
         <Text style={styles.subtitle}>Tu pourras recommencer si tu n'es pas satisfait.</Text>
       </View>
-      <View style={styles.centerContainer}>
+      <Animated.View style={[styles.centerContainer, { borderColor }]}>
         <CameraView
           style={styles.camera}
           facing="front"
           ref={(ref) => (cameraRef.current = ref)}
           zoom={0.2}
         />
-      </View>
+      </Animated.View>
       <View style={styles.notice}>
         <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
         <Text style={styles.infoNotice}>😳 Ne souris pas</Text>
@@ -129,7 +167,9 @@ export default function SnapScreen({ navigation, route }) {
             styles.button,
           ]}
         >
-          <FontAwesome name="circle-thin" size={100} color="rgba(250, 114, 90, 1)" />
+          <Animated.View style={[styles.circle, { borderColor }]} >
+            <FontAwesome name="camera" size={50} color="#F86F5D" />
+          </Animated.View>
         </Pressable>
       </View>
     </ImageBackground>
@@ -228,5 +268,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "80%",
+  },
+  circle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    position: 'absolute',
+    borderWidth: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  icon: {
+    zIndex: 1,
   },
 });

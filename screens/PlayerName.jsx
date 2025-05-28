@@ -21,7 +21,7 @@ export default function PlayerName({ navigation }) {
   const borderAnim = useRef(new Animated.Value(0)).current;
   const borderColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#F86F5D", "#0F3D62"] // orange <-> blanc (ou toute autre couleur)
+    outputRange: ["#F86F5D", "#0F3D62"] // orange <-> bleu
   });
   const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -81,6 +81,9 @@ export default function PlayerName({ navigation }) {
     ).start();
   }, [borderAnim]);
 
+  //----------------------------------------------
+  //JSX ------------------------------------------
+  //----------------------------------------------
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Écris ton prénom</Text>
@@ -93,9 +96,9 @@ export default function PlayerName({ navigation }) {
         <Text style={styles.infoNotice}>🫡 Ne mets QUE ton prénom</Text>
         <Text style={styles.infoNotice}>🥲 N'oublie pas le prénom des autres</Text>
       </View>
-        <AnimatedTouchable onPress={handleSubmit} style={[styles.button, {borderColor, borderWidth:2}]} activeOpacity={0.8}>
-          <Text style={styles.textButton}>Ok pour moi !</Text>
-        </AnimatedTouchable>
+      <AnimatedTouchable onPress={handleSubmit} style={[styles.button, { borderColor, borderWidth: 2 }]} activeOpacity={0.8}>
+        <Text style={styles.textButton}>Ok pour moi !</Text>
+      </AnimatedTouchable>
 
     </View>
   );
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "rgba(27, 77, 115, 1)",
     padding: 20,
-    borderRadius: 5,
+    borderRadius: 10,
     width: "40%",
   },
   textButton: {

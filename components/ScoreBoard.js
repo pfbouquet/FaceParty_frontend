@@ -26,7 +26,6 @@ export const ScoreBoard = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          // Trie par score décroissant
           const sorted = [...data.players].sort((a, b) => b.score - a.score);
           setPlayers(sorted);
         } else {
@@ -49,26 +48,31 @@ export const ScoreBoard = () => {
       roomID: roomID,
       gameID: gameID,
       currentQuestionIndex: question.index,
-    }); //transmet le signal de l'admin pour passer à la prochaine question
+    });
   };
 
   return (
     <SafeAreaView style={styles.lobby}>
       <Text style={styles.title}>🏆 Classement des joueurs</Text>
+
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
         <Text style={[styles.cell, styles.header]}>Nom</Text>
         <Text style={[styles.cell, styles.header]}>Score</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.container}>
-        {players.map((player, index) => (
-          <View key={player._id} style={styles.row}>
-            <Text style={styles.cell}>{index + 1}</Text>
-            <Text style={styles.cell}>{player.playerName}</Text>
-            <Text style={styles.cell}>{player.score}</Text>
-          </View>
-        ))}
-      </ScrollView>
+
+      {/* Scroll uniquement sur la liste des joueurs */}
+      <View style={styles.playerListContainer}>
+        <ScrollView contentContainerStyle={styles.playerList}>
+          {players.map((player, index) => (
+            <View key={player._id} style={styles.row}>
+              <Text style={styles.cell}>{index + 1}</Text>
+              <Text style={styles.cell}>{player.playerName}</Text>
+              <Text style={styles.cell}>{player.score}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
 
       {admin && (
         <TouchableOpacity style={styles.startButton} onPress={continueParty}>
@@ -80,11 +84,6 @@ export const ScoreBoard = () => {
 };
 
 const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   lobby: {
     flex: 1,
     backgroundColor: "white",
@@ -98,19 +97,23 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     color: "#2c3e50",
   },
-  container: {
-    paddingBottom: 40,
-  },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#ecf0f1",
+    backgroundColor: "#FBB954",
     paddingVertical: 10,
     borderRadius: 8,
     marginBottom: 10,
   },
+  playerListContainer: {
+    flex: 1,
+    maxHeight: "65%", // Tu peux adapter la hauteur selon le layout souhaité
+  },
+  playerList: {
+    paddingBottom: 20,
+  },
   row: {
     flexDirection: "row",
-    backgroundColor: "#3498db",
+    backgroundColor: "#0F3D62",
     marginBottom: 10,
     paddingVertical: 15,
     borderRadius: 8,
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
   },
   startButton: {
-    backgroundColor: "#de6b58",
+    backgroundColor: "#F86F5D",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     fontSize: 18,
-    color: "#fff",
+    color: "#F1F1F1",
     fontWeight: "bold",
   },
 });

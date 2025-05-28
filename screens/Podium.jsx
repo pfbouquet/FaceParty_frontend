@@ -4,12 +4,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
+  Image,
+  Platform,
+  StatusBar,
 } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import logo from "../assets/logo-faceparty.png";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -94,6 +98,11 @@ export default function Podium({ navigation }) {
 
   return (
     <SafeAreaView style={styles.lobby}>
+      <View style={styles.statusBarSpacer} />
+        <View style={styles.header}>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
+          <Text style={styles.titleHeader}>FaceParty</Text>
+        </View>
       <ConfettiCannon
         count={300}
         origin={{ x: -10, y: 0 }}
@@ -103,12 +112,13 @@ export default function Podium({ navigation }) {
       />
 
       <Text style={styles.title}>🏆 Podium 🏆</Text>
-
+      <View style={styles.podium} >
       <View style={styles.tableHeader}>
-        <Text style={[styles.cell, styles.header]}>Rang</Text>
-        <Text style={[styles.cell, styles.header]}>Nom</Text>
-        <Text style={[styles.cell, styles.header]}>Score</Text>
+        <Text style={[styles.cell, styles.headerPodium]}>Rang</Text>
+        <Text style={[styles.cell, styles.headerPodium]}>Nom</Text>
+        <Text style={[styles.cell, styles.headerPodium]}>Score</Text>
       </View>
+      {/* </View> */}
 
       <ScrollView contentContainerStyle={styles.container}>
         {players.map((player, index) => (
@@ -141,6 +151,7 @@ export default function Podium({ navigation }) {
           <Text style={styles.startButtonText}>New Game</Text>
         </TouchableOpacity>
       )}
+    </View>
     </SafeAreaView>
   );
 }
@@ -149,22 +160,25 @@ const styles = StyleSheet.create({
   lobby: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 40,
-    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30,
-    color: "#2c3e50",
+    // justifyContent: "center",
+    margin: "2%",
+    color: "#0F3D62",
+  },
+  podium: {
+    paddingTop: "1%",
+    paddingHorizontal: "5%",
   },
   container: {
     paddingBottom: 40,
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#ecf0f1",
+    // backgroundColor: "#ecf0f1",
     paddingVertical: 10,
     borderRadius: 8,
     marginBottom: 10,
@@ -182,9 +196,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
   },
-  header: {
+  headerPodium: {
     fontWeight: "bold",
-    color: "#2c3e50",
+    color: "#0F3D62",
   },
   startButton: {
     backgroundColor: "#de6b58",
@@ -198,4 +212,27 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+    statusBarSpacer: {
+      height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    },
+  header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      // paddingHorizontal: 16,
+      width: "100%",
+      paddingVertical: 12,
+      backgroundColor: "#0F3D62",
+    },
+    logo: {
+      width: 40,
+      height: 40,
+      marginRight: 12,
+    },
+    titleHeader: {
+      fontFamily: "Inter",
+      fontSize: 24,
+      fontWeight: "600",
+      color: "#F1F1F1",
+    },
 });

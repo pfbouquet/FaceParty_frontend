@@ -1,13 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Platform,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform, StatusBar } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useSelector } from "react-redux";
@@ -73,15 +64,12 @@ export default function Podium({ navigation }) {
   // 🧹 Réinitialise les scores et retourne au lobby
   const relaunchParty = async () => {
     try {
-      const response = await fetch(
-        `${EXPO_PUBLIC_BACKEND_URL}/players/clearScores/${gameID}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/clearScores/${gameID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 
@@ -98,60 +86,38 @@ export default function Podium({ navigation }) {
 
   return (
     <SafeAreaView style={styles.lobby}>
-      <View style={styles.statusBarSpacer} />
-        <View style={styles.header}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.titleHeader}>FaceParty</Text>
-        </View>
-      <ConfettiCannon
-        count={300}
-        origin={{ x: -10, y: 0 }}
-        fadeOut={true}
-        fallSpeed={5000}
-        explosionSpeed={900}
-      />
+      {/* <View style={styles.statusBarSpacer} /> */}
+      <View style={styles.header}>
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.titleHeader}>FaceParty</Text>
+      </View>
+      <ConfettiCannon count={300} origin={{ x: -10, y: 0 }} fadeOut={true} fallSpeed={5000} explosionSpeed={900} />
 
       <Text style={styles.title}>🏆 Podium 🏆</Text>
-      <View style={styles.podium} >
-      <View style={styles.tableHeader}>
-        <Text style={[styles.cell, styles.headerPodium]}>Rang</Text>
-        <Text style={[styles.cell, styles.headerPodium]}>Nom</Text>
-        <Text style={[styles.cell, styles.headerPodium]}>Score</Text>
+      <View style={styles.podium}>
+        <View style={styles.tableHeader}>
+          <Text style={[styles.cell, styles.headerPodium]}>Rang</Text>
+          <Text style={[styles.cell, styles.headerPodium]}>Nom</Text>
+          <Text style={[styles.cell, styles.headerPodium]}>Score</Text>
+        </View>
+        {/* </View> */}
+
+        <ScrollView contentContainerStyle={styles.container}>
+          {players.map((player, index) => (
+            <View key={player._id} style={[styles.row, index === 0 && { backgroundColor: "#f1c40f" }, index === 1 && { backgroundColor: "#bdc3c7" }, index === 2 && { backgroundColor: "#cd7f32" }]}>
+              <Text style={styles.cell}>{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}</Text>
+              <Text style={styles.cell}>{player.playerName}</Text>
+              <Text style={styles.cell}>{player.score}</Text>
+            </View>
+          ))}
+        </ScrollView>
+
+          {admin && (
+            <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
+              <Text style={styles.startButtonText}>New Game</Text>
+            </TouchableOpacity>
+          )}
       </View>
-      {/* </View> */}
-
-      <ScrollView contentContainerStyle={styles.container}>
-        {players.map((player, index) => (
-          <View
-            key={player._id}
-            style={[
-              styles.row,
-              index === 0 && { backgroundColor: "#f1c40f" },
-              index === 1 && { backgroundColor: "#bdc3c7" },
-              index === 2 && { backgroundColor: "#cd7f32" },
-            ]}
-          >
-            <Text style={styles.cell}>
-              {index === 0
-                ? "🥇"
-                : index === 1
-                ? "🥈"
-                : index === 2
-                ? "🥉"
-                : index + 1}
-            </Text>
-            <Text style={styles.cell}>{player.playerName}</Text>
-            <Text style={styles.cell}>{player.score}</Text>
-          </View>
-        ))}
-      </ScrollView>
-
-      {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
-          <Text style={styles.startButtonText}>New Game</Text>
-        </TouchableOpacity>
-      )}
-    </View>
     </SafeAreaView>
   );
 }
@@ -172,9 +138,12 @@ const styles = StyleSheet.create({
   podium: {
     paddingTop: "1%",
     paddingHorizontal: "5%",
+    flex: 1,
+    maxHeight: "85%",
   },
   container: {
-    paddingBottom: 40,
+    // paddingBottom: "45%",
+    // maxHeight: "65%",
   },
   tableHeader: {
     flexDirection: "row",
@@ -185,7 +154,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    backgroundColor: "#3498db",
+    backgroundColor: "#0F3D62",
     marginBottom: 10,
     paddingVertical: 15,
     borderRadius: 8,
@@ -201,38 +170,45 @@ const styles = StyleSheet.create({
     color: "#0F3D62",
   },
   startButton: {
-    backgroundColor: "#de6b58",
+    backgroundColor: "#F86F5D",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginTop: 20,
+    // marginTop: 20,
+    // alignSelf: 'baseline',
+    justifySelf: '',
+    // just: 'flex-end'
+
   },
   startButtonText: {
     fontSize: 18,
-    color: "#fff",
+    color: "#F1F1F1",
     fontWeight: "bold",
   },
-    statusBarSpacer: {
-      height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    },
+  statusBarSpacer: {
+    height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
   header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      // paddingHorizontal: 16,
-      width: "100%",
-      paddingVertical: 12,
-      backgroundColor: "#0F3D62",
-    },
-    logo: {
-      width: 40,
-      height: 40,
-      marginRight: 12,
-    },
-    titleHeader: {
-      fontFamily: "Inter",
-      fontSize: 24,
-      fontWeight: "600",
-      color: "#F1F1F1",
-    },
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    // paddingHorizontal: 16,
+    width: "100%",
+    paddingVertical: 12,
+    backgroundColor: "#0F3D62",
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+  },
+  titleHeader: {
+    fontFamily: "Inter",
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#F1F1F1",
+  },
+  newGameButton: {
+    // marginTop: "50%",
+  },
 });

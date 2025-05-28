@@ -53,7 +53,7 @@ export const ScoreBoard = () => {
 
   return (
     <SafeAreaView style={styles.lobby}>
-      <Text style={styles.title}>🏆 Classement des joueurs</Text>
+      <Text style={styles.title}>Classement des joueurs</Text>
 
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#FBB954",
+    // backgroundColor: "#FBB954",
     paddingVertical: 10,
     borderRadius: 8,
     marginBottom: 10,

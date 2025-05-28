@@ -21,7 +21,7 @@ export const LobbyPlayerAdminMenu = ({ playerID, roomID }) => {
         onPress={() => {
           // TODO
           fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-player`, {
-            method: "POST",
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },

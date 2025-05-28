@@ -9,6 +9,7 @@ import { resetQuestion } from "../reducers/question";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
+  
   useEffect(() => {
     // reset reducers when entering the Home screen
     dispatch(resetGame());

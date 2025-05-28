@@ -70,15 +70,15 @@ export default function PlayerLobby({ navigation }) {
     // Update game composition when player-update event is received
     socket.on("player-update", () => updateGameCompo(game.gameID));
     // Navigate to home screen when kicked from the room
-    socket.on("you-are-kicked", (id) => {
-      navigation.navigate("Home");
+    socket.on("you-are-kicked", () => {
+      navigation.navigate("HomeMulti");
     });
     // Navigate to GameLifeScreen when the game is being prepared
     socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
 
     return () => {
       socket.off("you-are-kicked", (id) => {
-        navigation.navigate("Home");
+        navigation.navigate("HomeMulti");
       });
       socket.off("player-update", () => updateGameCompo(game.gameID));
       socket.off("game-preparation", () =>

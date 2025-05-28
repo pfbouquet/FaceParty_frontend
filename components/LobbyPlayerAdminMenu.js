@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const LobbyPlayerAdminMenu = ({ playerID }) => {
+export const LobbyPlayerAdminMenu = ({ playerIDToKick }) => {
   const game = useSelector((state) => state.game.value);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export const LobbyPlayerAdminMenu = ({ playerID }) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              playerID: playerID,
+              playerID: playerIDToKick,
               roomID: game.roomID,
             }),
           })

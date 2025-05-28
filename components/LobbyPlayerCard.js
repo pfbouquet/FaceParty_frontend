@@ -1,6 +1,5 @@
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 // Load context and State managers
-import { SocketContext } from "../contexts/SocketContext";
 import { useEffect, useState, useContext } from "react";
 import { useSelector } from "react-redux";
 // Load components
@@ -10,7 +9,7 @@ import { LobbyPlayerDetailModal } from "./LobbyPlayerDetailModal";
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const LobbyPlayerCard = ({ navigation, id, name }) => {
-  const player = useSelector((state) => state.player.value);
+  const currentPlayer = useSelector((state) => state.player.value);
   const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
   useEffect(() => {}, []);
@@ -23,10 +22,10 @@ export const LobbyPlayerCard = ({ navigation, id, name }) => {
       >
         <Text style={styles.playerName}>{name}</Text>
       </TouchableOpacity>
-      {player.isAdmin && (
+      {currentPlayer.isAdmin && (
         <LobbyPlayerAdminMenu
           style={styles.playerAdminMenu}
-          playerID={id}
+          playerIDToKick={id}
         ></LobbyPlayerAdminMenu>
       )}
 

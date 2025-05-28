@@ -105,7 +105,6 @@ export default function SnapScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         if (data.result) {
           socket.emit("player-update", roomID);
           navigation.navigate("PlayerLobby");

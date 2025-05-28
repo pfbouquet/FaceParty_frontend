@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   Dimensions,
   Pressable,
@@ -9,30 +7,28 @@ import {
   Button,
   ImageBackground,
 } from "react-native";
+import { useEffect, useState, useContext, useRef } from "react";
 import { CameraView, Camera } from "expo-camera";
-import { useDispatch, useSelector } from "react-redux";
-import { addPitcure, setPlayerID } from "../reducers/user";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native";
+import { SocketContext } from "../contexts/SocketContext";
+// Load reducers
+import { useDispatch, useSelector } from "react-redux";
+import { addPicture } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width } = Dimensions.get("window");
 const FRAME_SIZE = width * 0.65;
 
-export default function SnapScreen({ navigation, route }) {
+export default function SnapScreen({ navigation }) {
+  const socket = useContext(SocketContext);
   const [hasPermission, setHasPermission] = useState(false);
   const [photoUri, setPhotoUri] = useState(null);
+  const { playerID } = useSelector((state) => state.player.value);
+  const { roomID } = useSelector((state) => state.game.value);
+  const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const cameraRef = useRef(null);
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.player.value);
-
-  // ✅ Initialise playerID si présent dans route.params
-  useEffect(() => {
-    if (route.params?.playerID) {
-      dispatch(setPlayerID(route.params.playerID));
-    }
-  }, [route.params?.playerID]);
 
   useEffect(() => {
     (async () => {
@@ -47,12 +43,12 @@ export default function SnapScreen({ navigation, route }) {
   };
 
   const handleConfirm = () => {
-    if (!user.playerID) {
+    if (!playerID) {
       alert("Erreur : playerID manquant");
       return;
     }
 
-    dispatch(addPitcure(photoUri));
+    dispatch(addPicture(photoUri));
 
     const formData = new FormData();
     formData.append("photoFromFront", {
@@ -60,7 +56,7 @@ export default function SnapScreen({ navigation, route }) {
       name: "photo.jpg",
       type: "image/jpeg",
     });
-    formData.append("playerID", user.playerID); // ✅ ajouté ici
+    formData.append("playerID", playerID);
 
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/selfie/upload`, {
       method: "POST",
@@ -69,12 +65,12 @@ export default function SnapScreen({ navigation, route }) {
         Accept: "application/json",
       },
     })
-      .then(async (res) => {
-        const txt = await res.text();
-        return JSON.parse(txt);
+      .then((res) => {
+        return res.json();
       })
       .then((data) => {
         if (data.result) {
+          socket.emit("player-update", roomID);
           navigation.navigate("PlayerLobby");
         } else {
           alert("Erreur lors de l'envoi");
@@ -82,7 +78,6 @@ export default function SnapScreen({ navigation, route }) {
       })
       .catch((err) => {
         console.error("Erreur réseau:", JSON.stringify(err, null, 2));
-        alert("Erreur réseau");
       });
   };
 

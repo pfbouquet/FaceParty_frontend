@@ -7,6 +7,7 @@ const initialState = {
     playerName: null,
     score: 0,
     scoreHistory: [],
+    selfieFilePath: null,
   },
 };
 
@@ -26,8 +27,11 @@ export const playerSlice = createSlice({
       state.value.score = 0;
       state.value.scoreHistory = [];
     },
+    addPicture: (state, action) => {
+      state.value.selfieFilePath = action.payload;
+    },
   },
 });
 
-export const { newPlayer, resetPlayer } = playerSlice.actions;
+export const { newPlayer, resetPlayer, addPicture } = playerSlice.actions;
 export default playerSlice.reducer;

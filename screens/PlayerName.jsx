@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useState, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -7,13 +13,10 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerName({ navigation }) {
   const socket = useContext(SocketContext);
-
   const [playerName, setPlayerName] = useState("");
-
   // Récupération du playerID depuis le reducer player
   const { playerID } = useSelector((state) => state.player.value);
-  const { roomID, gameID } = useSelector((state) => state.game.value);
-  console.log({ playerID, roomID, gameID });
+  const { roomID } = useSelector((state) => state.game.value);
 
   const handleSubmit = () => {
     if (playerName.length === 0 || !playerID) {
@@ -35,7 +38,7 @@ export default function PlayerName({ navigation }) {
       .then((data) => {
         console.log(data.message);
         if (data.result) {
-          socket.emit("playerUpdate", roomID);
+          socket.emit("player-update", roomID);
           navigation.navigate("SnapScreen");
         } else {
           alert("Erreur lors de la mise à jour du nom.");
@@ -50,8 +53,17 @@ export default function PlayerName({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>PlayerNameInput</Text>
-      <TextInput placeholder="Player name" onChangeText={(value) => setPlayerName(value)} value={playerName} style={styles.input} />
-      <TouchableOpacity onPress={handleSubmit} style={styles.button} activeOpacity={0.8}>
+      <TextInput
+        placeholder="Player name"
+        onChangeText={(value) => setPlayerName(value)}
+        value={playerName}
+        style={styles.input}
+      />
+      <TouchableOpacity
+        onPress={handleSubmit}
+        style={styles.button}
+        activeOpacity={0.8}
+      >
         <Text style={styles.textButton}>I'm OK with my name</Text>
       </TouchableOpacity>
     </View>

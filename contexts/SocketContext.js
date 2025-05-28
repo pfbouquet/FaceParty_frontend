@@ -13,7 +13,6 @@ export const SocketProvider = ({ children }) => {
     });
 
     console.log("url =>", EXPO_PUBLIC_BACKEND_URL);
-    console.log("new socket", newSocket);
 
     setSocket(newSocket);
 
@@ -26,5 +25,7 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+  );
 };

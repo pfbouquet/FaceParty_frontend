@@ -68,7 +68,7 @@ export const Question = () => {
     if (player.isAdmin && lastRound) {
       setNextRound(
         <TouchableOpacity style={styles.btnNext} onPress={() => finishParty()}>
-          <Text>Go to Podium</Text>
+          <Text style={styles.btntext}>Go to Podium</Text>
         </TouchableOpacity>
       );
     } else if (player.isAdmin) {
@@ -77,7 +77,7 @@ export const Question = () => {
           style={styles.btnNext}
           onPress={() => continueParty()}
         >
-          <Text>Next round</Text>
+          <Text style={styles.btntext}>Next round</Text>
         </TouchableOpacity>
       );
     }
@@ -235,15 +235,24 @@ image: {
     alignItems: "center",
   },
   btnNext: {
-    padding: 20,
+    // borderRadius: 10,
+    // borderWidth: 1,
+    // marginTop: 10,
+    // width: "70%",
+    // justifyContent: "center",
+    // padding: 20,
+    backgroundColor: "#F86F5D",
+    paddingVertical: "5%",
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "gray",
-    marginTop: 10,
-    width: "70%",
-    // height: "15%",
     alignItems: "center",
-    justifyContent: "center",
+    marginTop: "3%",
+    alignItems: "center",
+    width: "70%",
+  },
+  btntext:{
+    color: "#F1F1F1",
+    fontWeight: "bold",
+    fontSize: 18,
   },
   counter: {
     fontSize: 36,

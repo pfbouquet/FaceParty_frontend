@@ -49,10 +49,16 @@ export default function PlayerName({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>PlayerNameInput</Text>
-      <TextInput placeholder="Player name" onChangeText={(value) => setPlayerName(value)} value={playerName} style={styles.input} />
+      <Text style={styles.title}>Écris ton prénom</Text>
+      <TextInput placeholder="Mon prénom" onChangeText={(value) => setPlayerName(value)} value={playerName} style={styles.input} />
+      <View style={styles.notice}>
+        <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
+        <Text style={styles.infoNotice}>🙅 Pas de surnom</Text>
+        <Text style={styles.infoNotice}>🫡 Ne mets QUE ton prénom</Text>
+        <Text style={styles.infoNotice}>🥲 N'oublie pas le prénom des autres</Text>
+      </View>
       <TouchableOpacity onPress={handleSubmit} style={styles.button} activeOpacity={0.8}>
-        <Text style={styles.textButton}>I'm OK with my name</Text>
+        <Text style={styles.textButton}>Ok pour moi !</Text>
       </TouchableOpacity>
     </View>
   );
@@ -61,7 +67,7 @@ export default function PlayerName({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-around",
     alignItems: "center",
   },
   title: {
@@ -74,16 +80,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
-    marginVertical: 10,
     borderRadius: 5,
   },
   button: {
-    backgroundColor: "#3498db",
+    backgroundColor: "rgba(27, 77, 115, 1)",
     padding: 10,
     borderRadius: 5,
   },
   textButton: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  // ---------------------------------------------------
+  // Styles for the Notice informations ----------------
+  // ---------------------------------------------------
+  notice: {
+    width: "80%",
+    height: 120,
+    backgroundColor: 'rgba(27, 77, 115, 1)',
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  titleNotice: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  infoNotice: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 4,
   },
 });

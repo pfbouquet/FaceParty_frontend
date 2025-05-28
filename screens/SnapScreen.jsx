@@ -120,8 +120,6 @@ export default function SnapScreen({ navigation, route }) {
         <Text style={styles.infoNotice}>🤪 Ne fais pas de grimace</Text>
         <Text style={styles.infoNotice}>🤓 Retire tes lunettes</Text>
         <Text style={styles.infoNotice}>😮‍💨 N'oublie pas de respirer</Text>
-
-
       </View>
       <View style={styles.delimiter}>
         <Pressable
@@ -144,7 +142,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: "rgba(27, 77, 115, 1)",
+    backgroundColor: "#F1F1F1",
   },
   delimiter: {
     width: "100%",
@@ -164,12 +162,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    color: 'white',
+    color: 'rgba(27, 77, 115, 1)',
     fontSize: 24,
     fontWeight: "bold",
   },
   subtitle: {
-    color: "white",
+    color: "rgba(27, 77, 115, 1)",
     fontSize: 16,
   },
   // ---------------------------------------------------
@@ -178,19 +176,19 @@ const styles = StyleSheet.create({
   notice: {
     width: "80%",
     height: 150,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(27, 77, 115, 1)',
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
   titleNotice: {
-    color: 'rgba(27, 77, 115, 1)',
+    color: 'white',
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
   },
   infoNotice: {
-    color: "rgba(27, 77, 115, 1)",
+    color: "white",
     fontSize: 16,
     textAlign: "center",
     marginBottom: 4,
@@ -199,10 +197,12 @@ const styles = StyleSheet.create({
   // Styles for the camera container and button---------
   // ---------------------------------------------------
   centerContainer: {
-    width: FRAME_SIZE,
-    height: FRAME_SIZE * 1.3,
-    borderRadius: FRAME_SIZE * 0.65,
+    width: FRAME_SIZE * 1.1,
+    height: FRAME_SIZE * 1.5,
+    borderRadius: FRAME_SIZE * 0.67,
     overflow: "hidden",
+    borderWidth: 8,
+    borderColor: "rgba(250, 114, 90, 1)",
   },
   camera: {
     width: "100%",

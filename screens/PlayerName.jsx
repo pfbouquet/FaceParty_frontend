@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
-import { useState, useContext } from "react";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated } from "react-native";
+import { useState, useRef, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function PlayerName({ navigation }) {
+  //----------------------------------------------
+  //VARIABLES ------------------------------------
+  //----------------------------------------------
   const socket = useContext(SocketContext);
 
   const [playerName, setPlayerName] = useState("");
@@ -13,11 +16,22 @@ export default function PlayerName({ navigation }) {
   // Récupération du playerID depuis le reducer player
   const { playerID } = useSelector((state) => state.player.value);
   const { roomID, gameID } = useSelector((state) => state.game.value);
-  console.log({ playerID, roomID, gameID });
 
+  //Animation pour la bordure du TextInput
+  const borderAnim = useRef(new Animated.Value(0)).current;
+  const borderColor = borderAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#F86F5D", "#0F3D62"] // orange <-> blanc (ou toute autre couleur)
+  });
+  const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+
+  //----------------------------------------------
+  //FONCTIONS ------------------------------------
+  //----------------------------------------------
   const handleSubmit = () => {
     if (playerName.length === 0 || !playerID) {
-      alert("Player name or ID is missing.");
+      alert("Tu as oublié de renseigner ton prénom !");
       return;
     }
 
@@ -47,19 +61,42 @@ export default function PlayerName({ navigation }) {
       });
   };
 
+  //----------------------------------------------
+  //USEEFFECT ------------------------------------
+  //----------------------------------------------
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(borderAnim, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [borderAnim]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Écris ton prénom</Text>
-      <TextInput placeholder="Mon prénom" onChangeText={(value) => setPlayerName(value)} value={playerName} style={styles.input} />
+      <Animated.View style={[styles.inputWrapper, { borderColor }]}>
+        <TextInput placeholder="Mon prénom" onChangeText={setPlayerName} value={playerName} style={styles.input} />
+      </Animated.View>
       <View style={styles.notice}>
         <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
         <Text style={styles.infoNotice}>🙅 Pas de surnom</Text>
         <Text style={styles.infoNotice}>🫡 Ne mets QUE ton prénom</Text>
         <Text style={styles.infoNotice}>🥲 N'oublie pas le prénom des autres</Text>
       </View>
-      <TouchableOpacity onPress={handleSubmit} style={styles.button} activeOpacity={0.8}>
-        <Text style={styles.textButton}>Ok pour moi !</Text>
-      </TouchableOpacity>
+        <AnimatedTouchable onPress={handleSubmit} style={[styles.button, {borderColor, borderWidth:2}]} activeOpacity={0.8}>
+          <Text style={styles.textButton}>Ok pour moi !</Text>
+        </AnimatedTouchable>
+
     </View>
   );
 }
@@ -88,11 +125,21 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(27, 77, 115, 1)",
     padding: 20,
     borderRadius: 5,
-    width:"40%",
+    width: "40%",
   },
   textButton: {
     color: "#fff",
     fontWeight: "bold",
+    textAlign: "center",
+  },
+  inputWrapper: {
+    borderWidth: 2,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  input: {
+    width: 200,
+    padding: 10,
     textAlign: "center",
   },
   // ---------------------------------------------------

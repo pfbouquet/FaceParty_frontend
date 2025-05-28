@@ -9,26 +9,19 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
-// import Countdown from "react-native-countdown-component";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const Question = () => {
   const socket = useContext(SocketContext);
-  const roomID = useSelector((state) => state.game.value.roomID);
+  // Get reducers states
   const question = useSelector((state) => state.question.value);
   const game = useSelector((state) => state.game.value);
-  const playerID = useSelector((state) => state.player.value.playerID);
-  const admin = useSelector((state) => state.player.value.isAdmin);
-  const currentQuestionIndex = useSelector((state) => state.question.value.index);
-  // console.log(`currentQuestionIndex : `,currentQuestionIndex)
-  const nbRound = useSelector((state) => state.game.value.nbRound);
-  // console.log(`nbRound : `, nbRound)
-
+  const player = useSelector((state) => state.player.value);
+  // Create local states
   const [counter, setCounter] = useState(5);
   const [buttonsActive, setButtonsActive] = useState(true);
   const [selectedNames, setSelectedNames] = useState([]);
-
   const [nextRound, setNextRound] = useState(null);
 
   useEffect(() => {
@@ -48,7 +41,7 @@ export const Question = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        playerID: playerID,
+        playerID: player.playerID,
         score:
           selectedNames.filter((e) => question.goodAnswers.includes(e)).length *
           10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
@@ -58,41 +51,37 @@ export const Question = () => {
 
   //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
   function continueParty() {
-    socket.emit("game-cycle", { type: "go-scoreboard", roomID: roomID }); //transmet le signal de l'admin pour lancer la partie
+    socket.emit("game-cycle", { type: "go-scoreboard", roomID: game.roomID }); //transmet le signal de l'admin pour lancer la partie
   }
   // fonction pour naviguer vers la page Podium
   function finishParty() {
-  socket.emit("game-cycle", { type: "to-podium", roomID: roomID }); //transmet le signal de l'admin pour emètre un socket pour aller sur la page Podium
+    socket.emit("game-cycle", { type: "to-podium", roomID: game.roomID }); //transmet le signal de l'admin pour emètre un socket pour aller sur la page Podium
   }
 
-  
   //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
-function resultAnswer() {
-  setButtonsActive(false);
-  sendScoreToDB();
+  function resultAnswer() {
+    setButtonsActive(false);
+    sendScoreToDB();
 
-  const lastRound = currentQuestionIndex === nbRound - 1;
+    const lastRound = question.index === game.nbRound - 1;
 
-  if (admin && lastRound) {
-    setNextRound(
-      <TouchableOpacity
-        style={styles.btnNext}
-        onPress={() => finishParty()}
-      >
-        <Text>Go to Podium</Text>
-      </TouchableOpacity>
-    );
-  } else if (admin) {
-    setNextRound(
-      <TouchableOpacity
-        style={styles.btnNext}
-        onPress={() => continueParty()}
-      >
-        <Text>Next round</Text>
-      </TouchableOpacity>
-    );
+    if (player.isAdmin && lastRound) {
+      setNextRound(
+        <TouchableOpacity style={styles.btnNext} onPress={() => finishParty()}>
+          <Text>Go to Podium</Text>
+        </TouchableOpacity>
+      );
+    } else if (player.isAdmin) {
+      setNextRound(
+        <TouchableOpacity
+          style={styles.btnNext}
+          onPress={() => continueParty()}
+        >
+          <Text>Next round</Text>
+        </TouchableOpacity>
+      );
+    }
   }
-}
 
   // FUNCTIONS ------------------------------------------------------------
 
@@ -140,7 +129,9 @@ function resultAnswer() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.question}>
-        <Text style={styles.round}>Round {question.index + 1}/{game.nbRound}</Text>
+        <Text style={styles.round}>
+          Round {question.index + 1}/{game.nbRound}
+        </Text>
         <Image style={styles.image} source={{ uri: question.imageURL }} />
         <Text style={styles.rule}>
           Sélectionnez les 2 personnes présentes dans la photo

@@ -2,10 +2,13 @@ import { StyleSheet, View, TouchableOpacity, Button, Text } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const LobbyPlayerAdminMenu = ({ playerID, roomID }) => {
+export const LobbyPlayerAdminMenu = ({ playerIDToKick }) => {
+  const game = useSelector((state) => state.game.value);
+
   useEffect(() => {
     (async () => {
       const result = await Camera.requestCameraPermissionsAsync();
@@ -26,8 +29,8 @@ export const LobbyPlayerAdminMenu = ({ playerID, roomID }) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              playerID: playerID,
-              roomID: roomID,
+              playerID: playerIDToKick,
+              roomID: game.roomID,
             }),
           })
             .then((response) => response.json())

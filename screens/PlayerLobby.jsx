@@ -43,6 +43,11 @@ export default function PlayerLobby({ route, navigation }) {
 
   // FONCTIONS --------------------------------------------------------------
   const fetchPlayers = (id) => {
+    if (!EXPO_PUBLIC_BACKEND_URL) {
+      console.error("EXPO_PUBLIC_BACKEND_URL is not defined.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())

@@ -53,7 +53,7 @@ export default function GameLifeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.statusBarSpacer} />
+      {/* <View style={styles.statusBarSpacer} /> */}
       <View style={styles.header}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>FaceParty</Text>

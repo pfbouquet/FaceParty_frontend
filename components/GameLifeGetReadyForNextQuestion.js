@@ -6,6 +6,9 @@ import { Audio } from 'expo-av';
 import React from "react";
 
 export const GameLifeGetReadyForNextQuestion = () => {
+  // ------------------------------------------------------------
+  // VARIABLES---------------------------------------------------
+  // ------------------------------------------------------------
   const player = useSelector((state) => state.player.value);
   const socket = useContext(SocketContext);
   const roomID = useSelector((state) => state.game.value.roomID);
@@ -24,6 +27,10 @@ export const GameLifeGetReadyForNextQuestion = () => {
     outputRange: ['0deg', '360deg'],
   });
 
+  // ------------------------------------------------------------
+  // USEEFFECT---------------------------------------------------
+  // ------------------------------------------------------------
+  //Lancement animation spin logo
   useEffect(() => {
     Animated.loop(
       Animated.timing(spinValue, {
@@ -35,8 +42,9 @@ export const GameLifeGetReadyForNextQuestion = () => {
     ).start();
   }, []);
 
+  //Chargement des soundeffects
   useEffect(() => {
-    Audio.setAudioModeAsync({
+    Audio.setAudioModeAsync({ //force le son sur IOS
       playsInSilentModeIOS: true,
     });
 
@@ -65,12 +73,14 @@ export const GameLifeGetReadyForNextQuestion = () => {
     };
   }, []);
 
+  // lancement du compteur quand les sons sont chargés
   useEffect(() => {
     if (isBeepSoundReady && isFinishSoundReady) {
       setCounter(3);
     }
   }, [isBeepSoundReady, isFinishSoundReady]);
 
+  // Actions à effectuer à chaque seconde du compteur
   useEffect(() => {
     if (!isBeepSoundReady || !isFinishSoundReady) return;
 

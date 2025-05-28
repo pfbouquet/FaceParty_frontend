@@ -102,7 +102,10 @@ export default function SnapScreen({ navigation, route }) {
 
   return (
     <ImageBackground style={styles.overlay}>
-      <View style={styles.delimiter} />
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Prends-toi en photo !</Text>
+        <Text style={styles.subtitle}>Tu pourras recommencer si tu n'es pas satisfait.</Text>
+      </View>
       <View style={styles.centerContainer}>
         <CameraView
           style={styles.camera}
@@ -110,6 +113,15 @@ export default function SnapScreen({ navigation, route }) {
           ref={(ref) => (cameraRef.current = ref)}
           zoom={0.2}
         />
+      </View>
+      <View style={styles.notice}>
+        <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
+        <Text style={styles.infoNotice}>😳 Ne souris pas</Text>
+        <Text style={styles.infoNotice}>🤪 Ne fais pas de grimace</Text>
+        <Text style={styles.infoNotice}>🤓 Retire tes lunettes</Text>
+        <Text style={styles.infoNotice}>😮‍💨 N'oublie pas de respirer</Text>
+
+
       </View>
       <View style={styles.delimiter}>
         <Pressable
@@ -119,7 +131,7 @@ export default function SnapScreen({ navigation, route }) {
             styles.button,
           ]}
         >
-          <FontAwesome name="circle-thin" size={100} />
+          <FontAwesome name="circle-thin" size={100} color="rgba(250, 114, 90, 1)" />
         </Pressable>
       </View>
     </ImageBackground>
@@ -131,8 +143,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 20,
     alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "space-around",
+    backgroundColor: "rgba(27, 77, 115, 1)",
   },
   delimiter: {
     width: "100%",
@@ -141,6 +153,51 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  // ---------------------------------------------------
+  // Styles for the title container --------------------
+  // ---------------------------------------------------
+  titleContainer: {
+    width: "100%",
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  title: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  subtitle: {
+    color: "white",
+    fontSize: 16,
+  },
+  // ---------------------------------------------------
+  // Styles for the Notice informations ----------------
+  // ---------------------------------------------------
+  notice: {
+    width: "80%",
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleNotice: {
+    color: 'rgba(27, 77, 115, 1)',
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  infoNotice: {
+    color: "rgba(27, 77, 115, 1)",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  // ---------------------------------------------------
+  // Styles for the camera container and button---------
+  // ---------------------------------------------------
   centerContainer: {
     width: FRAME_SIZE,
     height: FRAME_SIZE * 1.3,

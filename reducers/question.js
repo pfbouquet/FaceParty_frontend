@@ -19,8 +19,14 @@ export const questionSlice = createSlice({
       state.value.possibleAnswers = action.payload.possibleAnswers;
       state.value.imageURL = action.payload.imageURL;
     },
+    resetQuestion: (state) => {
+      state.value.index = 0;
+      state.value.goodAnswers = [""];
+      state.value.possibleAnswers = [""];
+      state.value.imageURL = "";
+    },
   },
 });
 
-export const { newQuestion } = questionSlice.actions;
+export const { newQuestion, resetQuestion } = questionSlice.actions;
 export default questionSlice.reducer;

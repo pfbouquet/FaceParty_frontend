@@ -1,7 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  value: { gameID: null, roomID: null, nbRound: 10, players: [] },
+  value: {
+    gameID: null,
+    oomID: null,
+    nbRound: 10,
+    players: [],
+  },
 };
 
 export const gameSlice = createSlice({

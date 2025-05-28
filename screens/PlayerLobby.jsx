@@ -15,10 +15,11 @@ import * as ClipboardExpo from "expo-clipboard";
 import { Share } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { Ionicons } from "@expo/vector-icons";
-// Load reducers
-import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+// Load reducers
+import { useSelector, useDispatch } from "react-redux";
+
 // Load components
 import { LobbyPlayerAdminMenu } from "../components/LobbyPlayerAdminMenu";
 
@@ -104,6 +105,11 @@ export default function PlayerLobby({ route, navigation }) {
   useEffect(() => {
     socket.on("game-id", (id) => {
       fetchPlayers(id);
+    });
+
+    socket.on("you-are-kicked", (id) => {
+      // Navigate to home screen
+      navigation.navigate("Home");
     });
 
     socket.on("room-state", ({ room, currentPlayers }) => {

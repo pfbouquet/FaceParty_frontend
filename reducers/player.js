@@ -26,6 +26,7 @@ export const playerSlice = createSlice({
       state.value.playerName = null;
       state.value.score = 0;
       state.value.scoreHistory = [];
+      state.value.selfieFilePath = null;
     },
     addPicture: (state, action) => {
       state.value.selfieFilePath = action.payload;

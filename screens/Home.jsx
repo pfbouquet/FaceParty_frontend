@@ -1,11 +1,21 @@
 import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
-import { useContext, useEffect } from "react";
+import { use, useContext, useEffect } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-import { useSelector } from "react-redux";
-
+// load reducers
+import { useDispatch } from "react-redux";
+import { resetGame } from "../reducers/game";
+import { resetPlayer } from "../reducers/player";
+import { resetQuestion } from "../reducers/question";
 
 export default function Home({ navigation }) {
- 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // reset reducers when entering the Home screen
+    dispatch(resetGame());
+    dispatch(resetPlayer());
+    dispatch(resetQuestion());
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>HOME</Text>

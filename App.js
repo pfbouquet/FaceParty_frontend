@@ -16,7 +16,6 @@ import NewMultiGame from "./screens/NewMultiGame";
 import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 // import StartSound from "./screens/StartSound";
-import Start from "./screens/Start";
 import Podium from "./screens/Podium";
 
 import { Provider } from "react-redux";
@@ -94,7 +93,6 @@ export default function App() {
                 {/* Multi game admin and lobby screens */}
                 <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
                 <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
-                <Stack.Screen name="Start" component={Start} />
               </Stack.Navigator>
             </NavigationContainer>
           </KeyboardAvoidingWrapper>

@@ -105,7 +105,7 @@ export default function PlayerLobby({ route, navigation }) {
 
     socket.on("you-are-kicked", (id) => {
       // Navigate to home screen
-      navigation.navigate("Home");
+      navigation.navigate("HomeMulti");
     });
 
     socket.on("room-state", ({ room, currentPlayers }) => {

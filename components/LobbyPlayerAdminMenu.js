@@ -41,7 +41,6 @@ export const LobbyPlayerAdminMenu = ({ playerID, roomID }) => {
             })
             .catch((error) => {
               console.error("Erreur fetch:", error);
-              setLoading(false);
             });
         }}
       >

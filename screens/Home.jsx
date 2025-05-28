@@ -9,7 +9,7 @@ import { resetQuestion } from "../reducers/question";
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     // reset reducers when entering the Home screen
     dispatch(resetGame());
@@ -27,8 +27,8 @@ export default function Home({ navigation }) {
         <Text style={styles.buttonText}>Multiplayer</Text>
       </TouchableOpacity>
       <Button
-        title="Go to PlayerName"
-        onPress={() => navigation.navigate("PlayerName")}
+        title="Go to GameLifeScreen"
+        onPress={() => navigation.navigate("GameLifeScreen")}
       />
     </View>
   );

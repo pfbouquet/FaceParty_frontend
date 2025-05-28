@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useEffect } from "react";
 // load reducers
 import { useDispatch } from "react-redux";
 import { resetGame } from "../reducers/game";

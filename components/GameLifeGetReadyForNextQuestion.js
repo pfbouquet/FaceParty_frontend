@@ -89,7 +89,6 @@ export const GameLifeGetReadyForNextQuestion = () => {
         try {
           if (soundFinish.current) {
             await soundFinish.current.replayAsync();
-            console.log("finish joué");
 
           }
         } catch (e) {
@@ -109,7 +108,6 @@ export const GameLifeGetReadyForNextQuestion = () => {
         if (soundBeep.current) {
           await soundBeep.current.stopAsync();     // STOP le beep précédent
           await soundBeep.current.replayAsync();
-          console.log("beep joué");
 
         }
       } catch (e) {

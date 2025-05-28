@@ -1,16 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  SafeAreaView,
-  TextInput,
-  Image,
-  Modal,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, TextInput, Image, Modal, Platform, StatusBar } from "react-native";
 import * as ClipboardExpo from "expo-clipboard";
 import { Share } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -22,6 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 
 // Load components
 import { LobbyPlayerAdminMenu } from "../components/LobbyPlayerAdminMenu";
+import { SafeAreaView } from "react-native-safe-area-context";
+import logo from "../assets/logo-faceparty.png";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -137,10 +128,7 @@ export default function PlayerLobby({ route, navigation }) {
 
   useEffect(() => {
     socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
-    return () =>
-      socket.off("game-preparation", () =>
-        navigation.navigate("GamePreparation")
-      );
+    return () => socket.off("game-preparation", () => navigation.navigate("GamePreparation"));
   }, []);
 
   useEffect(() => {
@@ -177,29 +165,12 @@ export default function PlayerLobby({ route, navigation }) {
 
           {player.playerID === selectedPlayerID ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
             <>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("SnapScreen")}
-                activeOpacity={0.8}
-                style={styles.blockChangeImg}
-              >
+              <TouchableOpacity onPress={() => navigation.navigate("SnapScreen")} activeOpacity={0.8} style={styles.blockChangeImg}>
                 <Image style={styles.image} source={{ uri: selfieURL }} />
-                <FontAwesome
-                  name="pencil"
-                  size="20"
-                  color="#de6b58"
-                  style={styles.icon}
-                />
+                <FontAwesome name="pencil" size="20" color="#de6b58" style={styles.icon} />
               </TouchableOpacity>
-              <TextInput
-                onChangeText={setNewPlayerName}
-                value={newPlayerName}
-                style={styles.input}
-              />
-              <TouchableOpacity
-                onPress={handleNewName}
-                style={styles.button}
-                activeOpacity={0.8}
-              >
+              <TextInput onChangeText={setNewPlayerName} value={newPlayerName} style={styles.input} />
+              <TouchableOpacity onPress={handleNewName} style={styles.button} activeOpacity={0.8}>
                 <Text style={styles.textButton}>Update</Text>
               </TouchableOpacity>
             </>
@@ -221,15 +192,18 @@ export default function PlayerLobby({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.lobby}>
+      <View style={styles.statusBarSpacer} />
+            <View style={styles.header}>
+              <Image source={logo} style={styles.logo} resizeMode="contain" />
+              <Text style={styles.titleHeader}>FaceParty</Text>
+            </View>
       <ScrollView contentContainerStyle={styles.container}>
         {modal}
         <Text style={styles.title}>PlayerLobby</Text>
         <View style={styles.roomCodeContainer}>
           <Text style={styles.roomCodeInvite}>Room :</Text>
           <Text style={styles.roomCode}>{roomID}</Text>
-          <TouchableOpacity
-            onPress={() => ClipboardExpo.setStringAsync(roomID)}
-          >
+          <TouchableOpacity onPress={() => ClipboardExpo.setStringAsync(roomID)}>
             <Ionicons name="copy-outline" size={25} color="#333" />
           </TouchableOpacity>
           <TouchableOpacity
@@ -254,39 +228,22 @@ export default function PlayerLobby({ route, navigation }) {
             >
               <Text style={styles.playerName}>{player.playerName}</Text>
             </TouchableOpacity>
-            {admin && (
-              <LobbyPlayerAdminMenu
-                style={styles.playerAdminMenu}
-                playerID={player._id}
-                roomID={roomID}
-              ></LobbyPlayerAdminMenu>
-            )}
+            {admin && <LobbyPlayerAdminMenu style={styles.playerAdminMenu} playerID={player._id} roomID={roomID}></LobbyPlayerAdminMenu>}
           </View>
         ))}
       </ScrollView>
 
       {admin && (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => startParty()}
-        >
+        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
           <Text style={styles.playerName}>START</Text>
         </TouchableOpacity>
       )}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalQRVisible}
-        onRequestClose={() => setModalQRVisible(false)}
-      >
+      <Modal animationType="slide" transparent={true} visible={modalQRVisible} onRequestClose={() => setModalQRVisible(false)}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.title}>Scan ce QR pour rejoindre</Text>
             <QRCode value={roomID} size={200} backgroundColor="white" />
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalQRVisible(false)}
-            >
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalQRVisible(false)}>
               <Text style={{ color: "white" }}>Fermer</Text>
             </TouchableOpacity>
           </View>
@@ -466,5 +423,28 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: -5,
     marginTop: 10,
+  },
+  statusBarSpacer: {
+    height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    },
+  header: {
+   flexDirection: "row",
+   alignItems: "center",
+   justifyContent: "center",
+  //  paddingHorizontal: 26,
+   width: "100%",
+   paddingVertical: 12,
+   backgroundColor: "#0F3D62",
+    },
+  logo: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+    },
+  titleHeader:{
+    fontFamily: "Inter",
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#F1F1F1",
   },
 });

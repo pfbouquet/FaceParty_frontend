@@ -4,8 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome"; // https://oblador.github.io/react-native-vector-icons/#FontAwesome
 import { KeyboardAvoidingWrapper } from "./components/KeyboardAvoidingWrapper";
 
-import Home from "./screens/Home";
-import HomeTuto from "./screens/HomeTuto";
+// import Home from "./screens/Home";
+// import HomeTuto from "./screens/HomeTuto";
 import HomePlayer from "./screens/HomePlayer";
 import GameLifeScreen from "./screens/GameLifeScreen";
 import PlayerName from "./screens/PlayerName";
@@ -81,8 +81,9 @@ export default function App() {
           <KeyboardAvoidingWrapper>
             <NavigationContainer>
               <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Home" component={Home} />
-                <Stack.Screen name="HomeTuto" component={HomeTuto} />
+                {/* <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="HomeTuto" component={HomeTuto} /> */}
+                <Stack.Screen name="HomeMulti" component={HomeMulti} />
                 <Stack.Screen name="PlayerName" component={PlayerName} />
                 <Stack.Screen name="SnapScreen" component={SnapScreen} />
                 <Stack.Screen name="PlayerLobby" component={PlayerLobby} />
@@ -91,7 +92,6 @@ export default function App() {
                 <Stack.Screen name="Podium" component={Podium} />
 
                 {/* Multi game admin and lobby screens */}
-                <Stack.Screen name="HomeMulti" component={HomeMulti} />
                 <Stack.Screen name="NewMultiGame" component={NewMultiGame} />
                 <Stack.Screen name="JoinMultiGame" component={JoinMultiGame} />
                 <Stack.Screen name="Start" component={Start} />

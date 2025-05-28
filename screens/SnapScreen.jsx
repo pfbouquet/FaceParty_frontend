@@ -39,7 +39,7 @@ export default function SnapScreen({ navigation }) {
   const borderAnim = useRef(new Animated.Value(0)).current;
   const borderColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#F86F5D", "#0F3D62"] // orange <-> bleu 
+    outputRange: ["#F86F5D", "#0F3D62"], // orange <-> bleu
   });
 
   //----------------------------------------------
@@ -105,6 +105,7 @@ export default function SnapScreen({ navigation }) {
         return res.json();
       })
       .then((data) => {
+        console.log(data);
         if (data.result) {
           socket.emit("player-update", roomID);
           navigation.navigate("PlayerLobby");
@@ -125,7 +126,7 @@ export default function SnapScreen({ navigation }) {
         <Image source={{ uri: photoUri }} style={styles.previewImage} />
         <View style={styles.buttonRow}>
           <Button title="Reprendre" onPress={() => setPhotoUri(null)} />
-          <Button title="Confirmer" onPress={handleConfirm} />
+          <Button title="Confirmer" onPress={() => handleConfirm()} />
         </View>
       </View>
     );
@@ -138,7 +139,9 @@ export default function SnapScreen({ navigation }) {
     <ImageBackground style={styles.overlay}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Prends-toi en photo !</Text>
-        <Text style={styles.subtitle}>Tu pourras recommencer si tu n'es pas satisfait.</Text>
+        <Text style={styles.subtitle}>
+          Tu pourras recommencer si tu n'es pas satisfait.
+        </Text>
       </View>
       <Animated.View style={[styles.centerContainer, { borderColor }]}>
         <CameraView
@@ -163,7 +166,7 @@ export default function SnapScreen({ navigation }) {
             styles.button,
           ]}
         >
-          <Animated.View style={[styles.circle, { borderColor }]} >
+          <Animated.View style={[styles.circle, { borderColor }]}>
             <FontAwesome name="camera" size={50} color="#F86F5D" />
           </Animated.View>
         </Pressable>
@@ -198,7 +201,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    color: 'rgba(27, 77, 115, 1)',
+    color: "rgba(27, 77, 115, 1)",
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -212,13 +215,13 @@ const styles = StyleSheet.create({
   notice: {
     width: "80%",
     height: 150,
-    backgroundColor: 'rgba(27, 77, 115, 1)',
+    backgroundColor: "rgba(27, 77, 115, 1)",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
   titleNotice: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
@@ -269,7 +272,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    position: 'absolute',
+    position: "absolute",
     borderWidth: 8,
     justifyContent: "center",
     alignItems: "center",

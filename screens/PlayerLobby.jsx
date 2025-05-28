@@ -1,46 +1,45 @@
-import { useEffect, useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, TextInput, Image, Modal, Platform, StatusBar } from "react-native";
-import * as ClipboardExpo from "expo-clipboard";
-import { Share } from "react-native";
-import QRCode from "react-native-qrcode-svg";
-import { Ionicons } from "@expo/vector-icons";
-import { SocketContext } from "../contexts/SocketContext";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-// Load reducers
-import { useSelector, useDispatch } from "react-redux";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Image,
+  Platform,
+  StatusBar,
+} from "react-native";
 
-// Load components
-import { LobbyPlayerAdminMenu } from "../components/LobbyPlayerAdminMenu";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
+// Load context and State managers
+import { SocketContext } from "../contexts/SocketContext";
+import { useEffect, useState, useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
+// Load components
+import { RoomCodeSharing } from "../components/RoomCodeSharing";
+import { LobbyPlayerCard } from "../components/LobbyPlayerCard";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export default function PlayerLobby({ route, navigation }) {
+export default function PlayerLobby({ navigation }) {
   /*  supprimer le route dans la fonction ??? */
   const socket = useContext(SocketContext);
-  const gameID = useSelector((state) => state.game.value.gameID);
-  const roomID = useSelector((state) => state.game.value.roomID);
-  const admin = useSelector((state) => state.player.value.isAdmin);
+  const game = useSelector((state) => state.game.value);
   const player = useSelector((state) => state.player.value);
 
   const [players, setPlayers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalQRVisible, setModalQRVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newPlayerName, setNewPlayerName] = useState("");
-  const [selfieURL, setSelfieURL] = useState("");
-  const [playnerNameClick, setPlayerNameClick] = useState("");
-  const [selectedPlayerID, setSelectedPlayerID] = useState("");
 
   // FONCTIONS --------------------------------------------------------------
-  const fetchPlayers = (id) => {
-    if (!EXPO_PUBLIC_BACKEND_URL) {
-      console.error("EXPO_PUBLIC_BACKEND_URL is not defined.");
-      setLoading(false);
+  const updateGameCompo = (id) => {
+    if (!game.gameID) {
+      console.log("Waiting for game.gameID to be set...");
       return;
     }
-    setLoading(true);
+    if (!EXPO_PUBLIC_BACKEND_URL) {
+      console.error("EXPO_PUBLIC_BACKEND_URL is not defined.");
+      return;
+    }
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
       .then((data) => {
@@ -49,206 +48,97 @@ export default function PlayerLobby({ route, navigation }) {
         } else {
           console.error("Erreur:", data.error);
         }
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Erreur fetch:", error);
-        setLoading(false);
       });
   };
 
-  function handleNewName() {
-    if (newPlayerName.length === 0 || newPlayerName === player.playerName) {
-      alert("Player name empty or unchanged.");
-      return;
-    }
-
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/updateName`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        playerID: player.playerID,
-        playerName: newPlayerName,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data.message);
-        if (data.result) {
-          socket.emit("player-update", roomID);
-        } else {
-          alert("Erreur lors de la mise à jour du nom.");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Erreur réseau.");
-      });
-    setModalVisible(false);
-  }
-
-  function handleModal(id, playerName) {
-    setSelfieURL(`${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}`);
-    setNewPlayerName(playerName);
-    setPlayerNameClick(playerName);
-    setSelectedPlayerID(id);
-    setModalVisible(true);
-  }
-
   // USEEFFECT --------------------------------------------------------------
+  // Component mount and gameID change effect
   useEffect(() => {
-    socket.on("game-id", (id) => {
-      fetchPlayers(id);
-    });
+    // Load game composition for the first time
+    if (!game.gameID) {
+      console.log("Waiting for game.gameID to be set...");
+      return;
+    } else {
+      updateGameCompo(game.gameID);
+    }
+  }, [game.gameID]);
 
+  useEffect(() => {
+    // Update game composition when player-update event is received
+    socket.on("player-update", () => updateGameCompo(game.gameID));
+    // Navigate to home screen when kicked from the room
     socket.on("you-are-kicked", (id) => {
-      // Navigate to home screen
       navigation.navigate("Home");
     });
-
-    socket.on("room-state", ({ room, currentPlayers }) => {
-      if (room === gameID) {
-        fetchPlayers(room);
-      }
-    });
+    // Navigate to GameLifeScreen when the game is being prepared
+    socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
 
     return () => {
-      socket.off("game-id", (id) => {
-        fetchPlayers(id);
+      socket.off("you-are-kicked", (id) => {
+        navigation.navigate("Home");
       });
-      socket.off("room-state", ({ room, currentPlayers }) => {
-        if (room === gameID) {
-          fetchPlayers(room);
-        }
-      });
+      socket.off("player-update", () => updateGameCompo(game.gameID));
+      socket.off("game-preparation", () =>
+        navigation.navigate("GamePreparation")
+      );
     };
-  }, [gameID]);
-
-  useEffect(() => {
-    socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
-    return () => socket.off("game-preparation", () => navigation.navigate("GamePreparation"));
   }, []);
 
-  useEffect(() => {
-    gameID && fetchPlayers(gameID);
+  // ACTIONS HANDLERS --------------------------------------------------------------
 
-    socket.on("player-update", () => fetchPlayers(gameID));
-    return () => socket.off("player-update", () => fetchPlayers(gameID));
-  }, [gameID, socket]);
+  //fonction au clic sur le bouton START
+  function startParty() {
+    socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
+  }
 
-  if (loading || !gameID) {
+  // RETURN JSX --------------------------------------------------------------
+  // If no gameID, show a loader, waiting for gameID to be set
+  if (!game.gameID) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#3498db" />
       </View>
     );
   }
-
-  // VARIABLES --------------------------------------------------------------
-  const modal = (
-    <Modal visible={modalVisible} animationType="fade" transparent>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <View style={styles.modalCross}>
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(false);
-              }}
-              style={styles.crossModal}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.textButton}>X</Text>
-            </TouchableOpacity>
-          </View>
-
-          {player.playerID === selectedPlayerID ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
-            <>
-              <TouchableOpacity onPress={() => navigation.navigate("SnapScreen")} activeOpacity={0.8} style={styles.blockChangeImg}>
-                <Image style={styles.image} source={{ uri: selfieURL }} />
-                <FontAwesome name="pencil" size="20" color="#de6b58" style={styles.icon} />
-              </TouchableOpacity>
-              <TextInput onChangeText={setNewPlayerName} value={newPlayerName} style={styles.input} />
-              <TouchableOpacity onPress={handleNewName} style={styles.button} activeOpacity={0.8}>
-                <Text style={styles.textButton}>Update</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Image style={styles.image} source={{ uri: selfieURL }} />
-              <Text>{playnerNameClick}</Text>
-            </>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
-
-  //fonction au clic sur le bouton START
-  function startParty() {
-    socket.emit("start-game", roomID); //transmet le signal de l'admin pour lancer la partie
-  }
-
+  // Else, render the PlayerLobby
   return (
     <SafeAreaView style={styles.lobby}>
+      {/* HEADER */}
       <View style={styles.statusBarSpacer} />
-            <View style={styles.header}>
-              <Image source={logo} style={styles.logo} resizeMode="contain" />
-              <Text style={styles.titleHeader}>FaceParty</Text>
-            </View>
+      <View style={styles.header}>
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.titleHeader}>FaceParty</Text>
+      </View>
+
+      {/* MAIN */}
       <ScrollView contentContainerStyle={styles.container}>
-        {modal}
         <Text style={styles.title}>PlayerLobby</Text>
-        <View style={styles.roomCodeContainer}>
-          <Text style={styles.roomCodeInvite}>Room :</Text>
-          <Text style={styles.roomCode}>{roomID}</Text>
-          <TouchableOpacity onPress={() => ClipboardExpo.setStringAsync(roomID)}>
-            <Ionicons name="copy-outline" size={25} color="#333" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={async () => {
-              await Share.share({
-                message: `${roomID}`,
-              });
-            }}
-          >
-            <Ionicons name="share-outline" size={25} color="#333" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setModalQRVisible(true)}>
-            <Ionicons name="qr-code-outline" size={24} color="#333" />
-          </TouchableOpacity>
-        </View>
-        {players.map((player) => (
-          <View key={player._id} style={styles.playerCard}>
-            <TouchableOpacity
-              style={styles.playerButton}
-              // onPress={() => console.log(`Clicked on ${player.playerName}`)}
-              onPress={() => handleModal(player._id, player.playerName)}
-            >
-              <Text style={styles.playerName}>{player.playerName}</Text>
-            </TouchableOpacity>
-            {admin && <LobbyPlayerAdminMenu style={styles.playerAdminMenu} playerID={player._id} roomID={roomID}></LobbyPlayerAdminMenu>}
-          </View>
+        <RoomCodeSharing />
+        {/* PLAYERS CARDS */}
+        {players.map((p) => (
+          <LobbyPlayerCard
+            key={p._id}
+            style={styles.playerCard}
+            navigation={navigation}
+            id={p._id}
+            name={p.playerName || "loading..."}
+          ></LobbyPlayerCard>
         ))}
+
+        {/* CHARACTERS CARDS */}
       </ScrollView>
 
-      {admin && (
-        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
-          <Text style={styles.playerName}>START</Text>
+      {player.isAdmin && (
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => startParty()}
+        >
+          <Text style={styles.textButton}>START</Text>
         </TouchableOpacity>
       )}
-      <Modal animationType="slide" transparent={true} visible={modalQRVisible} onRequestClose={() => setModalQRVisible(false)}>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.title}>Scan ce QR pour rejoindre</Text>
-            <QRCode value={roomID} size={200} backgroundColor="white" />
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalQRVisible(false)}>
-              <Text style={{ color: "white" }}>Fermer</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -283,24 +173,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  playerButton: {
-    backgroundColor: "#3498db",
-    height: "80%",
-    width: "80%",
-    borderRadius: 10,
-    paddingHorizontal: 25,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  playerName: {
+  textButton: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-  },
-  playerAdminMenu: {
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
   },
 
   startButton: {
@@ -313,135 +189,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   // Room code styles
-  roomCodeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    gap: 10,
-    fontSize: 25,
-    fontWeight: "bold",
-  },
-  roomCodeInvite: {
-    fontSize: 25,
-  },
-  roomCode: {
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  // QR Code model styles
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContainer: {
-    width: 300,
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 20,
-    alignItems: "center",
-  },
-  closeButton: {
-    marginTop: 20,
-    backgroundColor: "#de6b58",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "90%",
-  },
-  modalView: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 30,
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalCross: {
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "",
-    width: "100%",
-  },
-  input: {
-    width: 200,
-    borderBottomColor: "#de6b58",
-    borderBottomWidth: 1,
-    fontSize: 16,
-    textAlign: "center",
-  },
-  button: {
-    width: 200,
-    alignItems: "center",
-    marginTop: 20,
-    paddingTop: 8,
-    backgroundColor: "#de6b58",
-    borderRadius: 10,
-  },
-  textButton: {
-    color: "#ffffff",
-    height: 24,
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  image: {
-    width: 150,
-    height: 200,
-    borderRadius: 20,
-    marginBottom: 20,
-    alignSelf: "center",
-    marginRight: -20,
-  },
-  crossModal: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    paddingTop: 5,
-    backgroundColor: "#de6b58",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -10,
-    marginBottom: 15,
-  },
-  blockChangeImg: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  icon: {
-    marginLeft: -5,
-    marginTop: 10,
-  },
   statusBarSpacer: {
     height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    },
+  },
   header: {
-   flexDirection: "row",
-   alignItems: "center",
-   justifyContent: "center",
-  //  paddingHorizontal: 26,
-   width: "100%",
-   paddingVertical: 12,
-   backgroundColor: "#0F3D62",
-    },
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    //  paddingHorizontal: 26,
+    width: "100%",
+    paddingVertical: 12,
+    backgroundColor: "#0F3D62",
+  },
   logo: {
     width: 40,
     height: 40,
     marginRight: 12,
-    },
-  titleHeader:{
+  },
+  titleHeader: {
     fontFamily: "Inter",
     fontSize: 24,
     fontWeight: "600",

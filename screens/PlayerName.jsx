@@ -67,8 +67,9 @@ export default function PlayerName({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-around",
+    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F1F1F1",
   },
   title: {
     fontSize: 20,
@@ -77,19 +78,22 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 200,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    borderWidth: 2,
+    borderColor: "#F86F5D",
     padding: 10,
     borderRadius: 5,
+    textAlign: "center",
   },
   button: {
     backgroundColor: "rgba(27, 77, 115, 1)",
-    padding: 10,
+    padding: 20,
     borderRadius: 5,
+    width:"40%",
   },
   textButton: {
     color: "#fff",
     fontWeight: "bold",
+    textAlign: "center",
   },
   // ---------------------------------------------------
   // Styles for the Notice informations ----------------

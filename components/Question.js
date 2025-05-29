@@ -9,7 +9,6 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
-import { LinearGradient } from 'expo-linear-gradient';
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -109,7 +108,6 @@ export const Question = () => {
     }
 
     return (
-      <LinearGradient colors={['#0F3D62', '#4DA8DA']} style={styles.gradient}>
       <TouchableOpacity
         key={i}
         onPress={() => canClick && handleSelect(e)}
@@ -131,7 +129,6 @@ export const Question = () => {
         {/* <Image source={require('../assets/true.gif')} style={styles.gif}/> */}
         <Text style={styles[isSelected ? "txtSelect" : "txt"]}>{e}</Text>
       </TouchableOpacity>
-    </LinearGradient>
     );
   });
 
@@ -244,21 +241,27 @@ image: {
     marginTop: 10,
     width: "40%",
     alignItems: "center",
+    // // ✅ Effet 3D / ombre
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 6 }, // Décalage vers le bas
+    // // shadowOpacity: 0.5,
+    // shadowRadius: 8,
+    // elevation: 3, // Pour Android
   },
   btnNext: {
-    // borderRadius: 10,
-    // borderWidth: 1,
-    // marginTop: 10,
-    // width: "70%",
-    // justifyContent: "center",
-    // padding: 20,
     backgroundColor: "#F86F5D",
     paddingVertical: "5%",
     borderRadius: 10,
     alignItems: "center",
     marginTop: "3%",
-    alignItems: "center",
     width: "70%",
+
+    // ✅ Effet 3D / ombre
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 }, // Décalage vers le bas
+    shadowOpacity: 5,
+    shadowRadius: 8,
+    elevation: 3, // Pour Android
   },
   btntext:{
     color: "#F1F1F1",

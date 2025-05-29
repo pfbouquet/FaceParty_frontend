@@ -66,8 +66,8 @@ export const WaitingStart = () => {
                     useNativeDriver: true,
                 }),
             ])
-            animation.start(() => {
-                if (isMounted.current) {
+            animation.start(({finished}) => {
+                if (isMounted.current && finished) {
                     setMessageIndex(prev => (prev + 1) % messages.length);
                     animateMessage();
                 }

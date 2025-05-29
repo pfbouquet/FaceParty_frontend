@@ -135,7 +135,7 @@ export default function PlayerLobby({ navigation }) {
   return (
     <SafeAreaView style={styles.lobby}>
       {/* HEADER */}
-      <View style={styles.statusBarSpacer} />
+      {/* <View style={styles.statusBarSpacer} /> */}
       <View style={styles.header}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
         <Text style={styles.titleHeader}>FaceParty</Text>
@@ -220,24 +220,28 @@ const styles = StyleSheet.create({
   },
   playerCard: {},
   addCharacterButton: {
-    backgroundColor: "#7a1c8c",
-    width: "100%",
+    backgroundColor: "#0F3D6290",
+    borderColor: "#0F3D62",
+    borderWidth: 3,
+    // flex :1,
+    width: "80%",
     height: 40,
     paddingHorizontal: 0,
     borderRadius: 10,
-    marginVertical: 10,
+    marginVertical: 30,
+    marginHorizontal: "8%",
     alignItems: "center",
     justifyContent: "center",
   },
   textButton: {
-    color: "#fff",
+    color: "#F1F1F1",
     fontSize: 18,
     fontWeight: "bold",
   },
   startButton: {
-    backgroundColor: "#de6b58",
-    paddingVertical: 30,
-    paddingHorizontal: 0,
+    backgroundColor: "#F86F5D",
+    paddingVertical: 15,
+    // paddingHorizontal: 0,
     borderRadius: 10,
     marginVertical: 10,
     width: "80%",

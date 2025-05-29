@@ -17,10 +17,10 @@ export default function NewMultiGame({ navigation }) {
   useEffect(() => {
     if (!socket) return;
 
-    adminCreateGame(10);
+    adminCreateGame();
   }, []);
 
-  async function createGame(nbRound = 10) {
+  async function createGame(nbRound = 6) {
     setStatusText("Create game in backend ...");
     // Create a game
     let response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/create`, {

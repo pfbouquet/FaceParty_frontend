@@ -88,7 +88,7 @@ export default function JoinMultiGame({ navigation }) {
       return;
     }
     try {
-      let joined = await joinGame(socket.id, true, roomIDvalue.toUpperCase());
+      let joined = await joinGame(socket.id, false, roomIDvalue.toUpperCase());
       if (joined) {
         // Navigate to the game screen => PlayerName
         navigation.navigate("PlayerName");
@@ -109,40 +109,40 @@ export default function JoinMultiGame({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* <View style={styles.statusBarSpacer} /> */}
-        <View style={styles.header}>
-          <Image source={logo} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.title}>FaceParty</Text>
-        </View>
-    <View style={styles.container}>
-      {/* Scan to fill the code */}
-      <TouchableOpacity onPress={() => setScannerVisible(true)}>
-        <Ionicons name="qr-code-outline" size={120} color="#333" />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
+        <Text style={styles.title}>FaceParty</Text>
+      </View>
+      <View style={styles.container}>
+        {/* Scan to fill the code */}
+        <TouchableOpacity onPress={() => setScannerVisible(true)}>
+          <Ionicons name="qr-code-outline" size={120} color="#333" />
+        </TouchableOpacity>
 
-      <Modal visible={scannerVisible} animationType="slide">
-        <JoinQRScanner
-          onScanned={handleScanSuccess}
-          onCancel={() => setScannerVisible(false)}
+        <Modal visible={scannerVisible} animationType="slide">
+          <JoinQRScanner
+            onScanned={handleScanSuccess}
+            onCancel={() => setScannerVisible(false)}
+          />
+        </Modal>
+
+        {/* Joining by entering the code */}
+        <Text style={styles.titleQR}>Join a game</Text>
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="XXXX"
+          value={roomID}
+          onChangeText={(value) => setRoomID(value)}
         />
-      </Modal>
 
-      {/* Joining by entering the code */}
-      <Text style={styles.titleQR}>Join a game</Text>
-      <Text style={styles.errorMessage}>{errorMessage}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="XXXX"
-        value={roomID}
-        onChangeText={(value) => setRoomID(value)}
-      />
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleCodeSubmission(roomID)}
-      >
-        <Text style={styles.buttonText}> JOIN </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleCodeSubmission(roomID)}
+        >
+          <Text style={styles.buttonText}> JOIN </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -196,23 +196,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#F1F1F1",
   },
   statusBarSpacer: {
-      height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    },
+    height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
   header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      // paddingHorizontal: 16,
-      width: "100%",
-      paddingVertical: 12,
-      backgroundColor: "#0F3D62",
-    },
-    logo: {
-      width: 40,
-      height: 40,
-      marginRight: 12,
-    },
-    title: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    // paddingHorizontal: 16,
+    width: "100%",
+    paddingVertical: 12,
+    backgroundColor: "#0F3D62",
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    marginRight: 12,
+  },
+  title: {
     fontFamily: "Inter",
     fontSize: 24,
     fontWeight: "600",

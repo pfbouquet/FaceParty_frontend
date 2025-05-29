@@ -42,6 +42,7 @@ export const WaitingStart = () => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
+        let isMounted = true;
         const animateMessage = () => {
             Animated.sequence([
                 Animated.timing(fadeAnim, {
@@ -56,10 +57,20 @@ export const WaitingStart = () => {
                     useNativeDriver: true,
                 }),
             ]).start(() => {
-                setMessageIndex(prev => (prev + 1) % messages.length);
+                if (isMounted) {
+                    setMessageIndex(prev => (prev + 1) % messages.length);
+                    // Trigger the next animation cycle
+                    if (isMounted) {
+                        animateMessage();
+                    }
+                }
             });
         };
         animateMessage();
+        return () => {
+            isMounted = false;
+            fadeAnim.stopAnimation();
+        };
     }, [messageIndex, fadeAnim, messages.length]);
 
     return (

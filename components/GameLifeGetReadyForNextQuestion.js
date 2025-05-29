@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useContext, useState, useEffect, useRef } from "react";
 import { SocketContext } from "../contexts/SocketContext";
 import { Audio } from 'expo-av';
-import React from "react";
 
 export const GameLifeGetReadyForNextQuestion = () => {
   // ------------------------------------------------------------

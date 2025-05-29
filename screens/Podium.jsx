@@ -1,37 +1,29 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform, StatusBar } from "react-native";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Audio } from 'expo-av';
 import logo from "../assets/logo-faceparty.png";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function Podium({ navigation }) {
+  // ------------------------------------------------------------
+  // VARIABLES---------------------------------------------------
+  // ------------------------------------------------------------
   const socket = useContext(SocketContext);
   const gameID = useSelector((state) => state.game.value.gameID);
   const roomID = useSelector((state) => state.game.value.roomID);
   const admin = useSelector((state) => state.player.value.isAdmin);
   const playerID = useSelector((state) => state.player.value.playerID);
   const [players, setPlayers] = useState([]);
+  const soundCrowd = useRef(null); // soundeffect crowd
 
-  const fetchPlayers = (id) => {
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          const sorted = [...data.players].sort((a, b) => b.score - a.score);
-          setPlayers(sorted);
-        } else {
-          console.error("Erreur:", data.error);
-        }
-      })
-      .catch((error) => {
-        console.error("Erreur fetch:", error);
-      });
-  };
-
+  // ------------------------------------------------------------
+  // USEEFFECT---------------------------------------------------
+  // ------------------------------------------------------------
   useEffect(() => {
     if (gameID) fetchPlayers(gameID);
   }, [gameID]);
@@ -49,6 +41,44 @@ export default function Podium({ navigation }) {
       socket.off("game-cycle", handler);
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadAndPlay = async () => {
+      const { sound } = await Audio.Sound.createAsync(require('../assets/sounds/crowd.mp3'));
+      if (isMounted) {
+        soundCrowd.current = sound;
+        await soundCrowd.current.replayAsync();
+      }
+    };
+    loadAndPlay();
+
+    return () => {
+      isMounted = false;
+      if (soundCrowd.current) {
+        soundCrowd.current.unloadAsync();
+      }
+    };
+  }, []);
+
+  // ------------------------------------------------------------
+  // FONCTIONS---------------------------------------------------
+  // ------------------------------------------------------------
+  const fetchPlayers = (id) => {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          const sorted = [...data.players].sort((a, b) => b.score - a.score);
+          setPlayers(sorted);
+        } else {
+          console.error("Erreur:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur fetch:", error);
+      });
+  };
 
   // 🔁 Émet un signal pour tous retourner au lobby
   const toTheLobby = () => {
@@ -112,11 +142,11 @@ export default function Podium({ navigation }) {
           ))}
         </ScrollView>
 
-          {admin && (
-            <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
-              <Text style={styles.startButtonText}>New Game</Text>
-            </TouchableOpacity>
-          )}
+        {admin && (
+          <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
+            <Text style={styles.startButtonText}>New Game</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

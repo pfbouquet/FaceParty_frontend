@@ -100,6 +100,12 @@ export const Question = () => {
     const canClick = buttonsActive;
     const isSelected = selectedNames.includes(e);
     const isValid = question.goodAnswers.includes(e);
+    let gif = ""
+    if (isValid && isSelected && counter === 0) {
+      gif = <Image source={require('../assets/true.gif')} style={styles.gif} />;
+    } else if (!isValid && isSelected && counter === 0) {
+      gif = <Image source={require('../assets/false.gif')} style={styles.gif} />;
+    }
 
     return (
       <TouchableOpacity
@@ -114,11 +120,13 @@ export const Question = () => {
               : isValid
               ? "btnSelectTrue"
               : isSelected
-              ? "btnSelectFalse"
+              ? "btnSelect"
               : "btn"
           ]
         }
       >
+        {gif}
+        {/* <Image source={require('../assets/true.gif')} style={styles.gif}/> */}
         <Text style={styles[isSelected ? "txtSelect" : "txt"]}>{e}</Text>
       </TouchableOpacity>
     );
@@ -262,5 +270,12 @@ image: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
+  },
+  gif:{
+    width: 40,
+    height: 40,
+    position: "absolute",
+    top: -18,
+    right: -18,
   },
 });

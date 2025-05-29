@@ -1,5 +1,14 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, StatusBar } from "react-native";
-import { useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Platform,
+  StatusBar,
+} from "react-native";
+import { useEffect, useContext } from "react";
+import { SocketContext } from "../contexts/SocketContext";
 // load reducers
 import { useDispatch } from "react-redux";
 import { resetGame } from "../reducers/game";
@@ -9,9 +18,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
 
 export default function HomeMulti({ navigation }) {
+  const socket = useContext(SocketContext);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // leave all rooms
+    socket.emit("leave-all-rooms");
     // reset reducers when entering the HomeMulti screen
     dispatch(resetGame());
     dispatch(resetPlayer());

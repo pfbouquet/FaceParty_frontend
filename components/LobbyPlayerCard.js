@@ -8,7 +8,13 @@ import { LobbyPlayerDetailModal } from "./LobbyPlayerDetailModal";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const LobbyPlayerCard = ({ navigation, id, name, type }) => {
+export const LobbyPlayerCard = ({
+  navigation,
+  id,
+  name,
+  isAdmin = false,
+  type,
+}) => {
   const currentPlayer = useSelector((state) => state.player.value);
   const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
@@ -17,9 +23,18 @@ export const LobbyPlayerCard = ({ navigation, id, name, type }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={type === "player" ? styles.playerButton : styles.characterButton}
+        style={[
+          styles.buttonWithBadgeContainer,
+          type === "player" ? styles.playerButton : styles.characterButton,
+        ]}
         onPress={() => setModalDetailVisible(true)}
       >
+        {/* Admin badge */}
+        {isAdmin && (
+          <View style={styles.adminBadge}>
+            <Text>Admin</Text>
+          </View>
+        )}
         <Text style={styles.playerName}>{name}</Text>
       </TouchableOpacity>
       {currentPlayer.isAdmin && (
@@ -52,14 +67,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: "100%",
   },
-  playerName: {
-    color: "#F1F1F1",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  playerButton: {
-    backgroundColor: "#0F3D62",
-    margin: "5",
+
+  buttonWithBadgeContainer: {
+    position: "relative",
+    margin: 5,
     height: 40,
     width: "80%",
     borderRadius: 10,
@@ -67,15 +78,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  playerButton: {
+    backgroundColor: "#0F3D62",
+  },
   characterButton: {
     backgroundColor: "#0F3D6295",
-    margin: "5",
-    height: 40,
-    width: "80%",
-    borderRadius: 10,
-    paddingHorizontal: 25,
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  adminBadge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    backgroundColor: "#de6b58",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  adminBadgeText: {
+    color: "white",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+
+  playerName: {
+    color: "#F1F1F1",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   playerAdminMenu: {
     height: "100%",

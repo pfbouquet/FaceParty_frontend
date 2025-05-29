@@ -141,7 +141,7 @@ export default function PlayerLobby({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.playersContainer}>
           {game.players.map((p) => (
-            <LobbyPlayerCard key={p._id} style={styles.playerCard} navigation={navigation} id={p._id} name={p.playerName || "loading..."} type="player"></LobbyPlayerCard>
+            <LobbyPlayerCard key={p._id} style={styles.playerCard} navigation={navigation} id={p._id} name={p.playerName || "loading..."} isAdmin={p.isAdmin} type="player"></LobbyPlayerCard>
           ))}
           {game.characters.map((c) => (
             <LobbyPlayerCard key={c._id} style={styles.playerCard} navigation={navigation} id={c._id} name={c.name || "loading..."} type="character"></LobbyPlayerCard>

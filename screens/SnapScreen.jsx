@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Animated,
   Text,
+  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState, useContext, useRef } from "react";
 import { CameraView, Camera } from "expo-camera";
@@ -124,8 +125,8 @@ export default function SnapScreen({ navigation }) {
       <View style={styles.previewContainer}>
         <Image source={{ uri: photoUri }} style={styles.previewImage} />
         <View style={styles.buttonRow}>
-          <Button title="Reprendre" onPress={() => setPhotoUri(null)} />
-          <Button title="Confirmer" onPress={() => handleConfirm()} />
+          <TouchableOpacity style={styles.button} onPress={() => setPhotoUri(null)}><Text style={styles.startButtonText}>Reprendre</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => handleConfirm()}><Text style={styles.startButtonText}>Confirmer</Text></TouchableOpacity>
         </View>
       </View>
     );
@@ -247,8 +248,17 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   button: {
+    backgroundColor: "#F86F5D",
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 10,
+    width: 130,
+    height: 35,
+  },
+  startButtonText:{
+    fontSize: 18,
+    color: "#F1F1F1",
+    fontWeight: "bold",
   },
   previewContainer: {
     flex: 1,

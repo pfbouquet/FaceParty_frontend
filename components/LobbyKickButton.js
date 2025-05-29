@@ -16,6 +16,60 @@ export const LobbyKickButton = ({ idToKick, type }) => {
     })();
   }, []);
 
+  function kickPlayer() {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-player`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        playerID: idToKick,
+        roomID: game.roomID,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.result) {
+          console.error(
+            "Erreur: couldn't kick player out of the room.",
+            data.error
+          );
+        } else {
+          console.log(data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur fetch:", error);
+      });
+  }
+
+  function kickCharacter() {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-character`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        characterID: idToKick,
+        roomID: game.roomID,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.result) {
+          console.error(
+            "Erreur: couldn't kick character out of the room.",
+            data.error
+          );
+        } else {
+          console.log(data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur fetch:", error);
+      });
+  }
+
   return (
     <View style={styles.container}>
       {/* Button to kick player, only visible to admin */}
@@ -23,51 +77,9 @@ export const LobbyKickButton = ({ idToKick, type }) => {
         style={styles.playerKickButton}
         onPress={() => {
           if (type === "player") {
-            fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-player`, {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                playerID: idToKick,
-                roomID: game.roomID,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (!data.result) {
-                  console.error(
-                    "Erreur: couldn't kick player out of the room.",
-                    data.error
-                  );
-                }
-              })
-              .catch((error) => {
-                console.error("Erreur fetch:", error);
-              });
+            kickPlayer();
           } else if (type === "character") {
-            fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-character`, {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                characterID: idToKick,
-                roomID: game.roomID,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (!data.result) {
-                  console.error(
-                    "Erreur: couldn't kick character out of the room.",
-                    data.error
-                  );
-                }
-              })
-              .catch((error) => {
-                console.error("Erreur fetch:", error);
-              });
+            kickCharacter();
           }
         }}
       >

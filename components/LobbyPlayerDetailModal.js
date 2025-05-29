@@ -11,22 +11,36 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 // Load context and State managers
 import { SocketContext } from "../contexts/SocketContext";
-import { useState, useContext } from "react";
-import { useSelector } from "react-redux";
+import { useState, useEffect, useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updatePlayerName } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const LobbyPlayerDetailModal = ({
   navigation,
   visible,
+  hide,
   id,
   name,
-  hide,
+  type,
 }) => {
   const socket = useContext(SocketContext);
   const player = useSelector((state) => state.player.value);
   const game = useSelector((state) => state.game.value);
   const [newPlayerName, setNewPlayerName] = useState(name);
+  const [portraitURL, setPortraitURL] = useState("");
+  const dispatch = useDispatch();
+
+  function refreshPortrait() {
+    setPortraitURL(
+      `${EXPO_PUBLIC_BACKEND_URL}/portrait/${type}/${id}?t=${Date.now()}`
+    );
+  }
+
+  useEffect(() => {
+    refreshPortrait();
+  }, []);
 
   function handleNewName() {
     if (newPlayerName.length === 0 || newPlayerName === player.playerName) {
@@ -47,6 +61,7 @@ export const LobbyPlayerDetailModal = ({
       .then((res) => res.json())
       .then((data) => {
         if (data.result) {
+          dispatch(updatePlayerName(newPlayerName));
           socket.emit("player-update", game.roomID);
           hide();
         } else {
@@ -84,7 +99,7 @@ export const LobbyPlayerDetailModal = ({
                 <Image
                   style={styles.image}
                   source={{
-                    uri: `${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}?t=${Date.now()}`,
+                    uri: portraitURL,
                   }}
                   // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
                 />
@@ -113,7 +128,7 @@ export const LobbyPlayerDetailModal = ({
               <Image
                 style={styles.image}
                 source={{
-                  uri: `${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}?t=${Date.now()}`,
+                  uri: portraitURL,
                 }}
                 // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
               />

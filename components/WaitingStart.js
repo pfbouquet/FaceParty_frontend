@@ -11,19 +11,13 @@ import {
 } from "react-native";
 
 export const WaitingStart = () => {
+    // --------------------------------------------------------------------------
+    // VARIABLES ----------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    const [messageIndex, setMessageIndex] = React.useState(0);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
     const spinValue = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        Animated.loop(
-            Animated.timing(spinValue, {
-                toValue: 1,
-                duration: 3000,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            })
-        ).start();
-    }, [spinValue]);
-
+    const isMounted = useRef(true);
     const spin = spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg'],
@@ -36,15 +30,30 @@ export const WaitingStart = () => {
         "Dégustation imminente des saucisses !",
         "Inversement du réchauffement climatique",
         "Préparation de la fête...",
-        "Soyez patient, nous y sommes presque !",
-
+        "Sois patient, nous y sommes presque !",
     ];
-    const [messageIndex, setMessageIndex] = React.useState(0);
-    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    // --------------------------------------------------------------------------
+    // USEEFFECT ----------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    useEffect(() => {
+        Animated.loop(
+            Animated.timing(spinValue, {
+                toValue: 1,
+                duration: 3000,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            })
+        ).start();
+    }, [spinValue]);
+
 
     useEffect(() => {
+        isMounted.current = true;
+        let animation;
+
         const animateMessage = () => {
-            Animated.sequence([
+            animation = Animated.sequence([
                 Animated.timing(fadeAnim, {
                     toValue: 1,
                     duration: 1000,
@@ -56,12 +65,22 @@ export const WaitingStart = () => {
                     duration: 1000,
                     useNativeDriver: true,
                 }),
-            ]).start(() => {
-                setMessageIndex(prev => (prev + 1) % messages.length);
+            ])
+            animation.start(({finished}) => {
+                if (isMounted.current && finished) {
+                    setMessageIndex(prev => (prev + 1) % messages.length);
+                    animateMessage();
+                }
             });
         };
         animateMessage();
-    }, [messageIndex, fadeAnim, messages.length]);
+
+        return () => {
+            isMounted.current = false;
+            fadeAnim.stopAnimation();
+            if (animation) animation.stop();
+        };
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>

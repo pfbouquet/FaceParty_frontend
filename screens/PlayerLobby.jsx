@@ -19,6 +19,7 @@ export default function PlayerLobby({ navigation }) {
   const game = useSelector((state) => state.game.value);
   const player = useSelector((state) => state.player.value);
   const dispatch = useDispatch();
+  const [addPeople, setAddPeople] = useState("");
 
   // FONCTIONS --------------------------------------------------------------
   const refreshGameCompo = () => {
@@ -81,7 +82,11 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
-    socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
+    if (game.players.length + game.characters.length >= 4) {
+      socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
+    } else {
+      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour lancer la partie</Text>)
+    }
   }
 
   // Add a character
@@ -156,11 +161,15 @@ export default function PlayerLobby({ navigation }) {
       </ScrollView>
 
       {player.isAdmin && (
-        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
-          <Text style={styles.textButton}>START</Text>
-        </TouchableOpacity>
-      )}
-    </SafeAreaView>
+        <>
+          {addPeople}
+          < TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+            <Text style={styles.textButton}>START</Text>
+          </TouchableOpacity>
+        </>
+      )
+      }
+    </SafeAreaView >
   );
 }
 
@@ -241,5 +250,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     color: "#F1F1F1",
+  },
+  peopleMissing: {
+    color: "red",
   },
 });

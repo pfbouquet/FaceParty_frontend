@@ -3,9 +3,9 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
   SafeAreaView,
 } from "react-native";
+import { Image } from 'expo-image';
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";

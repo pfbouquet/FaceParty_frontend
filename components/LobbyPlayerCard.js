@@ -3,12 +3,12 @@ import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import { useEffect, useState, useContext } from "react";
 import { useSelector } from "react-redux";
 // Load components
-import { LobbyPlayerAdminMenu } from "./LobbyPlayerAdminMenu";
+import { LobbyKickButton } from "./LobbyKickButton";
 import { LobbyPlayerDetailModal } from "./LobbyPlayerDetailModal";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-export const LobbyPlayerCard = ({ navigation, id, name }) => {
+export const LobbyPlayerCard = ({ navigation, id, name, type }) => {
   const currentPlayer = useSelector((state) => state.player.value);
   const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
@@ -17,16 +17,17 @@ export const LobbyPlayerCard = ({ navigation, id, name }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.playerButton}
+        style={type === "player" ? styles.playerButton : styles.characterButton}
         onPress={() => setModalDetailVisible(true)}
       >
         <Text style={styles.playerName}>{name}</Text>
       </TouchableOpacity>
       {currentPlayer.isAdmin && (
-        <LobbyPlayerAdminMenu
+        <LobbyKickButton
           style={styles.playerAdminMenu}
-          playerIDToKick={id}
-        ></LobbyPlayerAdminMenu>
+          idToKick={id}
+          type={type}
+        ></LobbyKickButton>
       )}
 
       <LobbyPlayerDetailModal
@@ -57,7 +58,16 @@ const styles = StyleSheet.create({
   },
   playerButton: {
     backgroundColor: "#3498db",
-    height: "80%",
+    height: 40,
+    width: "80%",
+    borderRadius: 10,
+    paddingHorizontal: 25,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  characterButton: {
+    backgroundColor: "#7a1c8c",
+    height: 40,
     width: "80%",
     borderRadius: 10,
     paddingHorizontal: 25,

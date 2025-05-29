@@ -46,7 +46,6 @@ export const LobbyPlayerDetailModal = ({
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data.result) {
           socket.emit("player-update", game.roomID);
           hide();

@@ -16,6 +16,7 @@ import logo from "../assets/logo-faceparty.png";
 import { SocketContext } from "../contexts/SocketContext";
 import { useEffect, useState, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { updatePlayers, updateCharacters } from "../reducers/game";
 // Load components
 import { RoomCodeSharing } from "../components/RoomCodeSharing";
 import { LobbyPlayerCard } from "../components/LobbyPlayerCard";
@@ -27,12 +28,12 @@ export default function PlayerLobby({ navigation }) {
   const socket = useContext(SocketContext);
   const game = useSelector((state) => state.game.value);
   const player = useSelector((state) => state.player.value);
-
-  const [players, setPlayers] = useState([]);
+  const dispatch = useDispatch();
 
   // FONCTIONS --------------------------------------------------------------
-  const updateGameCompo = (id) => {
-    if (!game.gameID) {
+  const refreshGameCompo = () => {
+    console.log("Refreshing game reducer Players and Characters");
+    if (!game.roomID) {
       console.log("Waiting for game.gameID to be set...");
       return;
     }
@@ -40,11 +41,12 @@ export default function PlayerLobby({ navigation }) {
       console.error("EXPO_PUBLIC_BACKEND_URL is not defined.");
       return;
     }
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/${game.roomID}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          setPlayers(data.players);
+          dispatch(updatePlayers(data.game.players));
+          dispatch(updateCharacters(data.game.characters));
         } else {
           console.error("Erreur:", data.error);
         }
@@ -58,17 +60,17 @@ export default function PlayerLobby({ navigation }) {
   // Component mount and gameID change effect
   useEffect(() => {
     // Load game composition for the first time
-    if (!game.gameID) {
+    if (!game.gameID || !game.players) {
       console.log("Waiting for game.gameID to be set...");
       return;
     } else {
-      updateGameCompo(game.gameID);
+      refreshGameCompo();
     }
-  }, [game.gameID]);
+  }, []);
 
   useEffect(() => {
     // Update game composition when player-update event is received
-    socket.on("player-update", () => updateGameCompo(game.gameID));
+    socket.on("player-update", () => refreshGameCompo());
     // Navigate to home screen when kicked from the room
     socket.on("you-are-kicked", () => {
       navigation.navigate("HomeMulti");
@@ -80,7 +82,7 @@ export default function PlayerLobby({ navigation }) {
       socket.off("you-are-kicked", (id) => {
         navigation.navigate("HomeMulti");
       });
-      socket.off("player-update", () => updateGameCompo(game.gameID));
+      socket.off("player-update", () => refreshGameCompo());
       socket.off("game-preparation", () =>
         navigation.navigate("GamePreparation")
       );
@@ -89,14 +91,40 @@ export default function PlayerLobby({ navigation }) {
 
   // ACTIONS HANDLERS --------------------------------------------------------------
 
-  //fonction au clic sur le bouton START
+  // Start the game
   function startParty() {
     socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
   }
 
+  // Add a character
+  function addCharacter(type = "celebrity") {
+    console.log(`Adding a character of type: ${type}`);
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/add-character`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomID: game.roomID,
+        // type: type,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.result) {
+          console.error("Erreur:", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur fetch:", error);
+      });
+
+    game.roomID;
+  }
+
   // RETURN JSX --------------------------------------------------------------
   // If no gameID, show a loader, waiting for gameID to be set
-  if (!game.gameID) {
+  if (!game.gameID || !game.players) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#3498db" />
@@ -118,15 +146,37 @@ export default function PlayerLobby({ navigation }) {
         <Text style={styles.title}>PlayerLobby</Text>
         <RoomCodeSharing />
         {/* PLAYERS CARDS */}
-        {players.map((p) => (
-          <LobbyPlayerCard
-            key={p._id}
-            style={styles.playerCard}
-            navigation={navigation}
-            id={p._id}
-            name={p.playerName || "loading..."}
-          ></LobbyPlayerCard>
-        ))}
+        <View style={styles.playersContainer}>
+          {game.players.map((p) => (
+            <LobbyPlayerCard
+              key={p._id}
+              style={styles.playerCard}
+              navigation={navigation}
+              id={p._id}
+              name={p.playerName || "loading..."}
+              type="player"
+            ></LobbyPlayerCard>
+          ))}
+          {game.characters.map((c) => (
+            <LobbyPlayerCard
+              key={c._id}
+              style={styles.playerCard}
+              navigation={navigation}
+              id={c._id}
+              name={c.name || "loading..."}
+              type="character"
+            ></LobbyPlayerCard>
+          ))}
+
+          {player.isAdmin && (
+            <TouchableOpacity
+              style={styles.addCharacterButton}
+              onPress={() => addCharacter("Celebrity")}
+            >
+              <Text style={styles.textButton}> + Ajouter une star + </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* CHARACTERS CARDS */}
       </ScrollView>
@@ -165,11 +215,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
   },
-  playerCard: {
-    marginVertical: 10,
+  playersContainer: {
     width: "100%",
-    height: 50,
-    flexDirection: "row",
+  },
+  playerCard: {},
+  addCharacterButton: {
+    backgroundColor: "#7a1c8c",
+    width: "100%",
+    height: 40,
+    paddingHorizontal: 0,
+    borderRadius: 10,
+    marginVertical: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -178,7 +234,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-
   startButton: {
     backgroundColor: "#de6b58",
     paddingVertical: 30,

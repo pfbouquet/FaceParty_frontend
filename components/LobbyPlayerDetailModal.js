@@ -11,7 +11,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 // Load context and State managers
 import { SocketContext } from "../contexts/SocketContext";
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -19,14 +19,26 @@ const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 export const LobbyPlayerDetailModal = ({
   navigation,
   visible,
+  hide,
   id,
   name,
-  hide,
+  type,
 }) => {
   const socket = useContext(SocketContext);
   const player = useSelector((state) => state.player.value);
   const game = useSelector((state) => state.game.value);
   const [newPlayerName, setNewPlayerName] = useState(name);
+  const [portraitURL, setPortraitURL] = useState("");
+
+  function refreshPortrait() {
+    setPortraitURL(
+      `${EXPO_PUBLIC_BACKEND_URL}/portrait/${type}/${id}?t=${Date.now()}`
+    );
+  }
+
+  useEffect(() => {
+    refreshPortrait();
+  }, []);
 
   function handleNewName() {
     if (newPlayerName.length === 0 || newPlayerName === player.playerName) {
@@ -84,7 +96,7 @@ export const LobbyPlayerDetailModal = ({
                 <Image
                   style={styles.image}
                   source={{
-                    uri: `${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}?t=${Date.now()}`,
+                    uri: portraitURL,
                   }}
                   // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
                 />
@@ -113,7 +125,7 @@ export const LobbyPlayerDetailModal = ({
               <Image
                 style={styles.image}
                 source={{
-                  uri: `${EXPO_PUBLIC_BACKEND_URL}/selfie/${id}?t=${Date.now()}`,
+                  uri: portraitURL,
                 }}
                 // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
               />

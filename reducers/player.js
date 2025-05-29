@@ -7,7 +7,7 @@ const initialState = {
     playerName: null,
     score: 0,
     scoreHistory: [],
-    selfieFilePath: null,
+    portraitFilePath: null,
   },
 };
 
@@ -26,10 +26,10 @@ export const playerSlice = createSlice({
       state.value.playerName = null;
       state.value.score = 0;
       state.value.scoreHistory = [];
-      state.value.selfieFilePath = null;
+      state.value.portraitFilePath = null;
     },
     addPicture: (state, action) => {
-      state.value.selfieFilePath = action.payload;
+      state.value.portraitFilePath = action.payload;
     },
   },
 });

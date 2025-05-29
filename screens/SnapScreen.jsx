@@ -94,7 +94,7 @@ export default function SnapScreen({ navigation }) {
     });
     formData.append("playerID", playerID);
 
-    fetch(`${EXPO_PUBLIC_BACKEND_URL}/selfie/upload`, {
+    fetch(`${EXPO_PUBLIC_BACKEND_URL}/portrait/upload`, {
       method: "POST",
       body: formData,
       headers: {

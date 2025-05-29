@@ -171,7 +171,7 @@ export default function PlayerLobby({ navigation }) {
           {player.isAdmin && (
             <TouchableOpacity
               style={styles.addCharacterButton}
-              onPress={() => addCharacter("Celebrity")}
+              onPress={() => addCharacter("celebrity")}
             >
               <Text style={styles.textButton}> + Ajouter une star + </Text>
             </TouchableOpacity>

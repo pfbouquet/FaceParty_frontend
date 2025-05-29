@@ -36,8 +36,7 @@ export const WaitingStart = () => {
         "Dégustation imminente des saucisses !",
         "Inversement du réchauffement climatique",
         "Préparation de la fête...",
-        "Soyez patient, nous y sommes presque !",
-
+        "Sois patient, nous y sommes presque !",
     ];
     const [messageIndex, setMessageIndex] = React.useState(0);
     const fadeAnim = useRef(new Animated.Value(0)).current;

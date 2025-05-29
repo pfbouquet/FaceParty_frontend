@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    // margin: 0,
     gap: 10,
     fontSize: 25,
     fontWeight: "bold",
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: 300,
-    backgroundColor: "white",
+    backgroundColor: "#F1F1F1",
     padding: 20,
     borderRadius: 20,
     alignItems: "center",
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   modalCloseButton: {
     marginTop: 20,
-    backgroundColor: "#de6b58",
+    backgroundColor: "#F86F5D",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,

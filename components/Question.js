@@ -9,6 +9,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
+import { LinearGradient } from 'expo-linear-gradient';
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -102,6 +103,7 @@ export const Question = () => {
     const isValid = question.goodAnswers.includes(e);
 
     return (
+      <LinearGradient colors={['#0F3D62', '#4DA8DA']} style={styles.gradient}>
       <TouchableOpacity
         key={i}
         onPress={() => canClick && handleSelect(e)}
@@ -121,6 +123,7 @@ export const Question = () => {
       >
         <Text style={styles[isSelected ? "txtSelect" : "txt"]}>{e}</Text>
       </TouchableOpacity>
+    </LinearGradient>
     );
   });
 

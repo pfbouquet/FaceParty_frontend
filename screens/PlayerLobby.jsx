@@ -1,14 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Image,
-  Platform,
-  StatusBar,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image, Platform, StatusBar } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
@@ -83,9 +73,7 @@ export default function PlayerLobby({ navigation }) {
         navigation.navigate("HomeMulti");
       });
       socket.off("player-update", () => refreshGameCompo());
-      socket.off("game-preparation", () =>
-        navigation.navigate("GamePreparation")
-      );
+      socket.off("game-preparation", () => navigation.navigate("GamePreparation"));
     };
   }, []);
 
@@ -142,37 +130,20 @@ export default function PlayerLobby({ navigation }) {
       </View>
 
       {/* MAIN */}
+      <Text style={styles.title}>PlayerLobby</Text>
+      <RoomCodeSharing />
+      {/* PLAYERS CARDS */}
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>PlayerLobby</Text>
-        <RoomCodeSharing />
-        {/* PLAYERS CARDS */}
         <View style={styles.playersContainer}>
           {game.players.map((p) => (
-            <LobbyPlayerCard
-              key={p._id}
-              style={styles.playerCard}
-              navigation={navigation}
-              id={p._id}
-              name={p.playerName || "loading..."}
-              type="player"
-            ></LobbyPlayerCard>
+            <LobbyPlayerCard key={p._id} style={styles.playerCard} navigation={navigation} id={p._id} name={p.playerName || "loading..."} type="player"></LobbyPlayerCard>
           ))}
           {game.characters.map((c) => (
-            <LobbyPlayerCard
-              key={c._id}
-              style={styles.playerCard}
-              navigation={navigation}
-              id={c._id}
-              name={c.name || "loading..."}
-              type="character"
-            ></LobbyPlayerCard>
+            <LobbyPlayerCard key={c._id} style={styles.playerCard} navigation={navigation} id={c._id} name={c.name || "loading..."} type="character"></LobbyPlayerCard>
           ))}
 
           {player.isAdmin && (
-            <TouchableOpacity
-              style={styles.addCharacterButton}
-              onPress={() => addCharacter("Celebrity")}
-            >
+            <TouchableOpacity style={styles.addCharacterButton} onPress={() => addCharacter("Celebrity")}>
               <Text style={styles.textButton}> + Ajouter une star + </Text>
             </TouchableOpacity>
           )}
@@ -182,10 +153,7 @@ export default function PlayerLobby({ navigation }) {
       </ScrollView>
 
       {player.isAdmin && (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => startParty()}
-        >
+        <TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
           <Text style={styles.textButton}>START</Text>
         </TouchableOpacity>
       )}

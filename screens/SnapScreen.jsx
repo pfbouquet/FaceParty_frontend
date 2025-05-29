@@ -4,7 +4,7 @@ import {
   Dimensions,
   Pressable,
   Image,
-  Button,
+  // Button,
   ImageBackground,
   Animated,
   Text,
@@ -125,8 +125,8 @@ export default function SnapScreen({ navigation }) {
       <View style={styles.previewContainer}>
         <Image source={{ uri: photoUri }} style={styles.previewImage} />
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.button} onPress={() => setPhotoUri(null)}><Text style={styles.startButtonText}>Reprendre</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => handleConfirm()}><Text style={styles.startButtonText}>Confirmer</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.buttonPrev} onPress={() => setPhotoUri(null)}><Text style={styles.startButtonText}>Reprendre</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.buttonPrev} onPress={() => handleConfirm()}><Text style={styles.startButtonText}>Confirmer</Text></TouchableOpacity>
         </View>
       </View>
     );
@@ -247,8 +247,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  button: {
+  buttonPrev: {
     backgroundColor: "#F86F5D",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    width: 130,
+    height: 35,
+  },
+  button: {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -262,7 +269,7 @@ const styles = StyleSheet.create({
   },
   previewContainer: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#F1F1F1",
     justifyContent: "center",
     alignItems: "center",
   },

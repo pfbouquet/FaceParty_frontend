@@ -12,7 +12,8 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 // Load context and State managers
 import { SocketContext } from "../contexts/SocketContext";
 import { useState, useEffect, useContext } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updatePlayerName } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -29,6 +30,7 @@ export const LobbyPlayerDetailModal = ({
   const game = useSelector((state) => state.game.value);
   const [newPlayerName, setNewPlayerName] = useState(name);
   const [portraitURL, setPortraitURL] = useState("");
+  const dispatch = useDispatch();
 
   function refreshPortrait() {
     setPortraitURL(
@@ -59,6 +61,7 @@ export const LobbyPlayerDetailModal = ({
       .then((res) => res.json())
       .then((data) => {
         if (data.result) {
+          dispatch(updatePlayerName(newPlayerName));
           socket.emit("player-update", game.roomID);
           hide();
         } else {

@@ -28,11 +28,15 @@ export const playerSlice = createSlice({
       state.value.scoreHistory = [];
       state.value.portraitFilePath = null;
     },
-    addPicture: (state, action) => {
+    updatePortrait: (state, action) => {
       state.value.portraitFilePath = action.payload;
+    },
+    updatePlayerName: (state, action) => {
+      state.value.playerName = action.payload;
     },
   },
 });
 
-export const { newPlayer, resetPlayer, addPicture } = playerSlice.actions;
+export const { newPlayer, resetPlayer, updatePortrait, updatePlayerName } =
+  playerSlice.actions;
 export default playerSlice.reducer;

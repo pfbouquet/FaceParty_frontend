@@ -16,7 +16,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { SocketContext } from "../contexts/SocketContext";
 // Load reducers
 import { useDispatch, useSelector } from "react-redux";
-import { addPicture } from "../reducers/player";
+import { updatePortrait } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width } = Dimensions.get("window");
@@ -84,7 +84,7 @@ export default function SnapScreen({ navigation }) {
       return;
     }
 
-    dispatch(addPicture(photoUri));
+    dispatch(updatePortrait(photoUri));
 
     const formData = new FormData();
     formData.append("photoFromFront", {

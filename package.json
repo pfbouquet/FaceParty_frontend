@@ -22,6 +22,7 @@
     "expo-av": "~15.1.4",
     "expo-camera": "^16.1.6",
     "expo-clipboard": "^7.1.4",
+    "expo-image": "~2.1.7",
     "expo-linear-gradient": "^14.1.4",
     "expo-status-bar": "~2.2.3",
     "lottie-react-native": "^7.2.2",

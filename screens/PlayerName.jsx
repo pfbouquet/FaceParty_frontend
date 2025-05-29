@@ -1,9 +1,23 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated, Image, Platform, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Animated,
+  Image,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { useState, useRef, useEffect, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
+
+// load reducer
+import { useDispatch } from "react-redux";
+import { updatePlayerName } from "../reducers/player";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -15,6 +29,8 @@ export default function PlayerName({ navigation }) {
   const [playerName, setPlayerName] = useState("");
   const { playerID } = useSelector((state) => state.player.value);
   const { roomID } = useSelector((state) => state.game.value);
+  const dispatch = useDispatch();
+
   //Animation pour la bordure du TextInput
   const borderAnim = useRef(new Animated.Value(0)).current;
   const borderColor = borderAnim.interpolate({
@@ -46,6 +62,7 @@ export default function PlayerName({ navigation }) {
       .then((data) => {
         console.log(data.message);
         if (data.result) {
+          dispatch(updatePlayerName(playerName));
           socket.emit("player-update", roomID);
           navigation.navigate("SnapScreen");
         } else {
@@ -91,15 +108,26 @@ export default function PlayerName({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.title}>Écris ton prénom</Text>
         <Animated.View style={[styles.inputWrapper, { borderColor }]}>
-          <TextInput placeholder="Mon prénom" onChangeText={setPlayerName} value={playerName} style={styles.input} />
+          <TextInput
+            placeholder="Mon prénom"
+            onChangeText={(value) => setPlayerName(value)}
+            value={playerName}
+            style={styles.input}
+          />
         </Animated.View>
         <View style={styles.notice}>
           <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
           <Text style={styles.infoNotice}>🙅 Pas de surnom</Text>
           <Text style={styles.infoNotice}>🫡 Ne mets QUE ton prénom</Text>
-          <Text style={styles.infoNotice}>🥲 N'oublie pas le prénom des autres</Text>
+          <Text style={styles.infoNotice}>
+            🥲 N'oublie pas le prénom des autres
+          </Text>
         </View>
-        <AnimatedTouchable onPress={handleSubmit} style={[styles.button, { borderColor, borderWidth: 2 }]} activeOpacity={0.8}>
+        <AnimatedTouchable
+          onPress={() => handleSubmit()}
+          style={[styles.button, { borderColor, borderWidth: 2 }]}
+          activeOpacity={0.8}
+        >
           <Text style={styles.textButton}>Ok pour moi !</Text>
         </AnimatedTouchable>
       </View>

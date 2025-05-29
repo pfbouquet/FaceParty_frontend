@@ -22,7 +22,7 @@ export default function PlayerLobby({ navigation }) {
 
   // FONCTIONS --------------------------------------------------------------
   const refreshGameCompo = () => {
-    console.log("Refreshing game reducer Players and Characters");
+    console.log(`${player.playerName} is refreshing its game reducer`);
     if (!game.roomID) {
       console.log("Waiting for game.gameID to be set...");
       return;
@@ -143,7 +143,10 @@ export default function PlayerLobby({ navigation }) {
           ))}
 
           {player.isAdmin && (
-            <TouchableOpacity style={styles.addCharacterButton} onPress={() => addCharacter("Celebrity")}>
+            <TouchableOpacity
+              style={styles.addCharacterButton}
+              onPress={() => addCharacter("celebrity")}
+            >
               <Text style={styles.textButton}> + Ajouter une star + </Text>
             </TouchableOpacity>
           )}

@@ -35,6 +35,7 @@ export const LobbyPlayerCard = ({ navigation, id, name, type }) => {
         visible={modalDetailVisible}
         id={id}
         name={name}
+        type={type}
         hide={() => {
           setModalDetailVisible(false);
         }}

@@ -82,10 +82,15 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
-    if (game.players.length + game.characters.length >= 4) {
+
+    let sameName = game.players.filter((e) => e.playerName === e.playerName)
+
+    if ((game.players.length + game.characters.length >= 4) && (sameName.length === 1)) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
-    } else {
+    } else if (game.players.length + game.characters.length < 4) {
       setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour lancer la partie</Text>)
+    } else if (sameName.length > 1) {
+      setAddPeople(<Text style={styles.peopleMissing}>Des joueurs ont le même nom, invitez-les à se différencier</Text>)
     }
   }
 

@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
 
 import { useEffect, useState, useContext } from "react";
 import { useSelector } from "react-redux";
@@ -88,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingTop: 40,
-    paddingHorizontal: 20,
+    marginHorizontal: 20,
   },
   title: {
     fontSize: 28,

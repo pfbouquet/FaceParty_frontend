@@ -6,23 +6,27 @@ on:
       - main
 
 jobs:
-  update:
+  eas-update:
+    name: Run EAS Update on push to main
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Install dependencies
         run: npm install
 
-      - name: Log in to Expo
-        run: npx expo login --token ${{ secrets.EXPO_TOKEN }}
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
 
-      - name: EAS update
+      - name: Run EAS Update
+        run: eas update --branch main -m "GitHub auto update"
         env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EXPO_PUBLIC_BACKEND_URL: ${{ secrets.EXPO_PUBLIC_BACKEND_URL }}
-        run: npx eas update --branch main -m "Auto update from GitHub"

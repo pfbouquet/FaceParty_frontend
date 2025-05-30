@@ -132,15 +132,32 @@ export default function Podium({ navigation }) {
         </View>
         {/* </View> */}
 
-        <ScrollView contentContainerStyle={styles.container}>
-          {players.map((player, index) => (
-            <View key={player._id} style={[styles.row, index === 0 && { backgroundColor: "#f1c40f" }, index === 1 && { backgroundColor: "#bdc3c7" }, index === 2 && { backgroundColor: "#cd7f32" }]}>
-              <Text style={styles.cell}>{index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : index + 1}</Text>
-              <Text style={styles.cell}>{player.playerName}</Text>
-              <Text style={styles.cell}>{player.score}</Text>
-            </View>
-          ))}
-        </ScrollView>
+      <ScrollView contentContainerStyle={styles.container}>
+        {players
+          .sort((a, b) => b.score - a.score) // Tri par score décroissant
+          .map((player, index, sortedPlayers) => {
+            // Calcul du rang (en tenant compte des égalités)
+            const prev = sortedPlayers[index - 1];
+            const rank = index > 0 && player.score === prev.score ? prev.rank : index + 1;
+            player.rank = rank; // Stock temporairement pour réutilisation
+
+            // Définir couleur et médaille selon le rang
+            let backgroundColor = null;
+            let medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+
+            if (rank === 1) backgroundColor = "#f1c40f";
+            else if (rank === 2) backgroundColor = "#bdc3c7";
+            else if (rank === 3) backgroundColor = "#cd7f32";
+
+            return (
+              <View key={player._id} style={[styles.row, backgroundColor && { backgroundColor }]}>
+                <Text style={styles.cell}>{medal}</Text>
+                <Text style={styles.cell}>{player.playerName}</Text>
+                <Text style={styles.cell}>{player.score}</Text>
+              </View>
+            );
+          })}
+      </ScrollView>
 
         {admin && (
           <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>

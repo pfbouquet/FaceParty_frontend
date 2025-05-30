@@ -26,6 +26,7 @@ export const LobbyPlayerCard = ({
         style={[
           styles.buttonWithBadgeContainer,
           type === "player" ? styles.playerButton : styles.characterButton,
+          currentPlayer.playerID === id ? styles.currentPlayerButton : "",
         ]}
         onPress={() => setModalDetailVisible(true)}
       >
@@ -77,6 +78,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignItems: "center",
     justifyContent: "center",
+  },
+  currentPlayerButton: {
+    borderWidth: 4,
+    borderColor: "#de6b58",
   },
   playerButton: {
     backgroundColor: "#0F3D62",

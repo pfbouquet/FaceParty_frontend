@@ -108,7 +108,7 @@ export default function SnapScreen({ navigation }) {
       .then((data) => {
         if (data.result) {
           socket.emit("player-update", roomID);
-          navigation.navigate("PlayerLobby");
+          navigation.replace("PlayerLobby");
         } else {
           alert("Erreur lors de l'envoi");
         }
@@ -125,8 +125,18 @@ export default function SnapScreen({ navigation }) {
       <View style={styles.previewContainer}>
         <Image source={{ uri: photoUri }} style={styles.previewImage} />
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.buttonPrev} onPress={() => setPhotoUri(null)}><Text style={styles.startButtonText}>Reprendre</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.buttonPrev} onPress={() => handleConfirm()}><Text style={styles.startButtonText}>Confirmer</Text></TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonPrev}
+            onPress={() => setPhotoUri(null)}
+          >
+            <Text style={styles.startButtonText}>Reprendre</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonPrev}
+            onPress={() => handleConfirm()}
+          >
+            <Text style={styles.startButtonText}>Confirmer</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -262,7 +272,7 @@ const styles = StyleSheet.create({
     width: 130,
     height: 35,
   },
-  startButtonText:{
+  startButtonText: {
     fontSize: 18,
     color: "#F1F1F1",
     fontWeight: "bold",

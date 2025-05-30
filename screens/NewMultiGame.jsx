@@ -99,7 +99,7 @@ export default function NewMultiGame({ navigation }) {
       setStatusText(`Game ${roomID} has been joined`);
       // console.log(`Game ${roomID} has been joined`);
       // Navigate to PlayerName
-      navigation.navigate("PlayerName");
+      navigation.replace("PlayerName");
     }
 
     // setStatusText("Initiating game ...");

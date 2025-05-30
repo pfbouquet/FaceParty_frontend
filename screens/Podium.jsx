@@ -32,7 +32,7 @@ export default function Podium({ navigation }) {
   useEffect(() => {
     const handler = (data) => {
       if (data.type === "to-the-lobby") {
-        navigation.navigate("PlayerLobby");
+        navigation.replace("PlayerLobby");
       }
     };
 

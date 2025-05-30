@@ -64,7 +64,7 @@ export default function PlayerName({ navigation }) {
         if (data.result) {
           dispatch(updatePlayerName(playerName));
           socket.emit("player-update", roomID);
-          navigation.navigate("SnapScreen");
+          navigation.replace("SnapScreen");
         } else {
           alert("Erreur lors de la mise à jour du nom.");
         }

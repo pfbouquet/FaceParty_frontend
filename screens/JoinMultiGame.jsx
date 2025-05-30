@@ -91,7 +91,7 @@ export default function JoinMultiGame({ navigation }) {
       let joined = await joinGame(socket.id, false, roomIDvalue.toUpperCase());
       if (joined) {
         // Navigate to the game screen => PlayerName
-        navigation.navigate("PlayerName");
+        navigation.replace("PlayerName");
       } else {
         setErrorMessage("Failed to join the game. Please try again.");
       }

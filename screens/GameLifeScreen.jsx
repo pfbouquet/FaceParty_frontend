@@ -34,7 +34,7 @@ export default function GameLifeScreen({ navigation }) {
       } else if (data.type === "go-scoreboard") {
         setPhase("scoreboard");
       } else if (data.type === "to-podium") {
-        navigation.navigate("Podium");
+        navigation.replace("Podium");
       }
     };
 

@@ -40,13 +40,13 @@ export default function HomeMulti({ navigation }) {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("NewMultiGame")}
+          onPress={() => navigation.replace("NewMultiGame")}
         >
           <Text style={styles.buttonText}>Create new game (admin)</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("JoinMultiGame")}
+          onPress={() => navigation.replace("JoinMultiGame")}
         >
           <Text style={styles.buttonText}>Join a game</Text>
         </TouchableOpacity>

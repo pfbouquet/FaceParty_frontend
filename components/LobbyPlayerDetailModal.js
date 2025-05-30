@@ -92,7 +92,7 @@ export const LobbyPlayerDetailModal = ({
           {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
             <>
               <TouchableOpacity
-                onPress={() => navigation.navigate("SnapScreen")}
+                onPress={() => navigation.replace("SnapScreen")}
                 activeOpacity={0.8}
                 style={styles.blockChangeImg}
               >

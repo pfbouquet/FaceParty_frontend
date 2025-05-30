@@ -1,4 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image, Platform, StatusBar } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Image,
+  Platform,
+  StatusBar,
+} from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
@@ -48,35 +58,34 @@ export default function PlayerLobby({ navigation }) {
   };
 
   // USEEFFECT --------------------------------------------------------------
-  // Component mount and gameID change effect
+  // Whenever gameID changes, fetch its composition
   useEffect(() => {
-    // Load game composition for the first time
-    if (!game.gameID || !game.players) {
-      console.log("Waiting for game.gameID to be set...");
-      return;
-    } else {
+    if (game.roomID) {
+      console.log(
+        "GameID changed:",
+        game.roomID,
+        "→ fetching players/characters"
+      );
       refreshGameCompo();
     }
-  }, []);
+  }, [game.roomID]);
 
   useEffect(() => {
-    // Update game composition when player-update event is received
-    socket.on("player-update", () => refreshGameCompo());
-    // Navigate to home screen when kicked from the room
-    socket.on("you-are-kicked", () => {
-      navigation.navigate("HomeMulti");
-    });
-    // Navigate to GameLifeScreen when the game is being prepared
-    socket.on("game-preparation", () => navigation.navigate("GameLifeScreen"));
-
+    if (!socket) return;
+    // stable handlers
+    const onPlayerUpdate = () => refreshGameCompo();
+    const onKicked = () => navigation.replace("HomeMulti");
+    const onPrep = () => navigation.replace("GameLifeScreen");
+    socket.on("player-update", onPlayerUpdate);
+    socket.on("you-are-kicked", onKicked);
+    socket.on("game-preparation", onPrep);
+    // cleanup the exact same handlers
     return () => {
-      socket.off("you-are-kicked", (id) => {
-        navigation.navigate("HomeMulti");
-      });
-      socket.off("player-update", () => refreshGameCompo());
-      socket.off("game-preparation", () => navigation.navigate("GamePreparation"));
+      socket.off("player-update", onPlayerUpdate);
+      socket.off("you-are-kicked", onKicked);
+      socket.off("game-preparation", onPrep);
     };
-  }, []);
+  }, [socket, game.roomID, navigation]); // ← re-subscribe if socket or room changes
 
   // ACTIONS HANDLERS --------------------------------------------------------------
 
@@ -85,7 +94,11 @@ export default function PlayerLobby({ navigation }) {
     if (game.players.length + game.characters.length >= 4) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
     } else {
-      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour lancer la partie</Text>)
+      setAddPeople(
+        <Text style={styles.peopleMissing}>
+          Vous devez être minimum 4 participants pour lancer la partie
+        </Text>
+      );
     }
   }
 
@@ -111,8 +124,6 @@ export default function PlayerLobby({ navigation }) {
       .catch((error) => {
         console.error("Erreur fetch:", error);
       });
-
-    game.roomID;
   }
 
   // RETURN JSX --------------------------------------------------------------
@@ -141,10 +152,25 @@ export default function PlayerLobby({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.playersContainer}>
           {game.players.map((p) => (
-            <LobbyPlayerCard key={p._id} style={styles.playerCard} navigation={navigation} id={p._id} name={p.playerName || "loading..."} isAdmin={p.isAdmin} type="player"></LobbyPlayerCard>
+            <LobbyPlayerCard
+              key={p._id}
+              style={styles.playerCard}
+              navigation={navigation}
+              id={p._id}
+              name={p.playerName || "loading..."}
+              isAdmin={p.isAdmin}
+              type="player"
+            ></LobbyPlayerCard>
           ))}
           {game.characters.map((c) => (
-            <LobbyPlayerCard key={c._id} style={styles.playerCard} navigation={navigation} id={c._id} name={c.name || "loading..."} type="character"></LobbyPlayerCard>
+            <LobbyPlayerCard
+              key={c._id}
+              style={styles.playerCard}
+              navigation={navigation}
+              id={c._id}
+              name={c.name || "loading..."}
+              type="character"
+            ></LobbyPlayerCard>
           ))}
 
           {player.isAdmin && (
@@ -163,13 +189,15 @@ export default function PlayerLobby({ navigation }) {
       {player.isAdmin && (
         <>
           {addPeople}
-          < TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={() => startParty()}
+          >
             <Text style={styles.textButton}>START</Text>
           </TouchableOpacity>
         </>
-      )
-      }
-    </SafeAreaView >
+      )}
+    </SafeAreaView>
   );
 }
 

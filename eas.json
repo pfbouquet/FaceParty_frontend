@@ -1,14 +1,10 @@
 {
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
-    "production": {
-      "distribution": "internal"
-    }
+  "cli": {
+    "version": ">=3.0.0"
+  },
+  "build": {},
+  "submit": {},
+  "updates": {
+    "url": "https://u.expo.dev/928ee766-311c-48cf-8525-e104053bdf68"
   }
 }

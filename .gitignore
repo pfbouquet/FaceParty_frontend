@@ -65,3 +65,7 @@ typings/
 .DS_Store
 .env.local
 .env*
+
+# expo
+dist/
+dist/*

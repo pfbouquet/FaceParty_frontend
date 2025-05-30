@@ -30,6 +30,7 @@ export default function PlayerLobby({ navigation }) {
   const player = useSelector((state) => state.player.value);
   const dispatch = useDispatch();
   const [addPeople, setAddPeople] = useState("");
+  const [alertAllCelebrities, setAlertAllCelebrities] = useState("")
 
   // FONCTIONS --------------------------------------------------------------
   const refreshGameCompo = () => {
@@ -91,14 +92,26 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
-    if (game.players.length + game.characters.length >= 4) {
+    console.log(game.players);
+
+    // Récupère tous les noms
+    const names = game.players.map(e => e.playerName);
+    // Trouve les noms en double
+    const duplicates = names.filter((name, idx) => names.indexOf(name) !== idx);
+    // Filtre les joueurs ayant un nom en double
+    const sameName = game.players.filter(e => duplicates.includes(e.playerName));
+    console.log("taille same name", sameName.length, sameName);
+
+    let portraitMissing = game.players.filter((e) => e.portraitFilePath.length === 0)
+
+    if ((game.players.length + game.characters.length >= 4) && (sameName.length === 0) && (portraitMissing.length === 0)) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
-    } else {
-      setAddPeople(
-        <Text style={styles.peopleMissing}>
-          Vous devez être minimum 4 participants pour lancer la partie
-        </Text>
-      );
+    } else if (game.players.length + game.characters.length < 4) {
+      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour jouer</Text>)
+    } else if (portraitMissing.length > 0) {
+      setAddPeople(<Text style={styles.peopleMissing}>Il manque au moins une photo de joueur</Text>)
+    } else if (sameName.length > 1) {
+      setAddPeople(<Text style={styles.peopleMissing}>Des joueurs ont le même nom, invitez-les à se différencier</Text>)
     }
   }
 
@@ -118,7 +131,7 @@ export default function PlayerLobby({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (!data.result) {
-          console.error("Erreur:", data.error);
+          setAlertAllCelebrities(<Text style={styles.peopleMissing}>Vous avez déjà ajouter toutes les célébrités</Text>)
         }
       })
       .catch((error) => {
@@ -174,29 +187,33 @@ export default function PlayerLobby({ navigation }) {
           ))}
 
           {player.isAdmin && (
-            <TouchableOpacity
-              style={styles.addCharacterButton}
-              onPress={() => addCharacter("celebrity")}
-            >
-              <Text style={styles.textButton}> + Ajouter une star + </Text>
-            </TouchableOpacity>
+            <>
+              {alertAllCelebrities}
+              < TouchableOpacity
+                style={styles.addCharacterButton}
+                onPress={() => addCharacter("celebrity")}
+              >
+                <Text style={styles.textButton}> + Ajouter une star + </Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
         {/* CHARACTERS CARDS */}
       </ScrollView>
 
-      {player.isAdmin && (
-        <>
-          {addPeople}
-          <TouchableOpacity
+      {
+        player.isAdmin && (
+          <>
+            {addPeople}
+            <TouchableOpacity
             style={styles.startButton}
             onPress={() => startParty()}
           >
-            <Text style={styles.textButton}>START</Text>
-          </TouchableOpacity>
-        </>
-      )}
+              <Text style={styles.textButton}>START</Text>
+            </TouchableOpacity>
+          </>
+        )}
     </SafeAreaView>
   );
 }
@@ -281,5 +298,7 @@ const styles = StyleSheet.create({
   },
   peopleMissing: {
     color: "red",
+    textAlign: 'center',
   },
+
 });

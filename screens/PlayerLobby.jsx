@@ -82,13 +82,24 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
+    console.log(game.players);
 
-    let sameName = game.players.filter((e) => e.playerName === e.playerName)
+    // Récupère tous les noms
+    const names = game.players.map(e => e.playerName);
+    // Trouve les noms en double
+    const duplicates = names.filter((name, idx) => names.indexOf(name) !== idx);
+    // Filtre les joueurs ayant un nom en double
+    const sameName = game.players.filter(e => duplicates.includes(e.playerName)); 
+    console.log("taille same name", sameName.length, sameName);
 
-    if ((game.players.length + game.characters.length >= 4) && (sameName.length === 1)) {
+    let portraitMissing = game.players.filter((e) => e.portraitFilePath.length === 0)
+
+    if ((game.players.length + game.characters.length >= 4) && (sameName.length === 0) && (portraitMissing.length === 0)) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
     } else if (game.players.length + game.characters.length < 4) {
-      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour lancer la partie</Text>)
+      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour jouer</Text>)
+    } else if (portraitMissing.length > 0) {
+      setAddPeople(<Text style={styles.peopleMissing}>Il manque au moins une photo de joueur</Text>)
     } else if (sameName.length > 1) {
       setAddPeople(<Text style={styles.peopleMissing}>Des joueurs ont le même nom, invitez-les à se différencier</Text>)
     }

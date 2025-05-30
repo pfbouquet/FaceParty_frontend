@@ -19,7 +19,7 @@ export const Question = () => {
   const game = useSelector((state) => state.game.value);
   const player = useSelector((state) => state.player.value);
   // Create local states
-  const [counter, setCounter] = useState(5);
+  const [counter, setCounter] = useState(7);
   const [buttonsActive, setButtonsActive] = useState(true);
   const [selectedNames, setSelectedNames] = useState([]);
   const [nextRound, setNextRound] = useState(null);

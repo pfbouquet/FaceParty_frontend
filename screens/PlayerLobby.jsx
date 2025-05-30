@@ -129,7 +129,7 @@ export default function PlayerLobby({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (!data.result) {
-          setAlertAllCelebrities(<Text style={styles.peopleMissing}>Vous avez déjà ajouter toutes les célébrités</Text>)
+          setAlertAllCelebrities(<Text style={styles.peopleMissing}>Vous avez déjà ajouté toutes les stars</Text>)
         }
       })
       .catch((error) => {

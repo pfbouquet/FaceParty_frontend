@@ -20,6 +20,7 @@ export default function PlayerLobby({ navigation }) {
   const player = useSelector((state) => state.player.value);
   const dispatch = useDispatch();
   const [addPeople, setAddPeople] = useState("");
+  const [alertAllCelebrities, setAlertAllCelebrities] = useState("")
 
   // FONCTIONS --------------------------------------------------------------
   const refreshGameCompo = () => {
@@ -89,7 +90,7 @@ export default function PlayerLobby({ navigation }) {
     // Trouve les noms en double
     const duplicates = names.filter((name, idx) => names.indexOf(name) !== idx);
     // Filtre les joueurs ayant un nom en double
-    const sameName = game.players.filter(e => duplicates.includes(e.playerName)); 
+    const sameName = game.players.filter(e => duplicates.includes(e.playerName));
     console.log("taille same name", sameName.length, sameName);
 
     let portraitMissing = game.players.filter((e) => e.portraitFilePath.length === 0)
@@ -121,7 +122,7 @@ export default function PlayerLobby({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (!data.result) {
-          console.error("Erreur:", data.error);
+          setAlertAllCelebrities(<Text style={styles.peopleMissing}>Vous avez déjà ajouter toutes les célébrités</Text>)
         }
       })
       .catch((error) => {
@@ -164,26 +165,30 @@ export default function PlayerLobby({ navigation }) {
           ))}
 
           {player.isAdmin && (
-            <TouchableOpacity
-              style={styles.addCharacterButton}
-              onPress={() => addCharacter("celebrity")}
-            >
-              <Text style={styles.textButton}> + Ajouter une star + </Text>
-            </TouchableOpacity>
+            <>
+              {alertAllCelebrities}
+              < TouchableOpacity
+                style={styles.addCharacterButton}
+                onPress={() => addCharacter("celebrity")}
+              >
+                <Text style={styles.textButton}> + Ajouter une star + </Text>
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
         {/* CHARACTERS CARDS */}
       </ScrollView>
 
-      {player.isAdmin && (
-        <>
-          {addPeople}
-          < TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
-            <Text style={styles.textButton}>START</Text>
-          </TouchableOpacity>
-        </>
-      )
+      {
+        player.isAdmin && (
+          <>
+            {addPeople}
+            < TouchableOpacity style={styles.startButton} onPress={() => startParty()}>
+              <Text style={styles.textButton}>START</Text>
+            </TouchableOpacity>
+          </>
+        )
       }
     </SafeAreaView >
   );
@@ -269,5 +274,7 @@ const styles = StyleSheet.create({
   },
   peopleMissing: {
     color: "red",
+    textAlign: 'center',
   },
+
 });

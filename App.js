@@ -15,7 +15,6 @@ import HomeMulti from "./screens/HomeMulti";
 import NewMultiGame from "./screens/NewMultiGame";
 import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
-// import StartSound from "./screens/StartSound";
 import Podium from "./screens/Podium";
 
 import { Provider } from "react-redux";

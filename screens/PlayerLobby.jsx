@@ -92,7 +92,6 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
-    console.log(game.players);
 
     // Récupère tous les noms
     const names = game.players.map(e => e.playerName);
@@ -100,7 +99,6 @@ export default function PlayerLobby({ navigation }) {
     const duplicates = names.filter((name, idx) => names.indexOf(name) !== idx);
     // Filtre les joueurs ayant un nom en double
     const sameName = game.players.filter(e => duplicates.includes(e.playerName));
-    console.log("taille same name", sameName.length, sameName);
 
     let portraitMissing = game.players.filter((e) => e.portraitFilePath.length === 0)
 

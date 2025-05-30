@@ -59,9 +59,7 @@ export default function GameLifeScreen({ navigation }) {
         <Text style={styles.title}>FaceParty</Text>
       </View>
 
-      <View style={styles.wrapper}>
-            {GameContent}
-      </View>
+      <View style={styles.wrapper}>{GameContent}</View>
     </SafeAreaView>
   );
 }
@@ -69,7 +67,7 @@ export default function GameLifeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F1F1F1",
+    backgroundColor: "white",
   },
   statusBarSpacer: {
     height: Platform.OS === "android" ? StatusBar.currentHeight : 0,

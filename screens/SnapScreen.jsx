@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useEffect, useState, useContext, useRef } from "react";
-import { CameraView, Camera } from "expo-camera";
+import { CameraView, CameraType, Camera } from "expo-camera";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native";
 import { SocketContext } from "../contexts/SocketContext";
@@ -29,6 +29,7 @@ export default function SnapScreen({ navigation }) {
   //----------------------------------------------
   const socket = useContext(SocketContext);
   const [hasPermission, setHasPermission] = useState(false);
+  const [facing, setFacing] = useState("front");
   const [photoUri, setPhotoUri] = useState(null);
   const { playerID } = useSelector((state) => state.player.value);
   const { roomID } = useSelector((state) => state.game.value);
@@ -42,6 +43,7 @@ export default function SnapScreen({ navigation }) {
     inputRange: [0, 1],
     outputRange: ["#F86F5D", "#0F3D62"], // orange <-> bleu
   });
+  
 
   //----------------------------------------------
   //USEEFFECT ------------------------------------
@@ -77,6 +79,11 @@ export default function SnapScreen({ navigation }) {
   const takePicture = async () => {
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.3 });
     if (photo) setPhotoUri(photo.uri);
+  };
+
+  // Functions to toggle camera facing and flash status
+  const toggleCameraFacing = () => {
+    setFacing((current) => (current === "back" ? "front" : "back"));
   };
 
   const handleConfirm = () => {
@@ -153,14 +160,30 @@ export default function SnapScreen({ navigation }) {
           Tu pourras recommencer si tu n'es pas satisfait.
         </Text>
       </View>
-      <Animated.View style={[styles.centerContainer, { borderColor }]}>
-        <CameraView
-          style={styles.camera}
-          facing="front"
-          ref={(ref) => (cameraRef.current = ref)}
-          zoom={0.2}
-        />
-      </Animated.View>
+      <View style={styles.cameraWrapper}>
+        <Animated.View style={[styles.centerContainer, { borderColor }]}>
+          <CameraView
+            style={styles.camera}
+            facing={facing}
+            ref={(ref) => (cameraRef.current = ref)}
+            zoom={0.2}
+          />
+        </Animated.View>
+        <Pressable
+          onPress={toggleCameraFacing}
+          style={({ pressed }) => [
+            styles.facingControl,
+            { opacity: pressed ? 0.6 : 1 },
+            styles.button,
+          ]}
+        >
+          <Animated.View
+            style={[styles.circle, styles.smallCircle, { borderColor }]}
+          >
+            <FontAwesome name="rotate-right" size={40} color="#F86F5D" />
+          </Animated.View>
+        </Pressable>
+      </View>
       <View style={styles.notice}>
         <Text style={styles.titleNotice}>Pour un quizz optimal :</Text>
         <Text style={styles.infoNotice}>😳 Ne souris pas</Text>
@@ -176,7 +199,9 @@ export default function SnapScreen({ navigation }) {
             styles.button,
           ]}
         >
-          <Animated.View style={[styles.circle, { borderColor }]}>
+          <Animated.View
+            style={[styles.circle, styles.bigCircle, { borderColor }]}
+          >
             <FontAwesome name="camera" size={50} color="#F86F5D" />
           </Animated.View>
         </Pressable>
@@ -257,6 +282,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  facingControl: {
+    position: "absolute",
+    left: -40,
+    bottom: 20,
+    width: 0,
+    height: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   buttonPrev: {
     backgroundColor: "#F86F5D",
     justifyContent: "center",
@@ -295,13 +329,20 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   circle: {
-    width: 100,
-    height: 100,
+    backgroundColor: "white",
     borderRadius: 50,
     position: "absolute",
     borderWidth: 8,
     justifyContent: "center",
     alignItems: "center",
+  },
+  bigCircle: {
+    width: 100,
+    height: 100,
+  },
+  smallCircle: {
+    width: 80,
+    height: 80,
   },
   icon: {
     zIndex: 1,

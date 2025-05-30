@@ -3,6 +3,7 @@
 
 
 "@0no-co/graphql.web@^1.0.1", "@0no-co/graphql.web@^1.0.5", "@0no-co/graphql.web@^1.0.8":
+"@0no-co/graphql.web@^1.0.1", "@0no-co/graphql.web@^1.0.5", "@0no-co/graphql.web@^1.0.8":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz#9af8deaf3f236c1c6ee99cc5349051475e5dcc83"
   integrity sha512-N2NGsU5FLBhT8NZ+3l2YrzZSHITjNXNuDhC4iDiikv0IujaJ0Xc6xIxQZ/Ek3Cb+rgPjnLHYyJm11tInuJn+cw==
@@ -222,6 +223,7 @@
     "@babel/template" "^7.27.2"
     "@babel/types" "^7.27.3"
 
+"@babel/highlight@^7.10.4", "@babel/highlight@^7.23.4":
 "@babel/highlight@^7.10.4", "@babel/highlight@^7.23.4":
   version "7.25.9"
   resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.25.9.tgz#8141ce68fc73757946f983b343f1231f4691acc6"

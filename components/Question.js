@@ -107,6 +107,10 @@ export const Question = () => {
       gif = <Image source={require('../assets/false.gif')} style={styles.gif} />;
     }
 
+    if (e.length > 10){
+      e=`${e.substring(0,10)}...`
+    }
+
     return (
       <TouchableOpacity
         key={i}
@@ -126,7 +130,6 @@ export const Question = () => {
         }
       >
         {gif}
-        {/* <Image source={require('../assets/true.gif')} style={styles.gif}/> */}
         <Text style={styles[isSelected ? "txtSelect" : "txt"]}>{e}</Text>
       </TouchableOpacity>
     );

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
 
@@ -116,7 +116,7 @@ export default function JoinMultiGame({ navigation }) {
       <View style={styles.container}>
         {/* Scan to fill the code */}
         <TouchableOpacity onPress={() => setScannerVisible(true)}>
-          <Ionicons name="qr-code-outline" size={120} color="#333" />
+          <MaterialIcons name="qr-code-scanner" size={200} color="#333" />
         </TouchableOpacity>
 
         <Modal visible={scannerVisible} animationType="slide">
@@ -127,8 +127,9 @@ export default function JoinMultiGame({ navigation }) {
         </Modal>
 
         {/* Joining by entering the code */}
-        <Text style={styles.titleQR}>Join a game</Text>
+        <Text style={styles.titleQR}>Click to scan the game code</Text>
         <Text style={styles.errorMessage}>{errorMessage}</Text>
+        <Text style={styles.titleQR}>Or enter the game code</Text>
         <TextInput
           style={styles.input}
           placeholder="XXXX"

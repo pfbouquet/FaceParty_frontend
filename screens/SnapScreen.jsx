@@ -13,6 +13,7 @@ import {
 import { useEffect, useState, useContext, useRef } from "react";
 import { CameraView, CameraType, Camera } from "expo-camera";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { SocketContext } from "../contexts/SocketContext";
 // Load reducers
@@ -43,7 +44,6 @@ export default function SnapScreen({ navigation }) {
     inputRange: [0, 1],
     outputRange: ["#F86F5D", "#0F3D62"], // orange <-> bleu
   });
-  
 
   //----------------------------------------------
   //USEEFFECT ------------------------------------
@@ -180,7 +180,7 @@ export default function SnapScreen({ navigation }) {
           <Animated.View
             style={[styles.circle, styles.smallCircle, { borderColor }]}
           >
-            <FontAwesome name="rotate-right" size={40} color="#F86F5D" />
+            <MaterialIcons name="flip-camera-ios" size={35} color="#333" />
           </Animated.View>
         </Pressable>
       </View>
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   smallCircle: {
-    width: 80,
+    width: 70,
     height: 80,
   },
   icon: {

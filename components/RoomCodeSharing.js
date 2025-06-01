@@ -90,11 +90,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     alignItems: "center",
+    justifyContent: "center",
   },
   modalTitle: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
   modalCloseButton: {
     marginTop: 20,

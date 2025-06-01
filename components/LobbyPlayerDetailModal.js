@@ -7,7 +7,7 @@ import {
   Image,
   TextInput,
 } from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Load context and State managers
 import { SocketContext } from "../contexts/SocketContext";
@@ -42,9 +42,13 @@ export const LobbyPlayerDetailModal = ({
     refreshPortrait();
   }, []);
 
+  function handleModalClose() {
+    handleNewName();
+    hide();
+  }
+
   function handleNewName() {
-    if (newPlayerName.length === 0 || newPlayerName === player.playerName) {
-      alert("Player name empty or unchanged.");
+    if (newPlayerName.length === 0 || newPlayerName === name) {
       return;
     }
 
@@ -63,7 +67,6 @@ export const LobbyPlayerDetailModal = ({
         if (data.result) {
           dispatch(updatePlayerName(newPlayerName));
           socket.emit("player-update", game.roomID);
-          hide();
         } else {
           alert("Erreur lors de la mise à jour du nom.");
         }
@@ -72,30 +75,49 @@ export const LobbyPlayerDetailModal = ({
         console.error(err);
         alert("Erreur réseau.");
       });
-    hide();
   }
 
   return (
-    <Modal visible={visible} animationType="fade" transparent>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <View style={styles.modalCross}>
-            <TouchableOpacity
-              onPress={() => hide()}
-              style={styles.crossModal}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.textButton}>X</Text>
-            </TouchableOpacity>
-          </View>
-
-          {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
-            <>
-              <TouchableOpacity
-                onPress={() => navigation.replace("SnapScreen")}
-                activeOpacity={0.8}
-                style={styles.blockChangeImg}
-              >
+    <>
+      <Modal visible={visible} animationType="fade" transparent>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
+              <>
+                <View style={styles.nameEdit}>
+                  <TextInput
+                    onChangeText={(value) => setNewPlayerName(value)}
+                    value={newPlayerName}
+                    style={styles.modalTitle}
+                  />
+                  <MaterialCommunityIcons
+                    name="account-edit"
+                    size={30}
+                    color="#F86F5D"
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => navigation.replace("SnapScreen")}
+                  style={styles.blockChangeImg}
+                >
+                  <Image
+                    style={styles.image}
+                    source={{
+                      uri: portraitURL,
+                    }}
+                    // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
+                  />
+                  <MaterialCommunityIcons
+                    name="image-edit-outline"
+                    size={40}
+                    color="#F86F5D"
+                    style={styles.photoEditIcon}
+                  />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.modalTitle}>{name}</Text>
                 <Image
                   style={styles.image}
                   source={{
@@ -103,118 +125,69 @@ export const LobbyPlayerDetailModal = ({
                   }}
                   // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
                 />
-                <FontAwesome
-                  name="pencil"
-                  size={20}
-                  color="#de6b58"
-                  style={styles.icon}
-                />
-              </TouchableOpacity>
-              <TextInput
-                onChangeText={(value) => setNewPlayerName(value)}
-                value={newPlayerName}
-                style={styles.input}
-              />
-              <TouchableOpacity
-                onPress={() => handleNewName()}
-                style={styles.button}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.textButton}>Update</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Image
-                style={styles.image}
-                source={{
-                  uri: portraitURL,
-                }}
-                // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
-              />
-              <Text>{name}</Text>
-            </>
-          )}
+              </>
+            )}
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => handleModalClose()}
+            >
+              <Text style={{ color: "white" }}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  centeredView: {
+  modalBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    width: "90%",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
-  modalView: {
-    backgroundColor: "white",
+  modalContainer: {
+    width: 300,
+    backgroundColor: "#F1F1F1",
+    padding: 20,
     borderRadius: 20,
-    padding: 30,
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    alignItems: "center",
   },
-  modalCross: {
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  nameEdit: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "",
-    width: "100%",
+    width: 200,
+    borderBottomColor: "#de6b58",
+    borderBottomWidth: 1,
   },
-  crossModal: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    paddingTop: 5,
-    backgroundColor: "#de6b58",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -10,
-    marginBottom: 15,
-  },
-  textButton: {
-    color: "#ffffff",
-    height: 24,
-    fontWeight: "600",
-    fontSize: 15,
+  modalCloseButton: {
+    marginTop: 20,
+    backgroundColor: "#F86F5D",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
   image: {
-    width: 150,
-    height: 200,
+    marginTop: 20,
+    width: 200,
+    height: 300,
     borderRadius: 20,
-    marginBottom: 20,
     alignSelf: "center",
-    marginRight: -20,
   },
   blockChangeImg: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 20,
   },
-  icon: {
-    marginLeft: -5,
-    marginTop: 10,
-  },
-  input: {
-    width: 200,
-    borderBottomColor: "#de6b58",
-    borderBottomWidth: 1,
-    fontSize: 16,
-    textAlign: "center",
-  },
-  button: {
-    width: 200,
-    alignItems: "center",
-    marginTop: 20,
-    paddingTop: 8,
-    backgroundColor: "#de6b58",
-    borderRadius: 10,
+  photoEditIcon: {
+    position: "absolute",
+    top: 25,
+    right: 5,
   },
 });

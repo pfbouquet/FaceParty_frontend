@@ -6,6 +6,7 @@ import {
   Modal,
   Image,
   TextInput,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -80,61 +81,63 @@ export const LobbyPlayerDetailModal = ({
   return (
     <>
       <Modal visible={visible} animationType="fade" transparent>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
-              <>
-                <View style={styles.nameEdit}>
-                  <TextInput
-                    onChangeText={(value) => setNewPlayerName(value)}
-                    value={newPlayerName}
-                    style={styles.modalTitle}
-                  />
-                  <MaterialCommunityIcons
-                    name="account-edit"
-                    size={30}
-                    color="#F86F5D"
-                  />
-                </View>
+        <TouchableWithoutFeedback onPress={() => handleModalClose()}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContainer}>
+                {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
+                  <>
+                    <View style={styles.nameEdit}>
+                      <TextInput
+                        onChangeText={(value) => setNewPlayerName(value)}
+                        value={newPlayerName}
+                        style={styles.modalTitle}
+                      />
+                      <MaterialCommunityIcons
+                        name="account-edit"
+                        size={30}
+                        color="#F86F5D"
+                      />
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => navigation.replace("SnapScreen")}
+                      style={styles.blockChangeImg}
+                    >
+                      <Image
+                        style={styles.image}
+                        source={{
+                          uri: portraitURL,
+                        }}
+                      />
+                      <MaterialCommunityIcons
+                        name="image-edit-outline"
+                        size={40}
+                        color="#F86F5D"
+                        style={styles.photoEditIcon}
+                      />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.modalTitle}>{name}</Text>
+                    <Image
+                      style={styles.image}
+                      source={{
+                        uri: portraitURL,
+                      }}
+                    />
+                  </>
+                )}
                 <TouchableOpacity
-                  onPress={() => navigation.replace("SnapScreen")}
-                  style={styles.blockChangeImg}
+                  style={styles.modalCloseButton}
+                  onPress={() => handleModalClose()}
                 >
-                  <Image
-                    style={styles.image}
-                    source={{
-                      uri: portraitURL,
-                    }}
-                    // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
-                  />
-                  <MaterialCommunityIcons
-                    name="image-edit-outline"
-                    size={40}
-                    color="#F86F5D"
-                    style={styles.photoEditIcon}
-                  />
+                  <Text style={{ color: "white" }}>Fermer</Text>
                 </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <Text style={styles.modalTitle}>{name}</Text>
-                <Image
-                  style={styles.image}
-                  source={{
-                    uri: portraitURL,
-                  }}
-                  // le Date.now() évite l'usage du cache par React Native, qui empeche de voir la vraie image courante.
-                />
-              </>
-            )}
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => handleModalClose()}
-            >
-              <Text style={{ color: "white" }}>Fermer</Text>
-            </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </>
   );

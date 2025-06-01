@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   Share,
+  TouchableWithoutFeedback,
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import * as ClipboardExpo from "expo-clipboard";
@@ -44,18 +45,26 @@ export const RoomCodeSharing = ({}) => {
         visible={modalQRVisible}
         onRequestClose={() => setModalQRVisible(false)}
       >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Scan ce QR pour rejoindre</Text>
-            <QRCode value={game.roomID} size={200} backgroundColor="white" />
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setModalQRVisible(false)}
-            >
-              <Text style={{ color: "white" }}>Fermer</Text>
-            </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={() => setModalQRVisible(false)}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Scan ce QR pour rejoindre</Text>
+                <QRCode
+                  value={game.roomID}
+                  size={200}
+                  backgroundColor="white"
+                />
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setModalQRVisible(false)}
+                >
+                  <Text style={{ color: "white" }}>Fermer</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );

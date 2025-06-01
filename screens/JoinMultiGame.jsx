@@ -132,6 +132,7 @@ export default function JoinMultiGame({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="XXXX"
+          keyboardType="numeric"
           value={roomID}
           onChangeText={(value) => setRoomID(value)}
         />

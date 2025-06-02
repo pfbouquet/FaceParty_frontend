@@ -13,12 +13,13 @@ export const LobbyPlayerCard = ({
   id,
   name,
   isAdmin = false,
+  isReady = false,
   type,
 }) => {
   const currentPlayer = useSelector((state) => state.player.value);
   const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
-  useEffect(() => {}, [name, isAdmin]);
+  useEffect(() => {}, [name, isAdmin, isReady]);
 
   return (
     <View style={styles.container}>
@@ -30,10 +31,16 @@ export const LobbyPlayerCard = ({
         ]}
         onPress={() => setModalDetailVisible(true)}
       >
+        {/* Is Ready ? */}
+        {isReady && (
+          <View style={styles.readyBadge}>
+            <Text style={styles.badgeText}>Ready</Text>
+          </View>
+        )}
         {/* Admin badge */}
         {isAdmin && (
           <View style={styles.adminBadge}>
-            <Text>Admin</Text>
+            <Text style={styles.badgeText}>Admin</Text>
           </View>
         )}
         <Text style={styles.playerName}>{name}</Text>
@@ -89,6 +96,16 @@ const styles = StyleSheet.create({
   characterButton: {
     backgroundColor: "#0F3D6295",
   },
+  readyBadge: {
+    position: "absolute",
+    color: "white",
+    left: -10,
+    backgroundColor: "#1f883d",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    zIndex: 10,
+  },
   adminBadge: {
     position: "absolute",
     top: -6,
@@ -99,12 +116,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     zIndex: 10,
   },
-  adminBadgeText: {
+  badgeText: {
     color: "white",
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "bold",
   },
-
   playerName: {
     color: "#F1F1F1",
     fontSize: 18,

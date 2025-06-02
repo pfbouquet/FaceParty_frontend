@@ -30,7 +30,7 @@ export default function PlayerLobby({ navigation }) {
   const player = useSelector((state) => state.player.value);
   const dispatch = useDispatch();
   const [addPeople, setAddPeople] = useState("");
-  const [alertAllCelebrities, setAlertAllCelebrities] = useState("")
+  const [alertAllCelebrities, setAlertAllCelebrities] = useState("");
 
   // FONCTIONS --------------------------------------------------------------
   const refreshGameCompo = () => {
@@ -92,24 +92,43 @@ export default function PlayerLobby({ navigation }) {
 
   // Start the game
   function startParty() {
-
     // Récupère tous les noms
-    const names = game.players.map(e => e.playerName);
+    const names = game.players.map((e) => e.playerName);
     // Trouve les noms en double
     const duplicates = names.filter((name, idx) => names.indexOf(name) !== idx);
     // Filtre les joueurs ayant un nom en double
-    const sameName = game.players.filter(e => duplicates.includes(e.playerName));
+    const sameName = game.players.filter((e) =>
+      duplicates.includes(e.playerName)
+    );
 
-    let portraitMissing = game.players.filter((e) => e.portraitFilePath.length === 0)
+    let portraitMissing = game.players.filter(
+      (e) => e.portraitFilePath.length === 0
+    );
 
-    if ((game.players.length + game.characters.length >= 4) && (sameName.length === 0) && (portraitMissing.length === 0)) {
+    if (
+      game.players.length + game.characters.length >= 4 &&
+      sameName.length === 0 &&
+      portraitMissing.length === 0
+    ) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
     } else if (game.players.length + game.characters.length < 4) {
-      setAddPeople(<Text style={styles.peopleMissing}>Vous devez être minimum 4 participants pour jouer</Text>)
+      setAddPeople(
+        <Text style={styles.peopleMissing}>
+          Vous devez être minimum 4 participants pour jouer
+        </Text>
+      );
     } else if (portraitMissing.length > 0) {
-      setAddPeople(<Text style={styles.peopleMissing}>Il manque au moins une photo de joueur</Text>)
+      setAddPeople(
+        <Text style={styles.peopleMissing}>
+          Il manque au moins une photo de joueur
+        </Text>
+      );
     } else if (sameName.length > 1) {
-      setAddPeople(<Text style={styles.peopleMissing}>Des joueurs ont le même nom, invitez-les à se différencier</Text>)
+      setAddPeople(
+        <Text style={styles.peopleMissing}>
+          Des joueurs ont le même nom, invitez-les à se différencier
+        </Text>
+      );
     }
   }
 
@@ -129,7 +148,11 @@ export default function PlayerLobby({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (!data.result) {
-          setAlertAllCelebrities(<Text style={styles.peopleMissing}>Vous avez déjà ajouté toutes les stars</Text>)
+          setAlertAllCelebrities(
+            <Text style={styles.peopleMissing}>
+              Vous avez déjà ajouté toutes les stars
+            </Text>
+          );
         }
       })
       .catch((error) => {
@@ -146,6 +169,7 @@ export default function PlayerLobby({ navigation }) {
       </View>
     );
   }
+  console.log(game.players);
   // Else, render the PlayerLobby
   return (
     <SafeAreaView style={styles.lobby}>
@@ -171,6 +195,12 @@ export default function PlayerLobby({ navigation }) {
               name={p.playerName || "loading..."}
               isAdmin={p.isAdmin}
               type="player"
+              isReady={
+                p.playerName
+                && p.playerName != "New player"
+                && p.portraitFilePath
+                && p.portraitFilePath.length > 0
+              }
             ></LobbyPlayerCard>
           ))}
           {game.characters.map((c) => (
@@ -181,13 +211,14 @@ export default function PlayerLobby({ navigation }) {
               id={c._id}
               name={c.name || "loading..."}
               type="character"
+              isReady={true}
             ></LobbyPlayerCard>
           ))}
 
           {player.isAdmin && (
             <>
               {alertAllCelebrities}
-              < TouchableOpacity
+              <TouchableOpacity
                 style={styles.addCharacterButton}
                 onPress={() => addCharacter("celebrity")}
               >
@@ -200,18 +231,17 @@ export default function PlayerLobby({ navigation }) {
         {/* CHARACTERS CARDS */}
       </ScrollView>
 
-      {
-        player.isAdmin && (
-          <>
-            {addPeople}
-            <TouchableOpacity
+      {player.isAdmin && (
+        <>
+          {addPeople}
+          <TouchableOpacity
             style={styles.startButton}
             onPress={() => startParty()}
           >
-              <Text style={styles.textButton}>START</Text>
-            </TouchableOpacity>
-          </>
-        )}
+            <Text style={styles.textButton}>START</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   );
 }
@@ -296,7 +326,6 @@ const styles = StyleSheet.create({
   },
   peopleMissing: {
     color: "red",
-    textAlign: 'center',
+    textAlign: "center",
   },
-
 });

@@ -40,8 +40,11 @@ export const LobbyPlayerDetailModal = ({
   }
 
   useEffect(() => {
-    refreshPortrait();
-  }, []);
+    if (visible) {
+      setNewPlayerName(name);
+      refreshPortrait();
+    }
+  }, [name, visible]);
 
   function handleModalClose() {
     handleNewName();

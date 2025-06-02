@@ -18,7 +18,7 @@ export const LobbyPlayerCard = ({
   const currentPlayer = useSelector((state) => state.player.value);
   const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [name, isAdmin]);
 
   return (
     <View style={styles.container}>

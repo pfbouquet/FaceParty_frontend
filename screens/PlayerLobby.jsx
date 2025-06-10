@@ -169,7 +169,6 @@ export default function PlayerLobby({ navigation }) {
       </View>
     );
   }
-  console.log(game.players);
   // Else, render the PlayerLobby
   return (
     <SafeAreaView style={styles.lobby}>
@@ -196,10 +195,10 @@ export default function PlayerLobby({ navigation }) {
               isAdmin={p.isAdmin}
               type="player"
               isReady={
-                p.playerName
-                && p.playerName != "New player"
-                && p.portraitFilePath
-                && p.portraitFilePath.length > 0
+                p.playerName &&
+                p.playerName != "New player" &&
+                p.portraitFilePath &&
+                p.portraitFilePath.length > 0
               }
             ></LobbyPlayerCard>
           ))}

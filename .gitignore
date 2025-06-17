@@ -67,5 +67,7 @@ typings/
 .env*
 
 # expo
-dist/
-dist/*
+# dist/
+# dist/*
+# .expo/
+# .expo-shared/

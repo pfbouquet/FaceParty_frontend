@@ -1,6 +1,6 @@
 # FaceParty Mobile (Frontend)
 
-![FaceParty Logo](./assets/logo.png)
+<img src="./assets/logo-faceparty.png" width="300" alt="FaceParty Logo" />
 
 ## Table des matières
 

@@ -20,6 +20,10 @@
 FaceParty est un party‑game mobile multijoueur basé sur la reconnaissance et le morphing de visages.  
 Les joueurs prennent un selfie, puis la partie s'éxécute en plusieurs tours. A chaque tour, le backend génère un morph entre les visages des joueurs et propose un QCM pour deviner qui se cache derrière l’image transformée.
 
+- Frontend: github.com/pfbouquet/FaceParty_frontend
+- Backend: github.com/pfbouquet/FaceParty_backend
+- Morphing API: github.com/pfbouquet/FaceParty_morpher
+
 ## Fonctionnalités
 
 - Création et gestion de parties multijoueurs via un code de salle (roomID)

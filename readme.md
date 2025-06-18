@@ -8,6 +8,7 @@
   - [Table des matières](#table-des-matières)
   - [Description](#description)
   - [Fonctionnalités](#fonctionnalités)
+  - [Next steps](#next-steps)
   - [Prérequis pour le développement](#prérequis-pour-le-développement)
   - [Installation pour le développement](#installation-pour-le-développement)
   - [Lancement](#lancement)
@@ -31,6 +32,12 @@ Les joueurs prennent un selfie, puis la partie s'éxécute en plusieurs tours. A
 - Quiz synchronisé en temps réel (Socket.io)
 - Classement et podium
 - Mode “Solo” avec célébrités pré‑enregistrées
+
+## Next steps
+- Robustesse: partir et revenir de l'app semble déconnecter les joueurs de la partie en cours.
+- Permettre de quitter une partie en cours
+- Désigner automatiquement un admin si il n'y a plus d'admin dans la partie
+- Déployer sur le play store
 
 ## Prérequis pour le développement
 

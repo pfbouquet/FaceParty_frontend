@@ -1,3 +1,4 @@
+// Modal affichant les détails d’un joueur/personnage avec possibilité de modification de ses propres données (nom et photo)
 import {
   View,
   Text,
@@ -26,19 +27,21 @@ export const LobbyPlayerDetailModal = ({
   name,
   type,
 }) => {
-  const socket = useContext(SocketContext);
+  const socket = useContext(SocketContext);// Récupère le socket
   const player = useSelector((state) => state.player.value);
   const game = useSelector((state) => state.game.value);
   const [newPlayerName, setNewPlayerName] = useState(name);
   const [portraitURL, setPortraitURL] = useState("");
   const dispatch = useDispatch();
 
+  // Met à jour l’URL du portrait pour forcer le rechargement avec timestamp unique
   function refreshPortrait() {
     setPortraitURL(
       `${EXPO_PUBLIC_BACKEND_URL}/portrait/${type}/${id}?t=${Date.now()}`
     );
   }
 
+  // À chaque ouverture de la modal, reset le nom modifiable et recharge le portrait
   useEffect(() => {
     if (visible) {
       setNewPlayerName(name);
@@ -46,14 +49,16 @@ export const LobbyPlayerDetailModal = ({
     }
   }, [name, visible]);
 
+  // Ferme la modal en sauvegardant le nouveau nom si modifié
   function handleModalClose() {
     handleNewName();
     hide();
   }
 
+  // Envoie la requête pour changer le nom du joueur sur le backend et met à jour Redux + socket
   function handleNewName() {
     if (newPlayerName.length === 0 || newPlayerName === name) {
-      return;
+      return; // Pas de changement
     }
 
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/updateName`, {
@@ -69,8 +74,8 @@ export const LobbyPlayerDetailModal = ({
       .then((res) => res.json())
       .then((data) => {
         if (data.result) {
-          dispatch(updatePlayerName(newPlayerName));
-          socket.emit("player-update", game.roomID);
+          dispatch(updatePlayerName(newPlayerName)); // Mise à jour reducer
+          socket.emit("player-update", game.roomID); // Notification aux autres joueurs via socket
         } else {
           alert("Erreur lors de la mise à jour du nom.");
         }
@@ -86,7 +91,7 @@ export const LobbyPlayerDetailModal = ({
       <Modal visible={visible} animationType="fade" transparent>
         <TouchableWithoutFeedback onPress={() => handleModalClose()}>
           <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={() => { }}>
               <View style={styles.modalContainer}>
                 {player.playerID === id ? ( //condition pour modifier les éléments de la modale si j'en suis le propriétaire
                   <>

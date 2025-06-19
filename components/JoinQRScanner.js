@@ -44,6 +44,7 @@ export const JoinQRScanner = ({ onScanned, onCancel }) => {
     );
   }
 
+  // Affichage du scanner si la permission est accordée
   return (
     <View style={styles.container}>
       <CameraView

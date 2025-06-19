@@ -1,3 +1,4 @@
+// Composant WaitingStart : écran d'attente animé affichant un logo tournant et du texte
 import React, { useRef, useEffect } from 'react';
 import {
     View,
@@ -18,11 +19,14 @@ export const WaitingStart = () => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const spinValue = useRef(new Animated.Value(0)).current;
     const isMounted = useRef(true);
+
+    // Interpolation : convertit la valeur animée (0 à 1) en degrés (0° à 360°) pour faire tourner le logo
     const spin = spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg'],
     });
 
+    // Liste des messages à afficher
     const messages = [
         "Génération des mix de vos visages...",
         "Chargement des confettis",
@@ -36,6 +40,7 @@ export const WaitingStart = () => {
     // --------------------------------------------------------------------------
     // USEEFFECT ----------------------------------------------------------------
     // --------------------------------------------------------------------------
+    // Animation du logo en boucle
     useEffect(() => {
         Animated.loop(
             Animated.timing(spinValue, {
@@ -47,34 +52,36 @@ export const WaitingStart = () => {
         ).start();
     }, [spinValue]);
 
-
+    // Animation en boucle de l'affichage des messages avec fondu
     useEffect(() => {
         isMounted.current = true;
         let animation;
 
+        // fonction contenant les animations fondu des messages
         const animateMessage = () => {
             animation = Animated.sequence([
-                Animated.timing(fadeAnim, {
+                Animated.timing(fadeAnim, { //apparition message
                     toValue: 1,
                     duration: 1000,
                     useNativeDriver: true,
                 }),
-                Animated.delay(1500),
-                Animated.timing(fadeAnim, {
+                Animated.delay(1500), // pause
+                Animated.timing(fadeAnim, { // disparition message
                     toValue: 0,
                     duration: 1000,
                     useNativeDriver: true,
                 }),
             ])
-            animation.start(({finished}) => {
+            animation.start(({ finished }) => { // lance l'animation animateMessage() et incrémente l'index pour relancer un autre message
                 if (isMounted.current && finished) {
                     setMessageIndex(prev => (prev + 1) % messages.length);
                     animateMessage();
                 }
             });
         };
-        animateMessage();
+        animateMessage(); // Lance la première animation au montage du composant
 
+        // évite nouveaux render si composant démonté pour passage au décompte
         return () => {
             isMounted.current = false;
             fadeAnim.stopAnimation();

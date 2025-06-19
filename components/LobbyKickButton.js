@@ -1,21 +1,24 @@
+// bouton pour exclure un joueur ou personnage d'une partie via requête API (dans composant LobbyPlayerCard)
 import { StyleSheet, View, TouchableOpacity, Button, Text } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const LobbyKickButton = ({ idToKick, type }) => {
-  const game = useSelector((state) => state.game.value);
+  const game = useSelector((state) => state.game.value);// Récupère les infos de la partie (roomID...)
 
-  useEffect(() => {
-    (async () => {
-      const result = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(result && result?.status === "granted");
-    })();
-  }, []);
+  // Semble caduque, à vérifier
+  // useEffect(() => {
+  //   (async () => {
+  //     const result = await Camera.requestCameraPermissionsAsync();
+  //     setHasPermission(result && result?.status === "granted");
+  //   })();
+  // }, []);
 
+  // Supprime un joueur de la partie
   function kickPlayer() {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-player`, {
       method: "DELETE",
@@ -43,6 +46,7 @@ export const LobbyKickButton = ({ idToKick, type }) => {
       });
   }
 
+  // Supprime un personnage de la partie
   function kickCharacter() {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/kick-character`, {
       method: "DELETE",

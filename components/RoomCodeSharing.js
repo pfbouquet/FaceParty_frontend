@@ -1,3 +1,4 @@
+// affiche le code de la salle, permet de le copier, le partager ou de générer un QR code pour rejoindre la partie.
 import {
   View,
   Text,
@@ -14,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
-export const RoomCodeSharing = ({}) => {
+export const RoomCodeSharing = ({ }) => {
   const game = useSelector((state) => state.game.value);
   const [modalQRVisible, setModalQRVisible] = useState(false);
 
@@ -22,11 +23,13 @@ export const RoomCodeSharing = ({}) => {
     <View style={styles.container}>
       <Text style={styles.roomCodeInvite}>Room :</Text>
       <Text style={styles.roomCode}>{game.roomID}</Text>
-      <TouchableOpacity
-        onPress={() => ClipboardExpo.setStringAsync(game.roomID)}
-      >
+
+      {/* Copie le roomID dans le presse-papiers */}
+      <TouchableOpacity onPress={() => ClipboardExpo.setStringAsync(game.roomID)}>
         <Ionicons name="copy-outline" size={25} color="#333" />
       </TouchableOpacity>
+
+      {/* Partage le roomID via les options de partage du téléphone */}
       <TouchableOpacity
         onPress={async () => {
           await Share.share({
@@ -36,6 +39,8 @@ export const RoomCodeSharing = ({}) => {
       >
         <Ionicons name="share-outline" size={25} color="#333" />
       </TouchableOpacity>
+
+      {/* Affiche une modale contenant un QR code */}
       <TouchableOpacity onPress={() => setModalQRVisible(true)}>
         <Ionicons name="qr-code-outline" size={24} color="#333" />
       </TouchableOpacity>
@@ -45,16 +50,19 @@ export const RoomCodeSharing = ({}) => {
         visible={modalQRVisible}
         onRequestClose={() => setModalQRVisible(false)}
       >
+        {/* Ferme la modale si on clique en dehors */}
         <TouchableWithoutFeedback onPress={() => setModalQRVisible(false)}>
           <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={() => { }}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalTitle}>Scan ce QR pour rejoindre</Text>
+                {/* Génère le QR code contenant le roomID */}
                 <QRCode
                   value={game.roomID}
                   size={200}
                   backgroundColor="white"
                 />
+                {/* Bouton de fermeture */}
                 <TouchableOpacity
                   style={styles.modalCloseButton}
                   onPress={() => setModalQRVisible(false)}

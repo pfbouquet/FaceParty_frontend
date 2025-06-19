@@ -1,3 +1,5 @@
+// Composant affichant joueur/personnage avec badges, modal de détails et bouton suppression pour les admins
+
 import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 // Load context and State managers
 import { useEffect, useState, useContext } from "react";
@@ -16,13 +18,14 @@ export const LobbyPlayerCard = ({
   isReady = false,
   type,
 }) => {
-  const currentPlayer = useSelector((state) => state.player.value);
-  const [modalDetailVisible, setModalDetailVisible] = useState(false);
+  const currentPlayer = useSelector((state) => state.player.value); // Récupère les infos du joueur courant depuis Redux
+  const [modalDetailVisible, setModalDetailVisible] = useState(false); // État pour afficher ou non la modal de détails des participants
 
-  useEffect(() => {}, [name, isAdmin, isReady]);
+  useEffect(() => { }, [name, isAdmin, isReady]); // Effet vide déclenché si données changent (à optimiser ultérieurement)
 
   return (
     <View style={styles.container}>
+      {/* Bouton principal affichant le nom, badges Ready/Admin, ouvre la modal détails au clic */}
       <TouchableOpacity
         style={[
           styles.buttonWithBadgeContainer,
@@ -43,8 +46,11 @@ export const LobbyPlayerCard = ({
             <Text style={styles.badgeText}>Admin</Text>
           </View>
         )}
+        {/* Player or character name */}
         <Text style={styles.playerName}>{name}</Text>
       </TouchableOpacity>
+
+      {/* Bouton kick visible uniquement pour l'admin */}
       {currentPlayer.isAdmin && (
         <LobbyKickButton
           style={styles.playerAdminMenu}
@@ -53,6 +59,7 @@ export const LobbyPlayerCard = ({
         ></LobbyKickButton>
       )}
 
+      {/* Modal de détails joueur, s’affiche au clic */}
       <LobbyPlayerDetailModal
         navigation={navigation}
         visible={modalDetailVisible}

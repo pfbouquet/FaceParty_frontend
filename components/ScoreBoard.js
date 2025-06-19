@@ -1,5 +1,6 @@
+// Composant ScoreBoard : affiche le classement des joueurs en fonction de leur score.
+// Si l'utilisateur est admin, il peut passer à la prochaine question via un bouton.
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from "react-native";
-
 import { useEffect, useState, useContext } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -14,6 +15,7 @@ export const ScoreBoard = () => {
   const question = useSelector((state) => state.question.value);
   const [players, setPlayers] = useState([]);
 
+  // Récupère la liste des joueurs depuis l'API et trie par score décroissant
   const fetchPlayers = (id) => {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
@@ -30,10 +32,12 @@ export const ScoreBoard = () => {
       });
   };
 
+  // Récupère les joueurs dès le début si gameID est ok
   useEffect(() => {
     gameID && fetchPlayers(gameID);
   }, []);
 
+  // Pour passer à la question suivante (émission vers le serveur via socket)
   const continueParty = () => {
     console.log("continue party to next question");
     socket.emit("game-cycle", {
@@ -48,6 +52,7 @@ export const ScoreBoard = () => {
     <SafeAreaView style={styles.lobby}>
       <Text style={styles.title}>Classement des joueurs</Text>
 
+      {/* En-tête du tableau */}
       <View style={styles.tableHeader}>
         <Text style={[styles.cell, styles.header]}>Rang</Text>
         <Text style={[styles.cell, styles.header]}>Nom</Text>
@@ -67,6 +72,7 @@ export const ScoreBoard = () => {
         </ScrollView>
       </View>
 
+      {/* Bouton visible uniquement par l'admin pour passer à la prochaine question */}
       {admin && (
         <TouchableOpacity style={styles.startButton} onPress={continueParty}>
           <Text style={styles.startButtonText}>Next round</Text>

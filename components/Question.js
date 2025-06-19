@@ -1,3 +1,4 @@
+// Composant React Native gérant chaque question de quiz avec timer, sélection de réponses et envoi du score.
 import {
   StyleSheet,
   Text,
@@ -5,7 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from "react-native";
-import { Image } from 'expo-image';
+import { Image } from 'expo-image'; // pour gestion des gifs notamment
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { SocketContext } from "../contexts/SocketContext";
@@ -13,7 +14,7 @@ import { SocketContext } from "../contexts/SocketContext";
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export const Question = () => {
-  const socket = useContext(SocketContext);
+  const socket = useContext(SocketContext);// Récupère le socket
   // Get reducers states
   const question = useSelector((state) => state.question.value);
   const game = useSelector((state) => state.game.value);
@@ -24,16 +25,20 @@ export const Question = () => {
   const [selectedNames, setSelectedNames] = useState([]);
   const [nextRound, setNextRound] = useState(null);
 
+  // Timer avec décrémentation toutes les secondes
   useEffect(() => {
     if (counter === 0) {
-      resultAnswer();
+      resultAnswer(); // Déclenche la logique de réponse à 0 seconde
       return;
     }
 
     const timer = setTimeout(() => setCounter(counter - 1), 1000);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); // Nettoyage du timer à chaque mise à jour
   }, [counter]);
 
+  // FUNCTIONS ------------------------------------------------------------
+
+  // Envoie les points gagnés au backend et donc sur MongoDB
   function sendScoreToDB() {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/addScore`, {
       method: "PUT",
@@ -44,34 +49,34 @@ export const Question = () => {
         playerID: player.playerID,
         score:
           selectedNames.filter((e) => question.goodAnswers.includes(e)).length *
-          10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses
+          10, //score de 0 si aucunes réponses sélectionnés ou si aucune bonnes réponses et 10 par bonne réponse
       }),
     });
   }
 
-  //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
+  // L’admin passe au tableau des scores
   function continueParty() {
     socket.emit("game-cycle", { type: "go-scoreboard", roomID: game.roomID }); //transmet le signal de l'admin pour lancer la partie
   }
-  // fonction pour naviguer vers la page Podium
+  // L’admin termine la partie et affiche le podium
   function finishParty() {
     socket.emit("game-cycle", { type: "to-podium", roomID: game.roomID }); //transmet le signal de l'admin pour emètre un socket pour aller sur la page Podium
   }
 
-  //fonction au clic sur le bouton START (récupéré dans PlayerLobby)
+  // Traite la fin du tour : envoie score, désactive, affiche bouton admin
   function resultAnswer() {
     setButtonsActive(false);
     sendScoreToDB();
 
     const lastRound = question.index === game.nbRound - 1;
 
-    if (player.isAdmin && lastRound) {
+    if (player.isAdmin && lastRound) { // si dernier round > go Podium
       setNextRound(
         <TouchableOpacity style={styles.btnNext} onPress={() => finishParty()}>
           <Text style={styles.btntext}>Go to Podium</Text>
         </TouchableOpacity>
       );
-    } else if (player.isAdmin) {
+    } else if (player.isAdmin) { // s'il reste des rounds > Next round
       setNextRound(
         <TouchableOpacity
           style={styles.btnNext}
@@ -83,47 +88,47 @@ export const Question = () => {
     }
   }
 
-  // FUNCTIONS ------------------------------------------------------------
-
-  // Fonction pour sélectionner les boutons
+  // Fonction pour sélectionner les boutons/choix de la question
   const handleSelect = (name) => {
     if (selectedNames.includes(name)) {
       setSelectedNames(selectedNames.filter((n) => n !== name)); // Si le nom est déjà sélectionné, on le désélectionne
     } else if (selectedNames.length < 2) {
-      setSelectedNames([...selectedNames, name]); // Si le nom n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajout
+      setSelectedNames([...selectedNames, name]); // Si le nom n'est pas sélectionné et qu'on n'a pas encore 2 réponses, on l'ajoute
     }
   };
 
-  // VARIABLES ----------------------------------------------------------------
-
+  // Gestion dynamique de l'aspect des boutons de réponses
   const buttons = question.possibleAnswers.map((e, i) => {
-    const canClick = buttonsActive;
-    const isSelected = selectedNames.includes(e);
-    const isValid = question.goodAnswers.includes(e);
+    const canClick = buttonsActive; // Vérifie si les boutons sont encore cliquables (temps non écoulé)
+    const isSelected = selectedNames.includes(e); // Vérifie si cette réponse a été sélectionnée par le joueur
+    const isValid = question.goodAnswers.includes(e); // Vérifie si cette réponse est une bonne réponse
     let gif = ""
+
+    // Affiche un gif true ou false en fonction de la validité de la réponse à la fin du timer
     if (isValid && isSelected && counter === 0) {
       gif = <Image source={require('../assets/true.gif')} style={styles.gif} />;
     } else if (!isValid && isSelected && counter === 0) {
       gif = <Image source={require('../assets/false.gif')} style={styles.gif} />;
     }
 
-    const displayText = e.length > 10 ? `${e.substring(0,10)}...` : e;
+    const displayText = e.length > 10 ? `${e.substring(0, 10)}...` : e; // tronque les prénoms trop long 
 
+    // Génère dynamiquement les boutons de réponse : active le style et le GIF selon l'état du bouton (cliquable, sélectionné, correct/incorrect) et la fin du timer
     return (
       <TouchableOpacity
         key={i}
         onPress={() => canClick && handleSelect(e)}
         style={
           styles[
-            canClick
-              ? !isSelected
-                ? "btn"
-                : "btnSelect"
-              : isValid
-              ? "btnSelectTrue"
-              : isSelected
-              ? "btnSelect"
-              : "btn"
+          canClick
+            ? !isSelected // pas sélectionné
+              ? "btn" //style par défaut
+              : "btnSelect" // si sélectionné > style Select
+            : isValid // fin timer
+              ? "btnSelectTrue" // style bonne réponse
+              : isSelected // si choix sélectionné
+                ? "btnSelect" // style réponse incorrect = style select
+                : "btn" //style neutre
           ]
         }
       >
@@ -162,14 +167,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-image: {
-  width: "100%",
-  height: 300,
-  maxWidth: 350,
-  borderRadius: 50,
-  resizeMode: "contain",
-  marginTop: "-30%",
-},
+  image: {
+    width: "100%",
+    height: 300,
+    maxWidth: 350,
+    borderRadius: 50,
+    resizeMode: "contain",
+    marginTop: "-30%",
+  },
   round: {
     // marginVertical: 1,
   },
@@ -251,7 +256,7 @@ image: {
     marginTop: "3%",
     width: "70%",
   },
-  btntext:{
+  btntext: {
     color: "#F1F1F1",
     fontWeight: "bold",
     fontSize: 18,
@@ -265,7 +270,7 @@ image: {
     paddingHorizontal: 20,
     borderRadius: 10,
   },
-  gif:{
+  gif: {
     width: 40,
     height: 40,
     position: "absolute",

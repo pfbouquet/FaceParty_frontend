@@ -1,3 +1,5 @@
+// Composant qui permet d’éviter que le clavier masque les champs en rendant la vue scrollable et réactive à son apparition.
+// présent dans app.js pour englober tout l'app
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export const KeyboardAvoidingWrapper = ({ children }) => {

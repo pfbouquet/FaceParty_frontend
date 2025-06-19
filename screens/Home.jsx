@@ -1,6 +1,8 @@
+//Screen INUTILISÉ actuellement > utile en mode dev pour la personnaliser et aller directement à certaines étapes du jeu par exemple
+
 import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
 import { use, useContext, useEffect } from "react";
-import { SocketContext } from "../contexts/SocketContext";
+// import { SocketContext } from "../contexts/SocketContext";
 // load reducers
 import { useDispatch } from "react-redux";
 import { resetGame } from "../reducers/game";

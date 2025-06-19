@@ -1,3 +1,11 @@
+/**
+ * Écran pour créer une nouvelle partie multijoueur (admin)
+ * - Crée la partie côté backend via API
+ * - Rejoint ensuite cette partie en tant qu'admin via socket
+ * - Met à jour les reducers game et player avec les données reçues
+ * - Navigue vers l'écran PlayerName une fois prêt
+ */
+
 import { StyleSheet, Text, View } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
@@ -14,15 +22,15 @@ export default function NewMultiGame({ navigation }) {
   const [statusText, setStatusText] = useState("");
   const dispatch = useDispatch();
 
+  // Au chargement du composant, crée et rejoint une nouvelle partie
   useEffect(() => {
     if (!socket) return;
-
     adminCreateGame();
   }, []);
 
+  // Crée une partie en appelant l'API backend
   async function createGame(nbRound = 6) {
     setStatusText("Create game in backend ...");
-    // Create a game
     let response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -33,6 +41,7 @@ export default function NewMultiGame({ navigation }) {
     let data = await response.json();
 
     if (data.result) {
+      // Mise à jour du reducer game avec la partie créée
       setStatusText(`Got a new game code: ${data.game.roomID}`);
       dispatch(
         newGame({
@@ -50,6 +59,7 @@ export default function NewMultiGame({ navigation }) {
     }
   }
 
+  // Permet à l'admin de rejoindre la partie qu'il a créée
   async function joinGame(playerSocketID, isAdmin, roomID) {
     setStatusText("Joining the game ...");
     // Call /games/join
@@ -66,8 +76,8 @@ export default function NewMultiGame({ navigation }) {
     let data = await response.json();
 
     if (data.result) {
+      // Mise à jour du reducer player avec les infos du joueur/admin
       setStatusText("Joined the game");
-      // Set playerID
       dispatch(
         newPlayer({
           playerID: data.player.playerID,
@@ -83,6 +93,7 @@ export default function NewMultiGame({ navigation }) {
     }
   }
 
+  // Fonction principale pour créer et rejoindre une nouvelle partie en admin
   async function adminCreateGame(nbRound) {
     // Create a game
     setStatusText("Creating game ...");
@@ -98,7 +109,7 @@ export default function NewMultiGame({ navigation }) {
     if (gameJoined) {
       setStatusText(`Game ${roomID} has been joined`);
       // console.log(`Game ${roomID} has been joined`);
-      // Navigate to PlayerName
+      // Navigate to PlayerName when game is ready
       navigation.replace("PlayerName");
     }
 
@@ -114,8 +125,6 @@ export default function NewMultiGame({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // Add your styles here
-  // Example:
   container: {
     flex: 1,
     justifyContent: "center",

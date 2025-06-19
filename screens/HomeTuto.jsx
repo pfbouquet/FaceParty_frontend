@@ -1,3 +1,5 @@
+//Screen INUTILISÉ actuellement > évolutions à venir 
+
 import { StyleSheet, Text, View, Button } from "react-native";
 
 export default function HomeTuto({ navigation }) {

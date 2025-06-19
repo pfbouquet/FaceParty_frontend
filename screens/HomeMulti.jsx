@@ -1,3 +1,10 @@
+/**
+ * Écran d'accueil principal : 
+ * - Déconnecte le joueur de toutes les salles Socket.IO à l'entrée.
+ * - Réinitialise les états Redux liés au jeu, joueur, et questions.
+ * - Propose la création ou de rejoindre une partie multi-joueurs.
+ */
+
 import {
   StyleSheet,
   Text,
@@ -32,7 +39,6 @@ export default function HomeMulti({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* <View style={styles.statusBarSpacer} /> */}
       <View style={styles.header}>
         <Image source={logo} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>FaceParty</Text>
@@ -67,7 +73,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    // paddingHorizontal: 16,
     width: "100%",
     paddingVertical: 12,
     backgroundColor: "#0F3D62",

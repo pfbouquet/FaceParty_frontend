@@ -1,3 +1,13 @@
+/**
+ * PlayerLobby - Salle d'attente avant le démarrage de la partie multijoueur
+ * 
+ * - Affiche la liste des joueurs et des personnages dans la partie
+ * - Permet à l'admin d'ajouter des personnages (stars)
+ * - Permet à l'admin de démarrer la partie si conditions remplies
+ * - Sync avec backend pour mise à jour des joueurs et personnages
+ * - Réagit aux événements socket (maj joueurs, kick, début partie)
+ */
+
 import {
   View,
   Text,
@@ -33,6 +43,7 @@ export default function PlayerLobby({ navigation }) {
   const [alertAllCelebrities, setAlertAllCelebrities] = useState("");
 
   // FONCTIONS --------------------------------------------------------------
+  // Fonction pour récupérer la composition du jeu (joueurs + personnages)
   const refreshGameCompo = () => {
     console.log(`${player.playerName} is refreshing its game reducer`);
     if (!game.roomID) {
@@ -59,7 +70,7 @@ export default function PlayerLobby({ navigation }) {
   };
 
   // USEEFFECT --------------------------------------------------------------
-  // Whenever gameID changes, fetch its composition
+  // Au changement de roomID, on recharge la liste des joueurs et persos
   useEffect(() => {
     if (game.roomID) {
       console.log(
@@ -71,6 +82,7 @@ export default function PlayerLobby({ navigation }) {
     }
   }, [game.roomID]);
 
+  // Écoute des événements socket pour mise à jour en temps réel
   useEffect(() => {
     if (!socket) return;
     // stable handlers
@@ -80,7 +92,7 @@ export default function PlayerLobby({ navigation }) {
     socket.on("player-update", onPlayerUpdate);
     socket.on("you-are-kicked", onKicked);
     socket.on("game-preparation", onPrep);
-    // cleanup the exact same handlers
+    // Nettoyage à la désactivation du composant
     return () => {
       socket.off("player-update", onPlayerUpdate);
       socket.off("you-are-kicked", onKicked);
@@ -111,19 +123,19 @@ export default function PlayerLobby({ navigation }) {
       portraitMissing.length === 0
     ) {
       socket.emit("start-game", game.roomID); //transmet le signal de l'admin pour lancer la partie
-    } else if (game.players.length + game.characters.length < 4) {
+    } else if (game.players.length + game.characters.length < 4) { // si moins de 4 joueurs
       setAddPeople(
         <Text style={styles.peopleMissing}>
           Vous devez être minimum 4 participants pour jouer
         </Text>
       );
-    } else if (portraitMissing.length > 0) {
+    } else if (portraitMissing.length > 0) { // s'il manque un portrait
       setAddPeople(
         <Text style={styles.peopleMissing}>
           Il manque au moins une photo de joueur
         </Text>
       );
-    } else if (sameName.length > 1) {
+    } else if (sameName.length > 1) { // si au moins 2 noms sont identiques
       setAddPeople(
         <Text style={styles.peopleMissing}>
           Des joueurs ont le même nom, invitez-les à se différencier
@@ -132,7 +144,7 @@ export default function PlayerLobby({ navigation }) {
     }
   }
 
-  // Add a character
+  // Ajout d'un personnage (character) via backend
   function addCharacter(type = "celebrity") {
     console.log(`Adding a character of type: ${type}`);
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/games/add-character`, {
@@ -161,7 +173,7 @@ export default function PlayerLobby({ navigation }) {
   }
 
   // RETURN JSX --------------------------------------------------------------
-  // If no gameID, show a loader, waiting for gameID to be set
+  // Affiche un loader tant que les données ne sont pas chargées
   if (!game.gameID || !game.players) {
     return (
       <View style={styles.loader}>

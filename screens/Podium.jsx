@@ -1,3 +1,5 @@
+// Composant React Native affichant le podium final des joueurs avec gestion du son, animation confettis, et navigation lobby.
+
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Platform, StatusBar } from "react-native";
 import { useEffect, useState, useContext, useRef } from "react";
 import ConfettiCannon from "react-native-confetti-cannon";
@@ -24,11 +26,12 @@ export default function Podium({ navigation }) {
   // ------------------------------------------------------------
   // USEEFFECT---------------------------------------------------
   // ------------------------------------------------------------
+  //Chargement des joueurs
   useEffect(() => {
     if (gameID) fetchPlayers(gameID);
   }, [gameID]);
 
-  // 🧠 Écoute du signal socket pour retour au lobby
+  // Écoute du signal socket pour retour au lobby
   useEffect(() => {
     const handler = (data) => {
       if (data.type === "to-the-lobby") {
@@ -42,6 +45,7 @@ export default function Podium({ navigation }) {
     };
   }, []);
 
+  // Chargement et lecture du son d’ambiance lors de l’affichage du podium
   useEffect(() => {
     let isMounted = true;
     const loadAndPlay = async () => {
@@ -56,7 +60,7 @@ export default function Podium({ navigation }) {
     return () => {
       isMounted = false;
       if (soundCrowd.current) {
-        soundCrowd.current.unloadAsync();
+        soundCrowd.current.unloadAsync(); // Libération des ressources audio à la sortie du composant
       }
     };
   }, []);
@@ -64,6 +68,7 @@ export default function Podium({ navigation }) {
   // ------------------------------------------------------------
   // FONCTIONS---------------------------------------------------
   // ------------------------------------------------------------
+  // Récupère les joueurs et leurs scores, trie par score décroissant
   const fetchPlayers = (id) => {
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/${id}`)
       .then((response) => response.json())
@@ -80,7 +85,7 @@ export default function Podium({ navigation }) {
       });
   };
 
-  // 🔁 Émet un signal pour tous retourner au lobby
+  // Émet un signal pour tous retourner au lobby
   const toTheLobby = () => {
     console.log("Bring everyone to the Lobby");
     socket.emit("game-cycle", {
@@ -91,7 +96,7 @@ export default function Podium({ navigation }) {
     });
   };
 
-  // 🧹 Réinitialise les scores et retourne au lobby
+  // Réinitialise les scores et retour au lobby
   const relaunchParty = async () => {
     try {
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/players/clearScores/${gameID}`, {
@@ -132,33 +137,34 @@ export default function Podium({ navigation }) {
         </View>
         {/* </View> */}
 
-      <ScrollView contentContainerStyle={styles.container}>
-        {players
-          .sort((a, b) => b.score - a.score) // Tri par score décroissant
-          .map((player, index, sortedPlayers) => {
-            // Calcul du rang (en tenant compte des égalités)
-            const prev = sortedPlayers[index - 1];
-            const rank = index > 0 && player.score === prev.score ? prev.rank : index + 1;
-            player.rank = rank; // Stock temporairement pour réutilisation
+        <ScrollView contentContainerStyle={styles.container}>
+          {players
+            .sort((a, b) => b.score - a.score) // Tri par score décroissant
+            .map((player, index, sortedPlayers) => {
+              // Calcul du rang (en tenant compte des égalités)
+              const prev = sortedPlayers[index - 1];
+              const rank = index > 0 && player.score === prev.score ? prev.rank : index + 1;
+              player.rank = rank; // Stock temporairement pour réutilisation
 
-            // Définir couleur et médaille selon le rang
-            let backgroundColor = null;
-            let medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+              // Définir couleur et médaille selon le rang
+              let backgroundColor = null;
+              let medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
 
-            if (rank === 1) backgroundColor = "#f1c40f";
-            else if (rank === 2) backgroundColor = "#bdc3c7";
-            else if (rank === 3) backgroundColor = "#cd7f32";
+              if (rank === 1) backgroundColor = "#f1c40f";
+              else if (rank === 2) backgroundColor = "#bdc3c7";
+              else if (rank === 3) backgroundColor = "#cd7f32";
 
-            return (
-              <View key={player._id} style={[styles.row, backgroundColor && { backgroundColor }]}>
-                <Text style={styles.cell}>{medal}</Text>
-                <Text style={styles.cell}>{player.playerName}</Text>
-                <Text style={styles.cell}>{player.score}</Text>
-              </View>
-            );
-          })}
-      </ScrollView>
+              return (
+                <View key={player._id} style={[styles.row, backgroundColor && { backgroundColor }]}>
+                  <Text style={styles.cell}>{medal}</Text>
+                  <Text style={styles.cell}>{player.playerName}</Text>
+                  <Text style={styles.cell}>{player.score}</Text>
+                </View>
+              );
+            })}
+        </ScrollView>
 
+        {/* Bouton visible uniquement par l’admin pour relancer une nouvelle partie */}
         {admin && (
           <TouchableOpacity style={styles.startButton} onPress={relaunchParty}>
             <Text style={styles.startButtonText}>New Game</Text>

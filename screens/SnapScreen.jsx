@@ -1,10 +1,11 @@
+// Composant React Native gérant la prise de photo utilisateur avec caméra frontale, animation de bordure, upload au serveur, et navigation.
+
 import {
   StyleSheet,
   View,
   Dimensions,
   Pressable,
   Image,
-  // Button,
   ImageBackground,
   Animated,
   Text,
@@ -48,7 +49,7 @@ export default function SnapScreen({ navigation }) {
   //----------------------------------------------
   //USEEFFECT ------------------------------------
   //----------------------------------------------
-
+  // demande accès à la caméra
   useEffect(() => {
     (async () => {
       const result = await Camera.requestCameraPermissionsAsync();
@@ -56,6 +57,7 @@ export default function SnapScreen({ navigation }) {
     })();
   }, []);
 
+  // Animation boucle infinie de la bordure de la caméra
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -76,23 +78,25 @@ export default function SnapScreen({ navigation }) {
   //----------------------------------------------
   //FONCTIONS ------------------------------------
   //----------------------------------------------
+  // prise photo, qualité 30%
   const takePicture = async () => {
     const photo = await cameraRef.current?.takePictureAsync({ quality: 0.3 });
     if (photo) setPhotoUri(photo.uri);
   };
 
-  // Functions to toggle camera facing and flash status
+  // Inverse la caméra entre frontale et arrière
   const toggleCameraFacing = () => {
     setFacing((current) => (current === "back" ? "front" : "back"));
   };
 
+  // Confirmer la photo : upload, mise à jour store et navigation
   const handleConfirm = () => {
     if (!playerID) {
       alert("Erreur : playerID manquant");
       return;
     }
 
-    dispatch(updatePortrait(photoUri));
+    dispatch(updatePortrait(photoUri)); // Mise à jour Redux avec URI photo
 
     const formData = new FormData();
     formData.append("photoFromFront", {
@@ -102,6 +106,7 @@ export default function SnapScreen({ navigation }) {
     });
     formData.append("playerID", playerID);
 
+    // Envoi vers serveur backend
     fetch(`${EXPO_PUBLIC_BACKEND_URL}/portrait/upload`, {
       method: "POST",
       body: formData,
@@ -114,8 +119,8 @@ export default function SnapScreen({ navigation }) {
       })
       .then((data) => {
         if (data.result) {
-          socket.emit("player-update", roomID);
-          navigation.replace("PlayerLobby");
+          socket.emit("player-update", roomID); // Notifier autres joueurs via socket
+          navigation.replace("PlayerLobby"); // Redirection vers lobby 
         } else {
           alert("Erreur lors de l'envoi");
         }
@@ -125,8 +130,10 @@ export default function SnapScreen({ navigation }) {
       });
   };
 
+  // Pas de caméra si permission refusée ou écran non focusé
   if (!hasPermission || !isFocused) return <View />;
 
+  // Affichage écran preview après prise photo avec options reprendre/confirmer
   if (photoUri) {
     return (
       <View style={styles.previewContainer}>

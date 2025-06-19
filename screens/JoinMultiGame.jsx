@@ -1,3 +1,13 @@
+/**
+ * Écran permettant de rejoindre une partie multijoueur
+ * - Soit en scannant un QR code (via modal et composant JoinQRScanner)
+ * - Soit en entrant manuellement un code à 4 caractères
+ * 
+ * Gère la communication avec le backend pour rejoindre une partie,
+ * met à jour les reducers player et game en fonction de la réponse,
+ * et navigue vers l'écran PlayerName si la connexion réussit.
+ */
+
 import {
   StyleSheet,
   Text,
@@ -75,6 +85,7 @@ export default function JoinMultiGame({ navigation }) {
     }
   }
 
+  // Gère la soumission du code saisi ou scanné
   const handleCodeSubmission = async (roomIDvalue) => {
     console.log(`testing code ${roomIDvalue.toUpperCase()}`);
 
@@ -101,6 +112,7 @@ export default function JoinMultiGame({ navigation }) {
     }
   };
 
+  // lors d'un scan QR réussi
   const handleScanSuccess = (code) => {
     setRoomID(code);
     handleCodeSubmission(code);

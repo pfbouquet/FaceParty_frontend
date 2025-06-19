@@ -1,3 +1,5 @@
+//Écran permettant à un joueur de saisir son prénom avant de rejoindre la partie.
+
 import {
   StyleSheet,
   Text,
@@ -42,6 +44,7 @@ export default function PlayerName({ navigation }) {
   //----------------------------------------------
   //FONCTIONS ------------------------------------
   //----------------------------------------------
+  //vérifie que le nom a été renseigné et envoie la modification en BDD + passage à Snapscreen
   const handleSubmit = () => {
     if (playerName.length === 0 || !playerID) {
       alert("Tu as oublié de renseigner ton prénom !");
@@ -78,6 +81,7 @@ export default function PlayerName({ navigation }) {
   //----------------------------------------------
   //USEEFFECT ------------------------------------
   //----------------------------------------------
+  // animation qui fait varier la couleur de la bordure en boucle
   useEffect(() => {
     Animated.loop(
       Animated.sequence([

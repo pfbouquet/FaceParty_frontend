@@ -1,9 +1,11 @@
+// Importations principales pour navigation, icônes, gestion clavier et Redux
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome"; // https://oblador.github.io/react-native-vector-icons/#FontAwesome
 import { KeyboardAvoidingWrapper } from "./components/KeyboardAvoidingWrapper";
 
+// Import des écrans (player, multi, photo, podium, etc.)
 // import Home from "./screens/Home";
 // import HomeTuto from "./screens/HomeTuto";
 import HomePlayer from "./screens/HomePlayer";
@@ -17,6 +19,7 @@ import JoinMultiGame from "./screens/JoinMultiGame";
 import SnapScreen from "./screens/SnapScreen";
 import Podium from "./screens/Podium";
 
+// Redux, persist et contexte socket
 import { Provider } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist"; // Persistor
@@ -24,6 +27,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { SocketProvider } from "./contexts/SocketContext";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage
 
+// Reducers redux
 import game from "./reducers/game";
 import player from "./reducers/player";
 import question from "./reducers/question";

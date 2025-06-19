@@ -15,12 +15,12 @@ export const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    newPlayer: (state, action) => {
+    newPlayer: (state, action) => { // Initialise un nouveau joueur
       state.value.playerID = action.payload.playerID;
       state.value.isAdmin = action.payload.isAdmin;
       state.value.playerName = action.payload.playerName;
     },
-    resetPlayer: (state, action) => {
+    resetPlayer: (state, action) => { // Réinitialise toutes les infos du joueur
       state.value.playerID = null;
       state.value.isAdmin = null;
       state.value.playerName = null;
@@ -28,10 +28,10 @@ export const playerSlice = createSlice({
       state.value.scoreHistory = [];
       state.value.portraitFilePath = null;
     },
-    updatePortrait: (state, action) => {
+    updatePortrait: (state, action) => { // Met à jour le portrait du joueur
       state.value.portraitFilePath = action.payload;
     },
-    updatePlayerName: (state, action) => {
+    updatePlayerName: (state, action) => { // Met à jour le nom du joueur
       state.value.playerName = action.payload;
     },
   },

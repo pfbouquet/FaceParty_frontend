@@ -13,13 +13,13 @@ export const questionSlice = createSlice({
   name: "question",
   initialState,
   reducers: {
-    newQuestion: (state, action) => {
+    newQuestion: (state, action) => { // Initialise une nouvelle question
       state.value.index = action.payload.index;
       state.value.goodAnswers = action.payload.goodAnswers;
       state.value.possibleAnswers = action.payload.possibleAnswers;
       state.value.imageURL = action.payload.imageURL;
     },
-    resetQuestion: (state) => {
+    resetQuestion: (state) => { // Réinitialise tous les champs de la question
       state.value.index = 0;
       state.value.goodAnswers = [""];
       state.value.possibleAnswers = [""];

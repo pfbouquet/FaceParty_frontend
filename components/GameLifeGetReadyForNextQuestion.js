@@ -1,3 +1,4 @@
+// Décompte de 3 à 0 juste avant la question
 import { StyleSheet, View, Text, Animated, Easing, TouchableOpacity, Button } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useContext, useState, useEffect, useRef } from "react";
@@ -72,7 +73,7 @@ export const GameLifeGetReadyForNextQuestion = () => {
     };
   }, []);
 
-  // lancement du compteur quand les sons sont chargés
+  // lancement du compteur une fois que les sons sont bien chargés
   useEffect(() => {
     if (isBeepSoundReady && isFinishSoundReady) {
       setCounter(3);
@@ -83,7 +84,7 @@ export const GameLifeGetReadyForNextQuestion = () => {
   useEffect(() => {
     if (!isBeepSoundReady || !isFinishSoundReady) return;
 
-    if (counter === 0) {
+    if (counter === 0) { //lancement son spécial fin du décompte
       const playFinish = async () => {
         try {
           if (soundFinish.current) {
@@ -105,8 +106,8 @@ export const GameLifeGetReadyForNextQuestion = () => {
     const playBeep = async () => {
       try {
         if (soundBeep.current) {
-          await soundBeep.current.stopAsync();     // STOP le beep précédent
-          await soundBeep.current.replayAsync();
+          await soundBeep.current.stopAsync(); // STOP le beep précédent pour pouvoir le relancer juste après
+          await soundBeep.current.replayAsync(); // joue le son bip de chaque seconde du décompte
 
         }
       } catch (e) {

@@ -1,3 +1,4 @@
+# met à jour l’app via EAS (Expo Application Services) dès qu’un changement est poussé sur main de github
 name: EAS Update
 
 on:

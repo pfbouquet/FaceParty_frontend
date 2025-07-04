@@ -7,7 +7,7 @@ import {
   Platform,
   StatusBar,
 } from "react-native";
-import { useEffect, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { SocketContext } from "../contexts/SocketContext";
 // load reducers
 import { useDispatch } from "react-redux";
@@ -16,7 +16,7 @@ import { resetPlayer } from "../reducers/player";
 import { resetQuestion } from "../reducers/question";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
-import { PolitiqueDeConfidentialite } from "./PolitiqueDeConfidentialite";
+import { PolitiqueDeConfidentialite } from "../components/PolitiqueDeConfidentialite";
 
 export default function HomeMulti({ navigation }) {
   const socket = useContext(SocketContext);
@@ -52,21 +52,21 @@ export default function HomeMulti({ navigation }) {
         >
           <Text style={styles.buttonText}>Join a game</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setModalDetailVisible(true)}
-        >
-        <PolitiqueDeConfidentialite
-        navigation={navigation}
+      <View style={styles.containerPolitique}>
+      <Text
+        onPress={() => setModalDetailVisible(true)}
+        style={styles.textPolitique}
+      >
+        Politique de confidentialité
+      </Text>
+
+      <PolitiqueDeConfidentialite
         visible={modalDetailVisible}
-        id={id}
-        type={type}
         hide={() => {
           setModalDetailVisible(false);
         }}
       />
-          <Text style={styles.buttonText}>PolitiqueTest</Text>
-        </TouchableOpacity>
+    </View>
       </View>
     </SafeAreaView>
   );
@@ -120,4 +120,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  containerPolitique: {
+    alignItems: "center",
+    marginTop: 150,
+  },
+  textPolitique: {
+    textDecorationLine: "underline",
+    color: "#0F3D62",
+    fontSize: 14,
+},
 });

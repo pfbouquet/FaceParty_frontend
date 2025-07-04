@@ -4,18 +4,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  TextInput,
 } from "react-native";
-
-// Load context and State managers
 import { useState, useEffect } from "react";
 
-
-export const PolitiqueDeConfidentialite = ({
-  visible,
-  hide,
-}) => {
-
+export const PolitiqueDeConfidentialite = ({ visible, hide }) => {
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.centeredView}>
@@ -26,10 +18,46 @@ export const PolitiqueDeConfidentialite = ({
               style={styles.crossModal}
               activeOpacity={0.8}
             >
-              <Text style={styles.textButton}>testtest</Text>
+              <Text style={styles.textButton}>X</Text>
             </TouchableOpacity>
           </View>
-          <Text>Politique de confidentialité ici......</Text>
+<Text style={styles.textPolitiqueModal}>
+  Bienvenue dans FaceParty !{"\n\n"}
+  Nous attachons une grande importance à la confidentialité et à la protection
+  des données de nos utilisateurs. Voici les principes que nous appliquons :{"\n\n"}
+
+  <Text style={{ fontWeight: "bold" }}>
+    Aucune donnée personnelle collectée
+  </Text>
+  {"\n"}
+  FaceParty ne vous demande pas de créer un compte, de fournir votre nom,
+  votre adresse e-mail ou toute autre information personnelle.{"\n\n"}
+
+  <Text style={{ fontWeight: "bold"}}>
+    Aucune conservation des photos de visage
+  </Text>
+  {"\n"}
+  Les photos prises lors de l’utilisation de FaceParty (notamment pour générer des visages morphés)
+  sont utilisées temporairement. Elles ne sont pas conservées après nos traitements de morphing.{"\n\n"}
+
+  <Text style={{ fontWeight: "bold"}}>
+    Suppression automatique
+  </Text>
+  {"\n"}
+  Un mécanisme spécifique est en place pour garantir la suppression des photos utilisées.
+  Cette suppression est contrôlée pour assurer une confidentialité totale de chaque session de jeu.{"\n\n"}
+
+  <Text style={{ fontWeight: "bold"}}>
+    Un jeu privé et respectueux
+  </Text>
+  {"\n"}
+  FaceParty a été conçu pour être joué entre amis et proches, sans aucune exposition publique
+  des images générées, sauf si vous choisissez délibérément de les partager.{"\n\n"}
+
+  En utilisant FaceParty, vous acceptez ces conditions et profitez d’un jeu fun, surprenant,
+  et respectueux de votre vie privée.{"\n\n"}
+  Bonne partie 🎉
+</Text>
         </View>
       </View>
     </Modal>
@@ -41,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    width: "90%",
+    margin: 20,
   },
   modalView: {
     backgroundColor: "white",
@@ -57,12 +85,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  modalCross: {
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "",
-    width: "100%",
-  },
+  // modalCross: {
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   width: "100%",
+  // },
   crossModal: {
     width: 30,
     height: 30,
@@ -80,36 +107,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 15,
   },
-  image: {
-    width: 150,
-    height: 200,
-    borderRadius: 20,
-    marginBottom: 20,
-    alignSelf: "center",
-    marginRight: -20,
-  },
-  blockChangeImg: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  icon: {
-    marginLeft: -5,
-    marginTop: 10,
-  },
-  input: {
-    width: 200,
-    borderBottomColor: "#de6b58",
-    borderBottomWidth: 1,
-    fontSize: 16,
-    textAlign: "center",
-  },
-  button: {
-    width: 200,
-    alignItems: "center",
-    marginTop: 20,
-    paddingTop: 8,
-    backgroundColor: "#de6b58",
-    borderRadius: 10,
+  textPolitiqueModal: {
+    fontSize: 10,
+    lineHeight: 15,
+    color: "#333",
+    textAlign: "left",
   },
 });

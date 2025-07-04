@@ -16,10 +16,12 @@ import { resetPlayer } from "../reducers/player";
 import { resetQuestion } from "../reducers/question";
 import { SafeAreaView } from "react-native-safe-area-context";
 import logo from "../assets/logo-faceparty.png";
+import { PolitiqueDeConfidentialite } from "./PolitiqueDeConfidentialite";
 
 export default function HomeMulti({ navigation }) {
   const socket = useContext(SocketContext);
   const dispatch = useDispatch();
+  const [modalDetailVisible, setModalDetailVisible] = useState(false);
 
   useEffect(() => {
     // leave all rooms
@@ -49,6 +51,21 @@ export default function HomeMulti({ navigation }) {
           onPress={() => navigation.replace("JoinMultiGame")}
         >
           <Text style={styles.buttonText}>Join a game</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setModalDetailVisible(true)}
+        >
+        <PolitiqueDeConfidentialite
+        navigation={navigation}
+        visible={modalDetailVisible}
+        id={id}
+        type={type}
+        hide={() => {
+          setModalDetailVisible(false);
+        }}
+      />
+          <Text style={styles.buttonText}>PolitiqueTest</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
